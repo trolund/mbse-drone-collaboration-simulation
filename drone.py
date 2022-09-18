@@ -8,7 +8,7 @@ from Models.ground import Ground
 
 class Drone(pygame.sprite.Sprite):
 
-    size = 50
+    size = 70
     tasks = []
     curr_task = None
 
@@ -16,7 +16,7 @@ class Drone(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
 
-        img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert()
+        img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
         img = pygame.transform.scale(img, (self.size, self.size))
         self.images.append(img)
         self.image = self.images[0]

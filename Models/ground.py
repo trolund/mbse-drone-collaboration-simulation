@@ -26,7 +26,6 @@ class Ground:
 
         pygame.draw.polygon(screen, (127, 252, 20), self.ground if self.pos is None else res)
 
-        pos = self.landing_spot if self.landing_spot is not None else (10, 10)
-        pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(pos[0] + self.pos[0] if self.pos is None else 0, pos[1] + self.pos[1] if self.pos is None else 0, 120, 120))
+        pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10, 10, 120, 120))
 
 
