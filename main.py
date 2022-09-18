@@ -1,5 +1,4 @@
 import pygame
-import os
 
 # Basic setup
 from Models.ground import Ground
@@ -10,7 +9,7 @@ pygame.mixer.init()
 
 FPS = 60
 
-WIDTH, HEIGHT = 1200, 900
+WIDTH, HEIGHT = 1200, 1000
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 BORDER = pygame.Rect(WIDTH // 2 - 5, 0, 10, HEIGHT)
@@ -43,7 +42,11 @@ def create_drones():
     drones.add(player)
 
 def create_Grounds():
-    grounds.append(Ground([(0, 0), (0, 600), (400, 600), (400, 0)]))
+    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
+    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
+    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
+    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
+
 
 def draw_window():
     pygame.display.update()
