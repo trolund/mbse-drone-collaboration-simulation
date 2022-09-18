@@ -2,7 +2,8 @@ import pygame
 import os
 
 # Basic setup
-from Drone import Drone
+from Models.ground import Ground
+from drone import Drone
 
 pygame.font.init()
 pygame.mixer.init()
@@ -12,7 +13,7 @@ FPS = 60
 WIDTH, HEIGHT = 1200, 900
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
-BORDER = pygame.Rect(WIDTH//2 - 5, 0, 10, HEIGHT)
+BORDER = pygame.Rect(WIDTH // 2 - 5, 0, 10, HEIGHT)
 
 # Colors
 WHITE = (255, 255, 255)
@@ -20,12 +21,12 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
-
 # Import resources
-#DRONE_IMAGE = pygame.image.load(os.path.join('Assets', 'drone.svg'))
-#DRONE = pygame.transform.rotate(pygame.transform.scale(DRONE_IMAGE, (DRONE_WIDTH, DRONE_HEIGHT)), 90)
+# DRONE_IMAGE = pygame.image.load(os.path.join('Assets', 'drone.svg'))
+# DRONE = pygame.transform.rotate(pygame.transform.scale(DRONE_IMAGE, (DRONE_WIDTH, DRONE_HEIGHT)), 90)
 
 drones = pygame.sprite.Group()
+grounds = []
 
 
 def create_drones():
@@ -41,6 +42,8 @@ def create_drones():
 
     drones.add(player)
 
+def create_Grounds():
+    grounds.append(Ground([(0, 0), (0, 600), (400, 600), (400, 0)]))
 
 def draw_window():
     pygame.display.update()
@@ -50,8 +53,10 @@ def update_drones():
     for drone in drones:
         drone.update()
 
+
 def main():
     create_drones()
+    create_Grounds()
 
     # Simulation/game loop
     clock = pygame.time.Clock()
@@ -66,8 +71,12 @@ def main():
         # clear background
         WIN.fill(WHITE)
 
+        # draw grounds
+        for g in grounds:
+            g.draw(WIN)
+
         # draw drones
-        update_drones()
+        drones.update()
         drones.draw(WIN)
 
         draw_window()

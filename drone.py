@@ -3,11 +3,12 @@ import os
 import pygame
 from pygame.rect import Rect
 
+from Models.ground import Ground
+
 
 class Drone(pygame.sprite.Sprite):
 
     size = 50
-
     tasks = []
     curr_task = None
 
@@ -20,6 +21,7 @@ class Drone(pygame.sprite.Sprite):
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
+
 
     def add_coordinates(self, x, y):
         self.tasks.append((x, y))
@@ -44,9 +46,8 @@ class Drone(pygame.sprite.Sprite):
             else:
                 stepx = float(bx - ax) / steps_number
                 stepy = float(by - ay) / steps_number
-                self.rect = Rect(ax + stepx, ay + stepy, self.size, self.size)
 
-            print(ax, ay, len(self.tasks))
+                self.rect = Rect(ax + stepx, ay + stepy, self.size, self.size)
 
             if ax == bx and ay == by:
                 self.curr_task = None
