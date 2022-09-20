@@ -2,6 +2,8 @@ import pygame
 
 # Basic setup
 from Models.ground import Ground
+from Models.move_type import Move_Type
+from Models.task import Task
 from drone import Drone
 
 pygame.font.init()
@@ -25,23 +27,41 @@ YELLOW = (255, 255, 0)
 # DRONE = pygame.transform.rotate(pygame.transform.scale(DRONE_IMAGE, (DRONE_WIDTH, DRONE_HEIGHT)), 90)
 
 drones = pygame.sprite.Group()
+tasks = pygame.sprite.Group()
 grounds = []
 
 
+def get_task_at(x, y):
+    return next((t for t in tasks if t.rect.x == x and t.rect.y == y), None)
+
+
 def create_drones():
-    player = Drone()  # spawn player
+    drone = Drone()  # spawn player
     # start at x, y
-    player.rect.x = 200
-    player.rect.y = 200
+    drone.rect.x = 200
+    drone.rect.y = 200
 
     # movements
-    player.add_coordinates(300, 300)
-    player.add_coordinates(900, 600)
-    player.add_coordinates(100, 400)
+    drone.add_move_point(300, 300)
+    drone.add_move_point(200, 200, Move_Type.PICKUP, get_task_at(200, 200))
+    drone.add_move_point(300, 300)
+    drone.add_move_point(900, 600)
+    drone.add_move_point(100, 400, Move_Type.DROP_OFF)
+    drone.add_move_point(900, 600)
 
-    drones.add(player)
+    drones.add(drone)
 
-def create_Grounds():
+
+def create_tasks():
+    task = Task()  # spawn player
+    # start at x, y
+    task.rect.x = 200
+    task.rect.y = 200
+
+    tasks.add(task)
+
+
+def create_grounds():
     grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
     grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
     grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
@@ -57,9 +77,29 @@ def update_drones():
         drone.update()
 
 
-def main():
+def create_env():
+    create_tasks()
     create_drones()
-    create_Grounds()
+    create_grounds()
+
+
+def draw_layers():
+    # draw grounds
+    for g in grounds:
+        g.draw(WIN)
+
+    # draw tasks
+    tasks.update()
+    tasks.draw(WIN)
+
+    # draw drones
+    drones.update()
+    drones.draw(WIN)
+
+
+def main():
+    # create all objects in the environment
+    create_env()
 
     # Simulation/game loop
     clock = pygame.time.Clock()
@@ -74,17 +114,11 @@ def main():
         # clear background
         WIN.fill(WHITE)
 
-        # draw grounds
-        for g in grounds:
-            g.draw(WIN)
+        # draw object layers
+        draw_layers()
 
-        # draw drones
-        drones.update()
-        drones.draw(WIN)
-
+        # update screen with drawing
         draw_window()
-
-    main()
 
 
 if __name__ == "__main__":
