@@ -1,5 +1,3 @@
-from typing import List
-
 import pygame
 from pygame.surface import Surface
 
@@ -26,6 +24,10 @@ class Ground:
 
         pygame.draw.polygon(screen, (127, 252, 20), self.ground if self.pos is None else res)
 
-        pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10, 10, 120, 120))
+        self.drew_landing_spot(screen)
 
-
+    def drew_landing_spot(self, screen):
+        if self.pos is not None:
+            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10 + self.pos[0], 10 + self.pos[1], 120, 120))
+        else:
+            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10, 10, 120, 120))

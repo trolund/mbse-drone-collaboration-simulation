@@ -2,11 +2,13 @@ import os
 
 import pygame
 from pygame.rect import Rect
+from typing import List
 
 from Models.move_type import Move_Type
 from Models.task import Task
 
-Move = ((int, int), str, any)
+Pos = (int, int)
+Move = (Pos, str, any)
 
 
 def get_cor(move: Move):
@@ -23,13 +25,15 @@ def get_move_obj(move: Move):
 
 class Drone(pygame.sprite.Sprite):
     size = 70
-    moves = []
-    curr_move: Move = None
     lift: float = 22.5
-    attachment = None
 
-    def __init__(self):
+    def __init__(self, name=""):
         pygame.sprite.Sprite.__init__(self)
+        self.name = name
+        self.moves = []
+        self.attachment = None
+        self.curr_move = None
+
         self.images = []
 
         img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
@@ -40,20 +44,23 @@ class Drone(pygame.sprite.Sprite):
 
     def attach(self, task: Task):
 
-        if task.rect.x is not self.rect.x or task.rect.x is not self.rect.y:
-            raise Exception('can not attach - drone is not centered over a package! 😤📦')
+        # print((task.rect.x, task.rect.y), (self.rect.x, self.rect.y))
+
+        if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
+            raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
+                            (self.rect.x, self.rect.y))
 
         self.attachment = task
 
     def drop(self):
 
         if self.attachment is None:
-            raise Exception('you can not drop a package you dont have!!!! 😤📦')
+            raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
 
         self.attachment = None
 
-    def add_move_point(self, x, y, name: Move_Type = Move_Type.NORMAL, obj: any = None):
-        self.moves.append(((x, y), name, obj))
+    def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):
+        self.moves.append((pos, name, obj))
 
     def move_package_with_drone(self):
 
@@ -71,31 +78,36 @@ class Drone(pygame.sprite.Sprite):
             bx = point[0]
             by = point[1]
 
-            steps_number = max(abs(bx - ax), abs(by - ay))
+            self.do_move(ax, ay, bx, by)
 
-            if steps_number == 0:
-                self.rect = Rect(bx, by, self.size, self.size)
-            else:
-                step_x = float(bx - ax) / steps_number
-                step_y = float(by - ay) / steps_number
+    def do_move(self, ax, ay, bx, by):
+        steps_number = max(abs(bx - ax), abs(by - ay))
 
-                self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
+        if steps_number == 0:
+            self.rect = Rect(bx, by, self.size, self.size)
+        else:
+            step_x = float(bx - ax) / steps_number
+            step_y = float(by - ay) / steps_number
 
-            # is we at the distinction?
-            if ax == bx and ay == by:
-                move_type = get_move_type(self.curr_move)
+            self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
 
-                if move_type == Move_Type.PICKUP:
-                    obj = get_move_obj(self.curr_move)
-                    self.attach(obj)
-                elif move_type == Move_Type.DROP_OFF:
-                    self.drop()
+        # is we at the distinction?
+        if ax == bx and ay == by:
+            print("!", self.rect.x, self.rect.y, self.name)
+            move_type = get_move_type(self.curr_move)
 
-                self.curr_move = None
+            if move_type == Move_Type.PICKUP:
+                obj = get_move_obj(self.curr_move)
+                self.attach(obj)
+            elif move_type == Move_Type.DROP_OFF:
+                self.drop()
+
+            self.curr_move = None
 
     def take_task(self):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
+            print(self.curr_move[0], self.name)
 
     def update(self):
         # take new task
