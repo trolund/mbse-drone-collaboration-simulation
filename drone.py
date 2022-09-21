@@ -2,13 +2,10 @@ import os
 
 import pygame
 from pygame.rect import Rect
-from typing import List
 
+from Models.basic import Move, Pos
 from Models.move_type import Move_Type
 from Models.task import Task
-
-Pos = (int, int)
-Move = (Pos, str, any)
 
 
 def get_cor(move: Move):
@@ -27,8 +24,9 @@ class Drone(pygame.sprite.Sprite):
     size = 70
     lift: float = 22.5
 
-    def __init__(self, name=""):
+    def __init__(self, env, name=""):
         pygame.sprite.Sprite.__init__(self)
+        self.env_ref = env
         self.name = name
         self.moves = []
         self.attachment = None
@@ -41,6 +39,8 @@ class Drone(pygame.sprite.Sprite):
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
+
+        self.font = pygame.font.SysFont("Arial", 22)
 
     def attach(self, task: Task):
 
@@ -118,3 +118,23 @@ class Drone(pygame.sprite.Sprite):
 
         # move package if it is attached
         self.move_package_with_drone()
+
+    def is_in_drop_zone(self):
+        for g in self.env_ref.grounds:
+            if self.in_zone(g):
+                return True
+
+        return False
+
+    def in_zone(self, ground):
+        dx, dy = self.rect.x, self.rect.y
+        lpx, lpy = ground.landing_spot
+        lpw, lph = ground.landing_spot_width, ground.landing_spot_height
+
+        if (lpx <= dx <= lpx + lpw) and (lpy <= dy <= lpy + lph):
+            return True
+        else:
+            return False
+
+    def draw(self):
+        self.textSurf = self.font.render("True" if self.is_in_drop_zone() else "False", 1, (0,0,0))

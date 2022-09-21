@@ -22,25 +22,25 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
+
 # Import resources
 # DRONE_IMAGE = pygame.image.load(os.path.join('Assets', 'drone.svg'))
 # DRONE = pygame.transform.rotate(pygame.transform.scale(DRONE_IMAGE, (DRONE_WIDTH, DRONE_HEIGHT)), 90)
+class Env:
+    drones = pygame.sprite.Group()
+    tasks = pygame.sprite.Group()
+    grounds = []
+    home = (0, 0)
 
-drones = pygame.sprite.Group()
-tasks = pygame.sprite.Group()
-grounds = []
-
-home = (0, 0)
-
+env = Env()
 
 def get_task_at(x, y):
-    return next((t for t in tasks if t.rect.x == x and t.rect.y == y), None)
+    return next((t for t in env.tasks if t.rect.x == x and t.rect.y == y), None)
 
 
 def create_drones():
-
     for d in range(0, 4):
-        drone = Drone("done_" + str(d))
+        drone = Drone(env, "done_" + str(d))
         # start at x, y
         drone.rect.x = 0
         drone.rect.y = 0
@@ -52,13 +52,12 @@ def create_drones():
         # drone.add_move_point(900, 600 * d)
         drone.add_move_point(((HEIGHT / 2) + 75, 400 + (d * 60)), Move_Type.DROP_OFF)
         # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(home)
+        drone.add_move_point(env.home)
 
-        drones.add(drone)
+        env.drones.add(drone)
 
 
 def create_tasks():
-
     for d in range(0, 4):
         task = Task()
         # start at x, y
@@ -66,16 +65,14 @@ def create_tasks():
         task.rect.y = 200
 
         print(task.rect.x, task.rect.y)
-        tasks.add(task)
-
-
+        env.tasks.add(task)
 
 
 def create_grounds():
-    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
-    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
-    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
-    grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
 
 
 def draw_window():
@@ -83,7 +80,7 @@ def draw_window():
 
 
 def update_drones():
-    for drone in drones:
+    for drone in env.drones:
         drone.update()
 
 
@@ -95,16 +92,16 @@ def create_env():
 
 def draw_layers():
     # draw grounds
-    for g in grounds:
+    for g in env.grounds:
         g.draw(WIN)
 
     # draw tasks
-    tasks.update()
-    tasks.draw(WIN)
+    env.tasks.update()
+    env.tasks.draw(WIN)
 
     # draw drones
-    drones.update()
-    drones.draw(WIN)
+    env.drones.update()
+    env.drones.draw(WIN)
 
 
 def main():
