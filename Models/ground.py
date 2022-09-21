@@ -9,7 +9,7 @@ class Ground:
     def __init__(self, ground, pos: Pos=None, landing_spot: Pos=None):
         self.pos = pos
         self.ground = ground
-        self.landing_spot = landing_spot
+        self.landing_spot = (10, 10) if landing_spot is None else landing_spot
 
         self.landing_spot_width = 150
         self.landing_spot_height = 150
@@ -31,6 +31,6 @@ class Ground:
 
     def drew_landing_spot(self, screen):
         if self.pos is not None:
-            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10 + self.pos[0], 10 + self.pos[1], self.landing_spot_width, self.landing_spot_height))
+            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(self.landing_spot[0] + self.pos[0], self.landing_spot[1] + self.pos[1], self.landing_spot_width, self.landing_spot_height))
         else:
-            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(10, 10, self.landing_spot_width, self.landing_spot_height))
+            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(self.landing_spot[0], self.landing_spot[1], self.landing_spot_width, self.landing_spot_height))

@@ -119,6 +119,10 @@ class Drone(pygame.sprite.Sprite):
         # move package if it is attached
         self.move_package_with_drone()
 
+        if self.is_in_drop_zone():
+            print(self.name + " is in zone")
+
+
     def is_in_drop_zone(self):
         for g in self.env_ref.grounds:
             if self.in_zone(g):
@@ -128,13 +132,10 @@ class Drone(pygame.sprite.Sprite):
 
     def in_zone(self, ground):
         dx, dy = self.rect.x, self.rect.y
-        lpx, lpy = ground.landing_spot
+        (lpx, lpy) = ground.landing_spot
         lpw, lph = ground.landing_spot_width, ground.landing_spot_height
 
         if (lpx <= dx <= lpx + lpw) and (lpy <= dy <= lpy + lph):
             return True
         else:
             return False
-
-    def draw(self):
-        self.textSurf = self.font.render("True" if self.is_in_drop_zone() else "False", 1, (0,0,0))
