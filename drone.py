@@ -1,3 +1,4 @@
+import math
 import os
 
 import pygame
@@ -90,6 +91,7 @@ class Drone(pygame.sprite.Sprite):
             step_y = float(by - ay) / steps_number
 
             self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
+            self.rotate(ax, ay, ax + step_x, ay + step_y)
 
         # is we at the distinction?
         if ax == bx and ay == by:
@@ -122,6 +124,12 @@ class Drone(pygame.sprite.Sprite):
         if self.is_in_drop_zone():
             print(self.name + " is in zone")
 
+    def rotate(self, ax, ay, bx, by):
+        v1 = pygame.math.Vector2(ax, ay)
+        v2 = pygame.math.Vector2(bx, by)
+        angle_v1_v2_degree = v1.angle_to(v2)
+
+        # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
 
     def is_in_drop_zone(self):
         for g in self.env_ref.grounds:
