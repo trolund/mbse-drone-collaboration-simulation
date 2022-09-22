@@ -29,10 +29,12 @@ YELLOW = (255, 255, 0)
 class Env:
     drones = pygame.sprite.Group()
     tasks = pygame.sprite.Group()
-    grounds = []
-    home = (0, 0)
+    grounds: list[Ground] = []
+    home = ((WIDTH / 2) - 30, (HEIGHT / 2) - 30)
+
 
 env = Env()
+
 
 def get_task_at(x, y):
     return next((t for t in env.tasks if t.rect.x == x and t.rect.y == y), None)
@@ -50,9 +52,9 @@ def create_drones():
         drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, get_task_at(200 + (d * 60), 200))
         # drone.add_move_point(300 * d, 300)
         # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(((HEIGHT / 2) + 75, 400 + (d * 60)), Move_Type.DROP_OFF)
+        drone.add_move_point(env.grounds[d].get_landing_spot_pos(True), Move_Type.DROP_OFF)
         # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(env.home)
+        drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
 
         env.drones.add(drone)
 
@@ -64,7 +66,6 @@ def create_tasks():
         task.rect.x = 200 + (d * 60)
         task.rect.y = 200
 
-        print(task.rect.x, task.rect.y)
         env.tasks.add(task)
 
 
@@ -86,8 +87,8 @@ def update_drones():
 
 def create_env():
     create_tasks()
-    create_drones()
     create_grounds()
+    create_drones()
 
 
 def draw_layers():

@@ -1,4 +1,3 @@
-import math
 import os
 
 import pygame
@@ -40,8 +39,6 @@ class Drone(pygame.sprite.Sprite):
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
-
-        self.font = pygame.font.SysFont("Arial", 22)
 
     def attach(self, task: Task):
 
@@ -104,6 +101,9 @@ class Drone(pygame.sprite.Sprite):
             elif move_type == Move_Type.DROP_OFF:
                 self.drop()
 
+                if not self.is_in_drop_zone():
+                    print(self.name + " did a drop of that was not in a drop zone 🤬.")
+
             self.curr_move = None
 
     def take_task(self):
@@ -121,9 +121,7 @@ class Drone(pygame.sprite.Sprite):
         # move package if it is attached
         self.move_package_with_drone()
 
-        if self.is_in_drop_zone():
-            print(self.name + " is in zone")
-
+    # not done (trying to turn the drone in the direction of flying)
     def rotate(self, ax, ay, bx, by):
         v1 = pygame.math.Vector2(ax, ay)
         v2 = pygame.math.Vector2(bx, by)
@@ -140,7 +138,7 @@ class Drone(pygame.sprite.Sprite):
 
     def in_zone(self, ground):
         dx, dy = self.rect.x, self.rect.y
-        (lpx, lpy) = ground.landing_spot
+        (lpx, lpy) = ground.get_landing_spot_pos()
         lpw, lph = ground.landing_spot_width, ground.landing_spot_height
 
         if (lpx <= dx <= lpx + lpw) and (lpy <= dy <= lpy + lph):

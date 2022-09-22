@@ -29,8 +29,16 @@ class Ground:
 
         self.drew_landing_spot(screen)
 
-    def drew_landing_spot(self, screen):
+    def get_landing_spot_pos(self, offset=False):
+        size = 25
+        x_offset = self.landing_spot_width / 2 - size if offset else 0
+        y_offset = self.landing_spot_height / 2 - size if offset else 0
+
         if self.pos is not None:
-            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(self.landing_spot[0] + self.pos[0], self.landing_spot[1] + self.pos[1], self.landing_spot_width, self.landing_spot_height))
+            return self.landing_spot[0] + self.pos[0] + x_offset, self.landing_spot[1] + self.pos[1] + y_offset
         else:
-            pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(self.landing_spot[0], self.landing_spot[1], self.landing_spot_width, self.landing_spot_height))
+            return self.landing_spot[0] + x_offset, self.landing_spot[1] + y_offset
+
+    def drew_landing_spot(self, screen):
+        (x, y) = self.get_landing_spot_pos()
+        pygame.draw.rect(screen, (180, 222, 100), pygame.Rect(x, y, self.landing_spot_width, self.landing_spot_height))
