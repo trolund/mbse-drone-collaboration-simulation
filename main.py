@@ -5,6 +5,7 @@ import pygame_gui
 from Models.ground import Ground
 from Models.move_type import Move_Type
 from Models.task import Task
+from UI import UI
 from drone import Drone
 
 pygame.init()
@@ -26,12 +27,6 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
-
-# UI
-UI_WIDTH = 400
-UI_X = WIN.get_width() - UI_WIDTH
-
-
 
 class Env:
     drones = pygame.sprite.Group()
@@ -113,29 +108,8 @@ def draw_layers():
 
 
 def main():
-
-    margin = 30
-    ui_x = UI_X + margin
-
-    manager = pygame_gui.UIManager((WIN.get_width(), WIN.get_height()))
-
-    button1 = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect(ui_x, 400, 100, 30),
-        text='Click me 1',
-        manager=manager
-    )
-
-    button2 = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect(ui_x, 200, 100, 30),
-        text='Click me 2',
-        manager=manager
-    )
-
-    label1 = pygame_gui.elements.UILabel(
-        relative_rect=pygame.Rect(ui_x, 100, 200, 100),
-        text="Value",
-        manager=manager
-    )
+    # instance of UI
+    ui = UI(WIN)
 
     # create all objects in the environment
     create_env()
@@ -151,15 +125,8 @@ def main():
                 run = False
                 pygame.quit()
 
-            if event.type == pygame.USEREVENT:
-                if event.ui_element == button1:
-                        label1.set_text("click 1")
-                        print("click 1")
-                if event.ui_element == button2:
-                        label1.set_text("click 2")
-                        print("click 2")
+            ui.handle_events(event)
 
-                manager.process_events(event)
         # clear background
         WIN.fill(WHITE)
 
@@ -167,9 +134,7 @@ def main():
         draw_layers()
 
         # update and draw UI
-        pygame.draw.rect(WIN, (220, 220, 222), pygame.Rect(UI_X, 0, UI_WIDTH, WIN.get_height()))
-        manager.update(time_delta)
-        manager.draw_ui(WIN)
+        ui.draw(time_delta)
 
         # update screen with drawing
         draw_window()

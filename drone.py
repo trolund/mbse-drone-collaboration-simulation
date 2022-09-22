@@ -92,7 +92,7 @@ class Drone(pygame.sprite.Sprite):
 
         # is we at the distinction?
         if ax == bx and ay == by:
-            print("!", self.rect.x, self.rect.y, self.name)
+            # print("!", self.rect.x, self.rect.y, self.name)
             move_type = get_move_type(self.curr_move)
 
             if move_type == Move_Type.PICKUP:
@@ -109,7 +109,7 @@ class Drone(pygame.sprite.Sprite):
     def take_task(self):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
-            print(self.curr_move[0], self.name)
+            # print(self.curr_move[0], self.name)
 
     def update(self):
         # take new task
