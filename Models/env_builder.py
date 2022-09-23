@@ -13,7 +13,6 @@ class EnvBuilder:
 
     def __init__(self, env: Env = Provide[Container.env]):
         self.env = env
-        self.create_env()
 
     def create_env(self):
         truck = Truck()

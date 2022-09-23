@@ -4,6 +4,7 @@ import pygame
 from dependency_injector.wiring import inject, Provide
 
 from GUI.UI import UI
+from Logging.eventlogger import EventLogger
 from Models.colors import WHITE
 from Models.env import Env
 from Models.env_builder import EnvBuilder
@@ -55,7 +56,7 @@ def main(env: Env = Provide[Container.env]):
     ui = UI(WIN)
 
     # create all objects in the environment
-    EnvBuilder()
+    EnvBuilder().create_env()
 
     # Simulation/game loop
     clock = pygame.time.Clock()
