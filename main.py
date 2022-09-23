@@ -3,13 +3,17 @@ import sys
 import pygame
 from dependency_injector.wiring import inject, Provide
 
-from GUI.UI import UI
 from Logging.eventlogger import EventLogger
 from Models.colors import WHITE
 from Models.env import Env
-from Models.env_builder import EnvBuilder
 # Basic setup
+from Models.ground import Ground
+from Models.move_type import Move_Type
 from Models.setup import FPS
+from Models.task import Task
+from GUI.UI import UI
+from Models.drone import Drone
+from Models.truck import Truck
 from containers import Container
 
 pygame.init()
@@ -22,6 +26,42 @@ pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
 
+def create_drones(env: Env):
+    for d in range(0, 4):
+        drone = Drone("done_" + str(d))
+        # start at x, y
+        drone.rect.x = 0
+        drone.rect.y = 0
+
+        # movements
+        # drone.add_move_point(300, 300)
+        drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, env.get_task_at(200 + (d * 60), 200))
+        # drone.add_move_point(300 * d, 300)
+        # drone.add_move_point(900, 600 * d)
+        drone.add_move_point(env.grounds[d].get_landing_spot_pos(True), Move_Type.DROP_OFF)
+        # drone.add_move_point(900, 600 * d)
+        drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
+
+        env.drones.add(drone)
+
+
+def create_tasks(env: Env):
+    for d in range(0, 4):
+        task = Task()
+        # start at x, y
+        task.rect.x = 200 + (d * 60)
+        task.rect.y = 200
+
+        env.tasks.add(task)
+
+
+def create_grounds(env: Env):
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
+    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
+
+
 def draw_window():
     pygame.display.update()
 
@@ -29,6 +69,14 @@ def draw_window():
 def update_drones(env: Env):
     for drone in env.drones:
         drone.update()
+
+
+def create_env(env: Env):
+    truck = Truck()
+    env.trucks.add(truck)
+    create_tasks(env)
+    create_grounds(env)
+    create_drones(env)
 
 
 def draw_layers(env: Env):
@@ -56,7 +104,7 @@ def main(env: Env = Provide[Container.env]):
     ui = UI(WIN)
 
     # create all objects in the environment
-    EnvBuilder().create_env()
+    create_env(env)
 
     # Simulation/game loop
     clock = pygame.time.Clock()

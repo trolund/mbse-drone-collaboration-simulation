@@ -17,6 +17,6 @@ class Container(containers.DeclarativeContainer):
         fname="logging.ini"
     )
 
+    env = providers.Singleton(Env)
     event_logger = providers.Singleton(EventLogger)
 
-    env = providers.Singleton(Env)

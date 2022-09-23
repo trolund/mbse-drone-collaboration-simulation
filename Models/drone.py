@@ -1,7 +1,7 @@
 import os
 
 import pygame
-from dependency_injector.wiring import Provide
+from dependency_injector.wiring import Provide, inject
 from pygame.rect import Rect
 
 from Logging.eventlogger import EventLogger
