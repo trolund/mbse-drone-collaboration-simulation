@@ -5,9 +5,18 @@ This project have been done as a part of the course 02223 - Model-Based Systems 
 # Ideas to investigate 
 
 * speed of truck 
-    How fast will the truck be able to drive through the streets?
-    Is this practical? - will it interrupt the "normal" traffic too much?
+    * How fast will the truck be able to drive through the streets?
+    * Is this practical? - will it interrupt the "normal" traffic too much?
 * Optimize order of packages fetched from truck
 * Optimize flying patch of drone
 * Optimize with delivering multiple packages at one time. (in container (task))
 * Multiple drones lifting heavy packages.
+
+
+# More detailed simulation
+    
+* Drone Controller (in the truck) communication to Drone 
+  * delay, errors, range. 
+  * INFO: https://www.911security.com/learn/airspace-security/drone-fundamentals/drone-communication-data-link
+    
+    
