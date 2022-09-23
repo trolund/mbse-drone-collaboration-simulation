@@ -17,7 +17,7 @@ class Truck(pygame.sprite.Sprite):
 
         self.images = []
 
-        self.scale = 3
+        self.scale = 3.2
         self.width = 855 / self.scale
         self.height = 352 / self.scale
 
@@ -28,8 +28,25 @@ class Truck(pygame.sprite.Sprite):
         self.image = self.images[0]
         self.rect = self.image.get_rect()
 
+        (rot_image, rot_rect) = self.rot_center(self.image, self.rect, 90)
+
+        self.image = rot_image
+        self.rect = rot_rect
+
+        self.rect.x = 560
+        self.rect.y = 800
+
     def draw(self):
         pass
 
+    def rot_center(self, image, rect, angle):
+        """rotate an image while keeping its center"""
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = rot_image.get_rect(center=rect.center)
+        return rot_image, rot_rect
 
+    def rot_front_wheels(self, image, rect, angle):
+        rot_image = pygame.transform.rotate(image, angle)
+        rot_rect = rot_image.get_rect(center=rect.right)
+        return rot_image, rot_rect
 
