@@ -84,9 +84,13 @@ class UI:
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
-        self.list.set_item_list(self.logger.get_log())
+        self.update_event_list()
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
+
+    def update_event_list(self):
+        if len(self.logger.get_log()) != len(self.list.item_list):
+            self.list.set_item_list(self.logger.get_log())
 
     def get_manager(self):
         return self.manager
