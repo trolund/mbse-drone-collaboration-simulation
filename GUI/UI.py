@@ -2,15 +2,19 @@ import os
 
 import pygame
 import pygame_gui
+from dependency_injector.wiring import Provide
 from pygame.surface import Surface
 from pygame_gui.core import ObjectID
 
+from Logging.eventlogger import EventLogger
 from Models.colors import GREY
+from containers import Container
 
 
 class UI:
 
-    def __init__(self, screen: Surface):
+    def __init__(self, screen: Surface, logger: EventLogger = Provide[Container.event_logger]):
+        self.logger = logger
         self.ui_width = 400
         self.margin = 30
 
@@ -85,11 +89,11 @@ class UI:
 
         self.manager.process_events(event)
 
-    def update(self, time_delta: float, fps: float, logs):
+    def update(self, time_delta: float, fps: float):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
-        self.list.item_list = logs
+        self.list.set_item_list(self.logger.get_log())
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
 

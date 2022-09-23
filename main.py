@@ -3,7 +3,7 @@ import sys
 import pygame
 from dependency_injector.wiring import inject, Provide
 
-from Logging.logger import Logger
+from Logging.eventlogger import EventLogger
 from Models.colors import WHITE
 from Models.env import Env
 # Basic setup
@@ -105,12 +105,7 @@ def draw_layers():
 
 
 @inject
-def main(user_service: UserService = Provide[Container.user_service]):
-
-    user_service.get_user("Trolund@gmail.com")
-
-    # logging
-    logger = Logger()
+def main(logger: EventLogger = Provide[Container.event_logger]):
 
     # instance of UI
     ui = UI(WIN)
@@ -139,13 +134,14 @@ def main(user_service: UserService = Provide[Container.user_service]):
         draw_layers()
 
         # update and draw UI
-        ui.update(time_delta, clock.get_fps(), logger.curr_log)
+        ui.update(time_delta, clock.get_fps())
 
         # update screen with drawing
         draw_window()
 
 
 if __name__ == "__main__":
+    # setup dependency injection
     container = Container()
     container.init_resources()
     container.wire(modules=[__name__])

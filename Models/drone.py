@@ -1,11 +1,15 @@
 import os
 
 import pygame
+from dependency_injector.wiring import Provide
 from pygame.rect import Rect
 
+from Logging.eventlogger import EventLogger
 from Models.basic_types import Move, Pos
 from Models.move_type import Move_Type
 from Models.task import Task
+from Services.BaseService import UserService
+from containers import Container
 
 
 def get_cor(move: Move):
@@ -24,8 +28,9 @@ class Drone(pygame.sprite.Sprite):
     size = 70
     lift: float = 22.5
 
-    def __init__(self, env, name=""):
+    def __init__(self, env, name="", logger: EventLogger = Provide[Container.event_logger]):
         pygame.sprite.Sprite.__init__(self)
+        self.logger = logger
         self.env_ref = env
         self.name = name
         self.moves = []
@@ -41,8 +46,7 @@ class Drone(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def attach(self, task: Task):
-
-        # print((task.rect.x, task.rect.y), (self.rect.x, self.rect.y))
+        self.logger.log(self.name + " attach!")
 
         if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
             raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
@@ -109,7 +113,8 @@ class Drone(pygame.sprite.Sprite):
     def take_task(self):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
-            # print(self.curr_move[0], self.name)
+            s = self.name + " move to: (" + str(self.curr_move[0][0]) + ", " + str(self.curr_move[0][1]) + ")"
+            self.logger.log(s)
 
     def update(self):
         # take new task
