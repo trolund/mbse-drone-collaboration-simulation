@@ -37,12 +37,6 @@ class UI:
             manager=self.manager
         )
 
-        self.button1 = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 400, 100, 30),
-            text='Pause',
-            manager=self.manager
-        )
-
         self.button2 = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(self.ui_x + self.margin, 200, 100, 30),
             text='Click me 2',
@@ -77,9 +71,6 @@ class UI:
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.button1:
-                    # self.pause_game(event)
-                    print("pause")
                 if event.ui_element == self.button2:
                     self.label1.set_text("click 2")
                     print("click 2")

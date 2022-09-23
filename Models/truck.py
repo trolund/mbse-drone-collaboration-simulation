@@ -39,6 +39,9 @@ class Truck(pygame.sprite.Sprite):
     def draw(self):
         pass
 
+    def get_home(self):
+        return self.rect.x, self.rect.y
+
     def rot_center(self, image, rect, angle):
         """rotate an image while keeping its center"""
         rot_image = pygame.transform.rotate(image, angle)

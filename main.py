@@ -1,6 +1,7 @@
 import sys
 
 import pygame
+import pygame_gui
 from dependency_injector.wiring import inject, Provide
 
 from Logging.eventlogger import EventLogger
@@ -38,7 +39,7 @@ def create_drones(env: Env):
         drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, env.get_task_at(200 + (d * 60), 200))
         # drone.add_move_point(300 * d, 300)
         # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(env.grounds[d].get_landing_spot_pos(True), Move_Type.DROP_OFF)
+        drone.add_move_point(env.grounds[d].get_landing_spot_pos(offset=True), Move_Type.DROP_OFF)
         # drone.add_move_point(900, 600 * d)
         drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
 
@@ -73,6 +74,7 @@ def update_drones(env: Env):
 
 def create_env(env: Env):
     truck = Truck()
+    env.home = truck.get_home()
     env.trucks.add(truck)
     create_tasks(env)
     create_grounds(env)
@@ -103,12 +105,21 @@ def main(env: Env = Provide[Container.env]):
     # instance of UI
     ui = UI(WIN)
 
+    is_paused = True
+
+    pause_btn = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect(WIN.get_width() - 400, WIN.get_height() - 40, 100, 30),
+        text="▶ Start",
+        manager=ui.get_manager()
+    )
+
     # create all objects in the environment
     create_env(env)
 
     # Simulation/game loop
     clock = pygame.time.Clock()
     is_running = True
+
 
     while is_running:
         time_delta = clock.tick(FPS) / 1000.0
@@ -117,14 +128,20 @@ def main(env: Env = Provide[Container.env]):
             if event.type == pygame.QUIT:
                 is_running = False
                 pygame.quit()
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == pause_btn:
+                        is_paused = not is_paused
+                        pause_btn.set_text("▶ Resume" if is_paused else "Pause")
 
             ui.handle_events(event)
 
-        # clear background
-        WIN.fill(WHITE)
+        if not is_paused:
+            # clear background
+            WIN.fill(WHITE)
 
-        # draw object layers
-        draw_layers(env)
+            # draw object layers
+            draw_layers(env)
 
         # update and draw UI
         ui.update(time_delta, clock.get_fps())
