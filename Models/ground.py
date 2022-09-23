@@ -1,7 +1,7 @@
 import pygame
 from pygame.surface import Surface
 
-from Models.basic import Pos
+from Models.basic_types import Pos
 
 
 class Ground:

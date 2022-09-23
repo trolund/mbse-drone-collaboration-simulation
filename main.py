@@ -1,39 +1,24 @@
 import pygame
-import pygame_gui
 
+from Models.colors import WHITE
+from Models.env import Env
 # Basic setup
 from Models.ground import Ground
 from Models.move_type import Move_Type
+from Models.setup import FPS
 from Models.task import Task
-from UI import UI
-from drone import Drone
+from GUI.UI import UI
+from Models.drone import Drone
+from Models.truck import Truck
 
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-FPS = 60
-
-WIDTH, HEIGHT = 1200, 1000
-
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
-BORDER = pygame.Rect(WIDTH // 2 - 5, 0, 10, HEIGHT)
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-YELLOW = (255, 255, 0)
-
-class Env:
-    drones = pygame.sprite.Group()
-    tasks = pygame.sprite.Group()
-    grounds: list[Ground] = []
-    home = ((WIDTH / 2) - 30, (HEIGHT / 2) - 30)
-
 
 env = Env()
 
@@ -88,6 +73,8 @@ def update_drones():
 
 
 def create_env():
+    truck = Truck()
+    env.trucks.add(truck)
     create_tasks()
     create_grounds()
     create_drones()
@@ -97,6 +84,10 @@ def draw_layers():
     # draw grounds
     for g in env.grounds:
         g.draw(WIN)
+
+    # draw truck
+    env.trucks.update()
+    env.trucks.draw(WIN)
 
     # draw tasks
     env.tasks.update()
@@ -116,13 +107,14 @@ def main():
 
     # Simulation/game loop
     clock = pygame.time.Clock()
-    run = True
+    is_running = True
 
-    while run:
+    while is_running:
         time_delta = clock.tick(FPS) / 1000.0
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                is_running = False
                 pygame.quit()
 
             ui.handle_events(event)
@@ -134,7 +126,7 @@ def main():
         draw_layers()
 
         # update and draw UI
-        ui.draw(time_delta)
+        ui.draw(time_delta, clock.get_fps())
 
         # update screen with drawing
         draw_window()

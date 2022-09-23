@@ -3,7 +3,7 @@ import os
 import pygame
 from pygame.rect import Rect
 
-from Models.basic import Move, Pos
+from Models.basic_types import Move, Pos
 from Models.move_type import Move_Type
 from Models.task import Task
 

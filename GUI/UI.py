@@ -2,6 +2,8 @@ import pygame
 import pygame_gui
 from pygame.surface import Surface
 
+from Models.colors import GREY
+
 
 class UI:
 
@@ -29,7 +31,7 @@ class UI:
 
         self.button1 = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(self.ui_x + self.margin, 400, 100, 30),
-            text='Click me 1',
+            text='Pause',
             manager=self.manager
         )
 
@@ -45,12 +47,23 @@ class UI:
             manager=self.manager
         )
 
+        self.delta_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 80, 200, 100),
+            text="Delta: 0.0",
+            manager=self.manager
+        )
+
+        self.FPS_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 60, 200, 100),
+            text="FPS: 0.0",
+            manager=self.manager
+        )
+
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.button1:
-                    self.label1.set_text("click 1")
-                    print("click 1")
+                    self.pause_game(event)
                 if event.ui_element == self.button2:
                     self.label1.set_text("click 2")
                     print("click 2")
@@ -60,8 +73,10 @@ class UI:
 
         self.manager.process_events(event)
 
-    def draw(self, time_delta):
-        pygame.draw.rect(self.screen, (220, 220, 222), pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
+    def draw(self, time_delta: float, fps: float):
+        pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
+        self.delta_label.set_text("Delta: " + str(time_delta))
+        self.FPS_label.set_text("FPS: " + str(fps))
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
 
