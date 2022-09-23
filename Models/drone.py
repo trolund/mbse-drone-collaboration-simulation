@@ -6,9 +6,9 @@ from pygame.rect import Rect
 
 from Logging.eventlogger import EventLogger
 from Models.basic_types import Move, Pos
+from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
-from Services.BaseService import UserService
 from containers import Container
 
 
@@ -28,7 +28,7 @@ class Drone(pygame.sprite.Sprite):
     size = 70
     lift: float = 22.5
 
-    def __init__(self, env, name="", logger: EventLogger = Provide[Container.event_logger]):
+    def __init__(self, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
         self.logger = logger
         self.env_ref = env

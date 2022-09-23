@@ -11,3 +11,6 @@ class Env:
     grounds: list[Ground] = []
     home = ((WIDTH / 2) - 30, (HEIGHT / 2) - 30)
     trucks = pygame.sprite.Group()
+
+    def get_task_at(self, x, y):
+        return next((t for t in self.tasks if t.rect.x == x and t.rect.y == y), None)

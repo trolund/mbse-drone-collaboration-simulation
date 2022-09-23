@@ -6,7 +6,7 @@ from datetime import datetime
 from dependency_injector import containers, providers
 
 from Logging.eventlogger import EventLogger
-from Services.BaseService import UserService
+from Models.env import Env
 
 
 class Container(containers.DeclarativeContainer):
@@ -19,4 +19,4 @@ class Container(containers.DeclarativeContainer):
 
     event_logger = providers.Singleton(EventLogger)
 
-    user_service = providers.Factory(UserService)
+    env = providers.Singleton(Env)
