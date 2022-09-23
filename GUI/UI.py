@@ -1,6 +1,9 @@
+import os
+
 import pygame
 import pygame_gui
 from pygame.surface import Surface
+from pygame_gui.core import ObjectID
 
 from Models.colors import GREY
 
@@ -15,9 +18,10 @@ class UI:
         self.ui_x = self.ui_width
 
         self.screen = screen
-        self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()))
+        self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), os.path.join("GUI", 'theme.json'))
 
         self.use_battery = False
+        self.log = []
 
         self.create_ui_elements()
 
@@ -50,20 +54,28 @@ class UI:
         self.delta_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 80, 200, 100),
             text="Delta: 0.0",
-            manager=self.manager
+            manager=self.manager,
+            object_id=ObjectID(class_id='#debug_text')
         )
 
         self.FPS_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 60, 200, 100),
             text="FPS: 0.0",
-            manager=self.manager
+            manager=self.manager,
+            object_id=ObjectID(class_id='#debug_text')
+        )
+
+        self.list = pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect(self.ui_x, self.screen.get_height() - 200, 400, 150),
+            manager=self.manager, item_list=[]
         )
 
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.button1:
-                    self.pause_game(event)
+                    # self.pause_game(event)
+                    print("pause")
                 if event.ui_element == self.button2:
                     self.label1.set_text("click 2")
                     print("click 2")
@@ -73,10 +85,11 @@ class UI:
 
         self.manager.process_events(event)
 
-    def draw(self, time_delta: float, fps: float):
+    def update(self, time_delta: float, fps: float, logs):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
+        self.list.item_list = logs
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
 

@@ -8,7 +8,7 @@ This project have been done as a part of the course 02223 - Model-Based Systems 
     * How fast will the truck be able to drive through the streets?
     * Is this practical? - will it interrupt the "normal" traffic too much?
 * Optimize order of packages fetched from truck
-* Optimize flying patch of drone
+* Optimize flying patch of drones
 * Optimize with delivering multiple packages at one time. (in container (task))
 * Multiple drones lifting heavy packages.
 
@@ -19,6 +19,7 @@ This project have been done as a part of the course 02223 - Model-Based Systems 
   * could be outputted to log-file at each run. --> timestamp.txt
 
 * Environment can be defined in som format (could be JSON)
+  * Random package/task generation
     
 * Drone Controller (in the truck) communication to Drone 
   * delay, errors, range. 

@@ -1,0 +1,39 @@
+ {
+     "button":
+     {
+         "misc":
+         {
+             "border_width": "1",
+             "shadow_width": "2"
+         }
+    },
+    "@friendly_buttons":
+     {
+         "misc":
+         {
+             "shadow_width": "5",
+             "shape": "rounded_rectangle"
+         }
+    },
+    "#hello_button":
+     {
+         "misc":
+         {
+             "text_horiz_alignment": "left"
+         }
+    },
+       "#debug_text":
+     {
+         "colours":
+         {
+             "normal_text": "#c5cbd8",
+             "text_shadow": "#505050"
+         },
+         "misc":
+         {
+             "text_shadow": "1",
+             "text_shadow_size": "1",
+             "text_shadow_offset": "0,0"
+         }
+     }
+}

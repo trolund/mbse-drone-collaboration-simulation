@@ -1,5 +1,9 @@
-import pygame
+import sys
 
+import pygame
+from dependency_injector.wiring import inject, Provide
+
+from Logging.logger import Logger
 from Models.colors import WHITE
 from Models.env import Env
 # Basic setup
@@ -10,6 +14,8 @@ from Models.task import Task
 from GUI.UI import UI
 from Models.drone import Drone
 from Models.truck import Truck
+from Services.BaseService import UserService
+from containers import Container
 
 pygame.init()
 pygame.font.init()
@@ -98,7 +104,14 @@ def draw_layers():
     env.drones.draw(WIN)
 
 
-def main():
+@inject
+def main(user_service: UserService = Provide[Container.user_service]):
+
+    user_service.get_user("Trolund@gmail.com")
+
+    # logging
+    logger = Logger()
+
     # instance of UI
     ui = UI(WIN)
 
@@ -126,11 +139,15 @@ def main():
         draw_layers()
 
         # update and draw UI
-        ui.draw(time_delta, clock.get_fps())
+        ui.update(time_delta, clock.get_fps(), logger.curr_log)
 
         # update screen with drawing
         draw_window()
 
 
 if __name__ == "__main__":
-    main()
+    container = Container()
+    container.init_resources()
+    container.wire(modules=[__name__])
+
+    main(*sys.argv[1:])
