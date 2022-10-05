@@ -49,7 +49,12 @@ def create_drones(env: Env):
 
 def create_tasks(env: Env):
     for d in range(0, 4):
+
         task = Task()
+
+        if d == 2:
+            task = Task(number_of_attachment_points=2)
+
         # start at x, y
         task.rect.x = 200 + (d * 60)
         task.rect.y = 200

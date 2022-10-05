@@ -25,11 +25,14 @@ def get_move_obj(move: Move):
 
 
 class Drone(pygame.sprite.Sprite):
-    size = 70
-    lift: float = 22.5
+
 
     def __init__(self, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
+        self.size = 70
+        self.lift_capacity: float = 22.5
+        self.wait = False
+
         self.logger = logger
         self.env_ref = env
         self.name = name
@@ -39,20 +42,32 @@ class Drone(pygame.sprite.Sprite):
 
         self.images = []
 
-        img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
-        img = pygame.transform.scale(img, (self.size, self.size))
-        self.images.append(img)
+        self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
+        self.img = pygame.transform.scale(self.img, (self.size, self.size))
+        self.images.append(self.img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
 
     def attach(self, task: Task):
-        self.logger.log(self.name + " attach!")
 
-        if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
-            raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
-                            (self.rect.x, self.rect.y))
+        index, (x, y) = task.get_attachment_point()  # get point of attachment, in real world this alignment could be done based on computer vision
 
-        self.attachment = task
+        # is ready to attach
+        if x == self.rect.x or y == self.rect.y:
+            self.attachment = task
+            self.attachment.confirm_attachment(index)
+            self.logger.log(self.name + " attach! pos: " + str(index))
+        # adjust position to attach
+        else:
+            self.add_move_point((x, y), Move_Type.PICKUP, task)
+            self.logger.log(self.name + " adjust to attach.")
+
+
+        #if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
+        #    raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
+        #                    (self.rect.x, self.rect.y))
+
+
 
     def drop(self):
 
@@ -67,8 +82,15 @@ class Drone(pygame.sprite.Sprite):
     def move_package_with_drone(self):
 
         if self.attachment is not None:
-            self.attachment.rect.x = self.rect.x
-            self.attachment.rect.y = self.rect.y
+
+            can_lift = self.attachment.can_lift(self)
+
+            if not can_lift:
+                self.wait = True
+            else:
+                # move the task with the drone.
+                self.attachment.rect.x = self.rect.x
+                self.attachment.rect.y = self.rect.y
 
     def process_task(self):
         if self.curr_move is not None:
@@ -85,6 +107,8 @@ class Drone(pygame.sprite.Sprite):
     def do_move(self, ax, ay, bx, by):
         steps_number = max(abs(bx - ax), abs(by - ay))
 
+        # self.point_at(float(bx - ax), float(by - ay))
+
         if steps_number == 0:
             self.rect = Rect(bx, by, self.size, self.size)
         else:
@@ -92,7 +116,6 @@ class Drone(pygame.sprite.Sprite):
             step_y = float(by - ay) / steps_number
 
             self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
-            self.rotate(ax, ay, ax + step_x, ay + step_y)
 
         # is we at the distinction?
         if ax == bx and ay == by:
@@ -120,19 +143,23 @@ class Drone(pygame.sprite.Sprite):
         # take new task
         self.take_task()
 
-        # process task
-        self.process_task()
+        if not self.wait:
+            # process task
+            self.process_task()
 
         # move package if it is attached
         self.move_package_with_drone()
 
     # not done (trying to turn the drone in the direction of flying)
-    def rotate(self, ax, ay, bx, by):
-        v1 = pygame.math.Vector2(ax, ay)
-        v2 = pygame.math.Vector2(bx, by)
-        angle_v1_v2_degree = v1.angle_to(v2)
+    #def rotate_old(self, ax, ay, bx, by):
 
         # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
+
+    def point_at(self, x, y):
+        direction = pygame.math.Vector2(x, y) - self.rect.center
+        angle = direction.angle_to(pygame.Vector2((0, -1)))
+        self.image = pygame.transform.rotate(self.img, angle)
+        #self.rect = self.image.get_rect(center=self.rect.center)
 
     def is_in_drop_zone(self):
         for g in self.env_ref.grounds:
