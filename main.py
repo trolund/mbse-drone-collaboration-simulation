@@ -6,6 +6,7 @@ from dependency_injector.wiring import inject, Provide
 
 from Logging.eventlogger import EventLogger
 from Models.colors import WHITE
+from Models.drone_mangement import DroneManager
 from Models.env import Env
 # Basic setup
 from Models.ground import Ground
@@ -32,19 +33,19 @@ def create_drones(env: Env):
     for d in range(0, 4):
         drone = Drone("done_" + str(d))
         # start at x, y
-        drone.rect.x = 0
+        drone.rect.x = WIN.get_width() / 3 + (d * 60)
         drone.rect.y = 0
 
-        # movements
-        # drone.add_move_point(300, 300)
-        drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, env.get_task_at(200 + (d * 60), 200))
-        # drone.add_move_point(300 * d, 300)
-        # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(env.grounds[d].get_landing_spot_pos(offset=True), Move_Type.DROP_OFF)
-        # drone.add_move_point(900, 600 * d)
-        drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
-
         env.drones.add(drone)
+        env.drones_ref.append(drone)
+
+    drone = Drone("done_" + str(5))
+    # start at x, y
+    drone.rect.x = 0
+    drone.rect.y = 0
+
+    env.drones.add(drone)
+    env.drones_ref.append(drone)
 
 
 def create_tasks(env: Env):
@@ -60,6 +61,7 @@ def create_tasks(env: Env):
         task.rect.y = 200
 
         env.tasks.add(task)
+        env.tasks_ref.append(task)
 
 
 def create_grounds(env: Env):
@@ -121,6 +123,10 @@ def main(env: Env = Provide[Container.env]):
 
     # create all objects in the environment
     create_env(env)
+
+    # drone
+    dm = DroneManager()
+    dm.plan_routes()
 
     # Simulation/game loop
     clock = pygame.time.Clock()

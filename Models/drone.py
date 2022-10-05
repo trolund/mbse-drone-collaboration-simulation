@@ -6,6 +6,7 @@ from pygame.rect import Rect
 
 from Logging.eventlogger import EventLogger
 from Models.basic_types import Move, Pos
+from Models.drone_mode import Drone_Mode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
@@ -26,18 +27,22 @@ def get_move_obj(move: Move):
 
 class Drone(pygame.sprite.Sprite):
 
-
-    def __init__(self, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
+    def __init__(self, name="", logger: EventLogger = Provide[Container.event_logger],
+                 env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
         self.size = 70
         self.lift_capacity: float = 22.5
         self.wait = False
+
+        self.mode = Drone_Mode.NORMAL
+        self.master = None
 
         self.logger = logger
         self.env_ref = env
         self.name = name
         self.moves = []
         self.attachment = None
+        self.attachment_point = None
         self.curr_move = None
 
         self.images = []
@@ -50,24 +55,28 @@ class Drone(pygame.sprite.Sprite):
 
     def attach(self, task: Task):
 
-        index, (x, y) = task.get_attachment_point()  # get point of attachment, in real world this alignment could be done based on computer vision
+        index, (x, y) = task.get_free_attachment_point()  # get point of attachment, in real world this alignment could be done based on computer vision
 
         # is ready to attach
         if x == self.rect.x or y == self.rect.y:
             self.attachment = task
-            self.attachment.confirm_attachment(index)
+            self.attachment.confirm_attachment(index, self)
+            self.attachment_point = index
             self.logger.log(self.name + " attach! pos: " + str(index))
+
+            # if the drone is not in pos 0 then become slave to drone(0)
+            if index > 0:
+                self.logger.log(self.name + " going in to slave mode. 🧟‍")
+                self.mode = Drone_Mode.Slave
+
         # adjust position to attach
         else:
             self.add_move_point((x, y), Move_Type.PICKUP, task)
             self.logger.log(self.name + " adjust to attach.")
 
-
-        #if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
+        # if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
         #    raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
         #                    (self.rect.x, self.rect.y))
-
-
 
     def drop(self):
 
@@ -76,6 +85,10 @@ class Drone(pygame.sprite.Sprite):
 
         self.attachment = None
 
+        if self.mode == Drone_Mode.Slave:
+            self.mode = Drone_Mode.NORMAL
+            self.logger.log(self.name + " going in to normal mode. 🎛")
+
     def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):
         self.moves.append((pos, name, obj))
 
@@ -83,26 +96,36 @@ class Drone(pygame.sprite.Sprite):
 
         if self.attachment is not None:
 
-            can_lift = self.attachment.can_lift(self)
+            self.wait = not self.attachment.can_lift(self)
 
-            if not can_lift:
-                self.wait = True
-            else:
+            if self.wait:
+                return
+
+            if self.mode is not Drone_Mode.Slave:
                 # move the task with the drone.
                 self.attachment.rect.x = self.rect.x
                 self.attachment.rect.y = self.rect.y
 
     def process_task(self):
-        if self.curr_move is not None:
-            ay = self.rect.y
-            ax = self.rect.x
 
-            point = get_cor(self.curr_move)
+        print(self.name, self.mode)
 
-            bx = point[0]
-            by = point[1]
+        if self.mode == Drone_Mode.NORMAL:
+            if self.curr_move is not None:
+                ay = self.rect.y
+                ax = self.rect.x
 
-            self.do_move(ax, ay, bx, by)
+                point = get_cor(self.curr_move)
+
+                bx = point[0]
+                by = point[1]
+
+                self.do_move(ax, ay, bx, by)
+
+        elif self.mode == Drone_Mode.Slave:
+            i, (x, y) = self.attachment.get_attachment_point(self.attachment_point)
+            self.rect.x = x
+            self.rect.y = y
 
     def do_move(self, ax, ay, bx, by):
         steps_number = max(abs(bx - ax), abs(by - ay))
@@ -151,15 +174,15 @@ class Drone(pygame.sprite.Sprite):
         self.move_package_with_drone()
 
     # not done (trying to turn the drone in the direction of flying)
-    #def rotate_old(self, ax, ay, bx, by):
+    # def rotate_old(self, ax, ay, bx, by):
 
-        # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
+    # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
 
     def point_at(self, x, y):
         direction = pygame.math.Vector2(x, y) - self.rect.center
         angle = direction.angle_to(pygame.Vector2((0, -1)))
         self.image = pygame.transform.rotate(self.img, angle)
-        #self.rect = self.image.get_rect(center=self.rect.center)
+        # self.rect = self.image.get_rect(center=self.rect.center)
 
     def is_in_drop_zone(self):
         for g in self.env_ref.grounds:
