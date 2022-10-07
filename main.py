@@ -23,7 +23,7 @@ pygame.font.init()
 pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+WIN = pygame.display.set_mode((1366,768))
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
