@@ -1,13 +1,15 @@
+from tokenize import String
+
+
 class Package:
 
-    wight: int
-    width: int
-    height: int
+    weight: int
+    address: int
 
-    def __init__(self, wight, width, height):
+    def __init__(self, weight, address):
         super().__init__()
-        self.wight = wight
-        self.width = width
-        self.height = height
+        self.weight = weight
+        self.address = address
+
 
 
