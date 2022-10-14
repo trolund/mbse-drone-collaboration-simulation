@@ -2,6 +2,15 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
+# Definitions 
+
+## Neighborhood (env) structure
+
+* Road : "R"
+* Ground: "G"
+* Delivery spot: "S"
+* House : "H" (could be nice)
+
 # Ideas to investigate 
 
 * speed of truck 
