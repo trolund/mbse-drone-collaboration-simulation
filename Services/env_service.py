@@ -85,16 +85,30 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2):
     for i in range(m):
         for j in range(m):
             if i % g < road_size:
-                layout[i][j] = "R"
+                layout[i][j] = "R"  # Horizontal roads
             else:
-                if j % g < road_size:
+                if j % g < road_size:  # vertical roads
                     layout[i][j] = "R"
                 else:
                     layout[i][j] = "."
 
+    return provide_dp(layout, m, ground_size, road_size)
+
+
+def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int):
+    size = ground_size - road_size
+
+    for i in range(road_size, world_size, ground_size):
+        for j in range(road_size, world_size, ground_size):
+            x = math.floor(random.uniform(i, i + size))
+            y = math.floor(random.uniform(j, j + size))
+
+            layout[x][y] = "S"
+
     return layout
 
-def print_layout(layout):
+
+def print_layout(layout: Layout):
     for i in range(len(layout)):
         print()
         for j in range(len(layout)):
