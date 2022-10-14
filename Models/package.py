@@ -6,7 +6,7 @@ class Package:
     weight: int
     width: int
     height: int
-    address: String
+    address: int
 
     def __init__(self, wight, width, height, address):
         super().__init__()
