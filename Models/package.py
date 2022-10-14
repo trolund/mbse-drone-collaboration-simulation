@@ -33,7 +33,7 @@ def queue_package(amount_of_packages, possible_addresses, max_weight):
 
 if __name__ == "__main__":
     possible_addresses = [[1,1],[2,2],[3,3],[4,4]]
-    amount_of_packages = 7
+    amount_of_packages = 3
     max_weight = 200
     queue = queue_package(amount_of_packages,possible_addresses,max_weight)
     for i in queue:
