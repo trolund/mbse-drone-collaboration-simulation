@@ -3,6 +3,8 @@ import random
 
 import pygame
 
+from basic_types import Layout
+
 
 def grid_to_pos(i, j, step_size):
     return step_size * i, step_size * j
@@ -58,13 +60,13 @@ def draw_env(surface, layout, x_len: int, y_len: int, step_size: int):
             color = 50 if (i + j) % 2 == 0 else 150
             x, y = grid_to_pos(i, j, step_size)
 
-            if layout[i][j] == "v":
+            if layout[i][j] == "R":
                 pygame.draw.rect(surface, (200, 100, 100), pygame.Rect(x, y, step_size, step_size))
             elif layout[i][j] == "S":
                 pygame.draw.rect(surface, (100, 10, 10),
                                  pygame.Rect(x, y, int(step_size),
                                              int(step_size)))
-            elif layout[i][j] == "E":
+            elif layout[i][j] == ".":
                 pygame.draw.rect(surface, (50, 10, 240),
                                  pygame.Rect(x, y, int(step_size),
                                              int(step_size)))
@@ -74,31 +76,31 @@ def draw_env(surface, layout, x_len: int, y_len: int, step_size: int):
                                              int(step_size)))
 
 
-
-def create_layout_env(world_size, ground_size):
-    m = world_size + 1
+def create_layout_env(world_size: int, ground_size: int, road_size: int = 2):
+    m = world_size + road_size
     g = ground_size
 
-    for i in range(m):
-        print()
-        for j in range(m):
-            if i % g == 0:
-                print(" R ", end="")
-            else:
-                if j % g == 0:
-                    print(" R ", end="")
-                else:
-                    print(" * ", end="")
+    layout: Layout = [[""] * m for i in range(m)]
 
+    for i in range(m):
+        for j in range(m):
+            if i % g < road_size:
+                layout[i][j] = "R"
+            else:
+                if j % g < road_size:
+                    layout[i][j] = "R"
+                else:
+                    layout[i][j] = "."
+
+    return layout
+
+def print_layout(layout):
+    for i in range(len(layout)):
+        print()
+        for j in range(len(layout)):
+            print(f' {layout[i][j]} ', end="")
 
 
 if __name__ == "__main__":
-    create_layout_env(50, 5)
-
-
-
-
-
-
-
-
+    layout = create_layout_env(200, 10)
+    print_layout(layout)
