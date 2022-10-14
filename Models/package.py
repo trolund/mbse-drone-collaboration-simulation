@@ -1,6 +1,4 @@
-import queue
 import random
-
 
 class Package:
 
@@ -20,7 +18,6 @@ def queue_package(amount_of_packages, possible_addresses, max_weight):
     if amount_of_packages > len(possible_addresses):
         print("More packages than delivery spots!")
         return ("ERROR")
-
     for i in range(amount_of_packages):
         if min_weight == max_weight:
             weight = min_weight
