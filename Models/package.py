@@ -8,9 +8,9 @@ class Package:
     height: int
     address: int
 
-    def __init__(self, wight, width, height, address):
+    def __init__(self, weight, width, height, address):
         super().__init__()
-        self.weight = wight
+        self.weight = weight
         self.width = width
         self.height = height
         self.address = address
