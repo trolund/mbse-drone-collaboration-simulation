@@ -27,4 +27,4 @@ class Task(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def get_lift_requirement(self):
-        return sum(p.wight for p in self.packages)
+        return sum(p.weight for p in self.packages)
