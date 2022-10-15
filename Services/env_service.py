@@ -6,13 +6,14 @@ import pygame
 from Models.colors import GREY, GREEN, GREENY, DARK_GERY
 from basic_types import Layout
 
-def grid_to_pos(i, j, step_size):
-    return step_size * i, step_size * j
+
+def grid_to_pos(i, j, step_size, scale: float = 1.0):
+    return step_size * i * scale, step_size * j * scale
 
 
-def pos_to_grid(i, j, step_size):
-    x, y = i / step_size, j / step_size
-    return math.floor(x % step_size), math.floor(y % step_size)
+def pos_to_grid(i, j, step_size, scale: float = 1.0):
+    x, y = (i / step_size) / scale, (j / step_size) / scale
+    return math.floor(x), math.floor(y)
 
 
 def translate_moves(list: list[(int, int)], step_size: int):
@@ -56,6 +57,7 @@ def get_world_size(surface: pygame.Surface, layout: Layout):
 def scale_corr(cor: (int, int), scale: float):
     return cor[0] * scale, cor[1] * scale
 
+
 def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: float = 1):
     # draw grounds
     for i in range(0, y_len):
@@ -94,6 +96,7 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
 
     return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
 
+
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)
     layout[pos[0]][pos[1]] = "T"
@@ -112,6 +115,7 @@ def find_random_road_pos(layout: Layout):
         pos = (x, y)
 
     return pos
+
 
 def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
     delivery_sports = []

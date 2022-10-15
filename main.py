@@ -14,7 +14,7 @@ from Models.task import Task
 from GUI.UI import UI
 from Models.drone import Drone
 from Models.truck import Truck
-from Services.env_service import draw_layout, create_layout_env, get_world_size, grid_to_pos
+from Services.env_service import draw_layout, create_layout_env, get_world_size, grid_to_pos, pos_to_grid
 from containers import Container
 
 pygame.init()
@@ -23,7 +23,7 @@ pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCALE = 1 # 4.5
+SCALE = 1.5 # 4.5
 
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
@@ -107,7 +107,9 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
-    print(number_of_grounds, number_of_customers)
+    tanslated_pos = grid_to_pos(truck_pos[0], truck_pos[1], step_size, scale=SCALE)
+
+    print(tanslated_pos, truck_pos, pos_to_grid(tanslated_pos[0], tanslated_pos[1], step_size, SCALE))
 
     # instance of UI
     ui = UI(WIN)
@@ -121,7 +123,7 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
     )
 
     # create all objects in the environment
-    create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size))
+    create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, SCALE))
     create_env(env)
 
     # Simulation/game loop
