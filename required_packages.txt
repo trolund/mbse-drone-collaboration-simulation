@@ -1,1 +1,0 @@
-pip3 install pygame pygame_gui dependency_injector

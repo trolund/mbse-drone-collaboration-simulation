@@ -15,9 +15,7 @@ from GUI.UI import UI
 from Models.drone import Drone
 from Models.truck import Truck
 from Services.env_service import draw_layout, create_layout_env, get_world_size
-from basic_types import Layout
 from containers import Container
-from json_util import dumpJson
 
 pygame.init()
 pygame.font.init()
@@ -86,12 +84,10 @@ def create_env(env: Env):
 
 
 def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
+
+    # draw the basic layout
     draw_layout(WIN, layout, x_len, y_len, step_size, SCALE)
 
-    # # draw grounds
-    # for g in env.grounds:
-    #     g.draw(WIN)
-    #
     # draw truck
     env.trucks.update(SCALE)
     env.trucks.draw(WIN)
@@ -109,7 +105,7 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
 def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
     print(config)
 
-    layout, addresses = create_layout_env(50, 10, change_of_customer=1.0)
+    (layout, addresses), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
     # instance of UI

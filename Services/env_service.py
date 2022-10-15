@@ -90,8 +90,29 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
                 else:
                     layout[i][j] = "."
 
-    return provide_dp(layout, m, ground_size, road_size, change_of_customer)
+    new_layout, truck_pos = create_random_truck_pos(layout)
 
+    return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
+
+def create_random_truck_pos(layout: Layout):
+    pos = find_random_road_pos(layout)
+
+    layout[pos[0]][pos[1]] = "T"
+    return layout, pos
+
+
+def find_random_road_pos(layout: Layout):
+    curr = None
+    pos = (0, 0)
+    while curr != "R":
+        length = len(layout)
+        x = math.floor(random.uniform(0, length))
+        y = math.floor(random.uniform(0, length))
+
+        curr = layout[x][y]
+        pos = (x, y)
+
+    return pos
 
 def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
     size = ground_size - road_size

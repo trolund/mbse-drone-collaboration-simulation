@@ -12,7 +12,7 @@ To run the project please install the following packages by using pip or pip3:
 
 The config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
 
-* init_scale - the scale the simulation starts at.
+* scale - the scale the simulation starts at.
 
 # Definitions (Conventions of the project)
 

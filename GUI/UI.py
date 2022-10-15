@@ -13,8 +13,12 @@ from containers import Container
 
 class UI:
 
-    def __init__(self, screen: Surface, logger: EventLogger = Provide[Container.event_logger]):
+    def __init__(self, screen: Surface, logger: EventLogger = Provide[Container.event_logger],
+                 config=Provide[Container.config]):
         self.logger = logger
+        self.config = config
+        self.scale = float(self.config["setup"]["scale"])
+
         self.ui_width = 400
         self.margin = 30
 
@@ -22,7 +26,8 @@ class UI:
         self.ui_x = self.ui_width
 
         self.screen = screen
-        self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()), os.path.join("GUI", 'theme.json'))
+        self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()),
+                                            os.path.join("GUI", 'theme.json'))
 
         self.use_battery = False
         self.log = []
@@ -37,9 +42,21 @@ class UI:
             manager=self.manager
         )
 
-        self.button2 = pygame_gui.elements.UIButton(
+        self.button_scale_up = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(self.ui_x + self.margin, 200, 100, 30),
-            text='Click me 2',
+            text='scale up',
+            manager=self.manager
+        )
+
+        self.button_scale_down = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(self.ui_x + self.margin, 200, 100, 30),
+            text='scale down',
+            manager=self.manager
+        )
+
+        self.scale_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 200, 100),
+            text="scale: ",
             manager=self.manager
         )
 
@@ -71,9 +88,10 @@ class UI:
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == self.button2:
-                    self.label1.set_text("click 2")
-                    print("click 2")
+                if event.ui_element == self.button_scale_up:
+                    self.scale = self.scale + 1
+                if event.ui_element == self.button_scale_down:
+                    self.scale = self.scale - 1
                 if event.ui_element == self.use_battery_btn:
                     self.use_battery = not self.use_battery
                     self.use_battery_btn.set_text(str(self.use_battery))
@@ -84,6 +102,7 @@ class UI:
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
+        self.scale_label.set_text(str(self.scale))
         self.update_event_list()
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
