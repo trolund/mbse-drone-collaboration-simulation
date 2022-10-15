@@ -3,8 +3,8 @@ import random
 
 import pygame
 
+from Models.basic_types import Layout
 from Models.colors import GREY, GREEN, GREENY, DARK_GERY
-from basic_types import Layout
 
 
 def grid_to_pos(i, j, step_size, scale: float = 1.0):
@@ -76,7 +76,7 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
                 pygame.draw.rect(surface, GREY, pygame.Rect(x, y, size, size))
 
 
-def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5):
+def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5, random_truck_pos: bool = False):
     m = world_size + road_size
     g = ground_size
 
@@ -92,10 +92,11 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
                 else:
                     layout[i][j] = "."
 
-    new_layout, truck_pos = create_random_truck_pos(layout)
-
-    return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
-
+    if random_truck_pos:
+        new_layout, truck_pos = create_random_truck_pos(layout)
+        return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
+    else:
+        return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
 
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)
@@ -150,8 +151,7 @@ def print_layout(layout: Layout):
 
     print()
 
-
-if __name__ == "__main__":
-    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
-    print_layout(layout)
-    print(number_of_customers, number_of_grounds, truck_pos, delivery_sports)
+# if __name__ == "__main__":
+#     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
+#     print_layout(layout)
+#     print(number_of_customers, number_of_grounds, truck_pos, delivery_sports)

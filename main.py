@@ -4,6 +4,7 @@ import pygame
 import pygame_gui
 from dependency_injector.wiring import inject, Provide
 
+from Models.basic_types import Pos
 from Models.colors import WHITE
 from Models.env import Env
 # Basic setup
@@ -22,8 +23,11 @@ pygame.font.init()
 pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCALE = 1
+WIN: pygame.Surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SCALE: int = 1
+TRUCK_POS_RANDOM: bool = False
+FIXED_TRUCK_POS: Pos = (0, 0)
+
 
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
@@ -108,16 +112,25 @@ def set_scale(val):
         SCALE = 1
     else:
         SCALE = temp
+
+def get_config(config):
+    global SCALE
+    global FIXED_TRUCK_POS
+    global TRUCK_POS_RANDOM
+
+    SCALE = float(config["setup"]["scale"])
+    TRUCK_POS_RANDOM = bool(config["setup"]["truck_pos_random"])
+    a = config["setup"]["fixed_truck_pos"].split(",")
+    FIXED_TRUCK_POS = (int(a[0]), int(a[1]))
+
+
 @inject
 def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
-    global SCALE
-    SCALE = float(config["setup"]["scale"])
+    get_config(config)
+
+    # setup layout
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
-
-    tanslated_pos = grid_to_pos(truck_pos[0], truck_pos[1], step_size, scale=SCALE)
-
-    print(tanslated_pos, truck_pos, pos_to_grid(tanslated_pos[0], tanslated_pos[1], step_size, SCALE))
 
     # instance of UI
     ui = UI(set_scale, WIN)

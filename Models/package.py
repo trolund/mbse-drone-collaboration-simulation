@@ -26,7 +26,7 @@ def queue_package(amount_of_packages, possible_addresses, max_weight):
         point = random.randrange(0,len(possible_addresses))
         address = possible_addresses[point]
         del possible_addresses[point]
-        package = Package(weight,address)
+        package = Package(weight, address)
         queue.append(package)
     return queue
 

@@ -36,12 +36,12 @@ class Drone(pygame.sprite.Sprite):
         self.moves = []
         self.attachment = None
         self.curr_move = None
-        self.size = 15 * scale
+        self.size = 70 * scale
 
         self.images = []
 
-        img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
-        img = pygame.transform.scale(img, (self.size, self.size))
+        self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
+        img = pygame.transform.scale(self.img, (self.size, self.size))
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -119,6 +119,7 @@ class Drone(pygame.sprite.Sprite):
 
     def update(self, scale):
         self.size = 15 * scale
+        self.image = pygame.transform.scale(self.images[0], (self.size, self.size))
 
         # take new task
         self.take_task()
