@@ -16,10 +16,10 @@ def pos_to_grid(i, j, step_size, scale: float = 1.0):
     return math.floor(x), math.floor(y)
 
 
-def translate_moves(list: list[(int, int)], step_size: int):
+def translate_moves(list: list[(int, int)], step_size: int, scale: float = 1.0):
     moves = []
     for p in list:
-        moves.append(grid_to_pos(p[0], p[1], step_size))
+        moves.append(grid_to_pos(p[0], p[1], step_size, scale))
 
     return moves
 
