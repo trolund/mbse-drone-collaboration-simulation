@@ -114,9 +114,11 @@ def find_random_road_pos(layout: Layout):
     return pos
 
 def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
-    size = ground_size - road_size
-
     delivery_sports = []
+    number_of_grounds = 0
+    number_of_customers = 0
+
+    size = ground_size - road_size
 
     for i in range(road_size, world_size, ground_size):
         for j in range(road_size, world_size, ground_size):
@@ -124,13 +126,16 @@ def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int
                 # assign the delivery spot to a random point on the ground
                 x = math.floor(random.uniform(i, i + size))
                 y = math.floor(random.uniform(j, j + size))
+                number_of_customers += 1
 
                 # add address to list
                 delivery_sports.append((x, y))
 
                 layout[x][y] = "S"
 
-    return layout, delivery_sports
+            number_of_grounds += 1
+
+    return layout, delivery_sports, number_of_grounds, number_of_customers
 
 
 def print_layout(layout: Layout):
@@ -139,7 +144,10 @@ def print_layout(layout: Layout):
         for j in range(len(layout)):
             print(f' {layout[i][j]} ', end="")
 
+    print()
+
 
 if __name__ == "__main__":
-    (layout, addresses), truck_pos = create_layout_env(15, 5, 1, 0.5)
+    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
     print_layout(layout)
+    print(number_of_customers, number_of_grounds, truck_pos, delivery_sports)

@@ -104,8 +104,10 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
 
 @inject
 def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
-    (layout, addresses), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
+    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
+
+    print(number_of_grounds, number_of_customers)
 
     # instance of UI
     ui = UI(WIN)
