@@ -2,6 +2,27 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
+## Dependencies 
+
+To run the project please install the following packages by using pip or pip3:
+
+  pip3 install pygame pygame_gui dependency_injector
+
+## Config 
+
+The config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
+
+* init_scale - the scale the simulation starts at.
+
+# Definitions (Conventions of the project)
+
+## Neighborhood (env) structure
+
+* Road : "R"
+* Ground: “.”
+* Delivery spot: "S"
+* House : "H" (could be nice)
+
 # Ideas to investigate 
 
 * speed of truck 

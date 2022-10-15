@@ -1,11 +1,11 @@
 import logging
 
-
 class EventLogger:
 
     def __init__(self) -> None:
         self.log_in_memory = []
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}", )
+        print(self.logger)
 
     def log(self, msg):
         self.log_in_memory.insert(0, msg)

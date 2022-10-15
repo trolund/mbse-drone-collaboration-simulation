@@ -4,7 +4,6 @@ import pygame
 import pygame_gui
 from dependency_injector.wiring import inject, Provide
 
-from Logging.eventlogger import EventLogger
 from Models.colors import WHITE
 from Models.env import Env
 # Basic setup
@@ -15,6 +14,8 @@ from Models.task import Task
 from GUI.UI import UI
 from Models.drone import Drone
 from Models.truck import Truck
+from Services.env_service import draw_layout, create_layout_env, get_world_size
+from basic_types import Layout
 from containers import Container
 from json_util import dumpJson
 
@@ -23,14 +24,16 @@ pygame.font.init()
 pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-WIN = pygame.display.set_mode((1366,768))
+WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SCALE = 4.5
+
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
 
 def create_drones(env: Env):
     for d in range(0, 4):
-        drone = Drone("done_" + str(d))
+        drone = Drone(SCALE, "done_" + str(d))
         # start at x, y
         drone.rect.x = 0
         drone.rect.y = 0
@@ -74,7 +77,7 @@ def update_drones(env: Env):
 
 
 def create_env(env: Env):
-    truck = Truck()
+    truck = Truck(SCALE)
     env.home = truck.get_home()
     env.trucks.add(truck)
     create_tasks(env)
@@ -82,26 +85,32 @@ def create_env(env: Env):
     create_drones(env)
 
 
-def draw_layers(env: Env):
-    # draw grounds
-    for g in env.grounds:
-        g.draw(WIN)
+def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
+    draw_layout(WIN, layout, x_len, y_len, step_size, SCALE)
 
+    # # draw grounds
+    # for g in env.grounds:
+    #     g.draw(WIN)
+    #
     # draw truck
-    env.trucks.update()
+    env.trucks.update(SCALE)
     env.trucks.draw(WIN)
-
+    #
     # draw tasks
     env.tasks.update()
     env.tasks.draw(WIN)
-
+    #
     # draw drones
-    env.drones.update()
+    env.drones.update(SCALE)
     env.drones.draw(WIN)
 
 
 @inject
-def main(env: Env = Provide[Container.env]):
+def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
+    print(config)
+
+    layout, addresses = create_layout_env(50, 10, change_of_customer=1.0)
+    (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
     # instance of UI
     ui = UI(WIN)
@@ -142,7 +151,7 @@ def main(env: Env = Provide[Container.env]):
             WIN.fill(WHITE)
 
             # draw object layers
-            draw_layers(env)
+            draw_layers(layout, x_len, y_len, step_size, env)
 
         # update and draw UI
         ui.update(time_delta, clock.get_fps())

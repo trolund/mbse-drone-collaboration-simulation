@@ -7,19 +7,17 @@ from Models.package import Package
 
 
 class Truck(pygame.sprite.Sprite):
-
     packages: List[Package] = []
 
-    def __init__(self, packages=None, number_of_attachment_points=1):
+    def __init__(self, scale, packages=None, number_of_attachment_points=1):
         super().__init__()
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
 
         self.images = []
 
-        self.scale = 3.2
-        self.width = 855 / self.scale
-        self.height = 352 / self.scale
+        self.width = 27 * scale
+        self.height = 11 * scale
 
         img = pygame.image.load(os.path.join('Assets', 'Truck.png')).convert_alpha()
         img = pygame.transform.scale(img, (self.width, self.height))
@@ -35,6 +33,10 @@ class Truck(pygame.sprite.Sprite):
 
         self.rect.x = 560
         self.rect.y = 800
+
+    def update(self, scale):
+        self.width = 27 * scale
+        self.height = 11 * scale
 
     def draw(self):
         pass
@@ -52,4 +54,3 @@ class Truck(pygame.sprite.Sprite):
         rot_image = pygame.transform.rotate(image, angle)
         rot_rect = rot_image.get_rect(center=rect.right)
         return rot_image, rot_rect
-

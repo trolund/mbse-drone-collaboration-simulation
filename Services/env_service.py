@@ -3,8 +3,8 @@ import random
 
 import pygame
 
+from Models.colors import GREY, GREEN, GREENY, DARK_GERY
 from basic_types import Layout
-
 
 def grid_to_pos(i, j, step_size):
     return step_size * i, step_size * j
@@ -42,7 +42,7 @@ def add_offset(pos: (int, int), step_size):
     return pos[0] + step_size / 2, pos[1] + step_size / 2
 
 
-def get_world_size(surface, layout):
+def get_world_size(surface: pygame.Surface, layout: Layout):
     space = min(surface.get_height(), surface.get_width())
 
     x_len = len(layout)
@@ -53,30 +53,28 @@ def get_world_size(surface, layout):
     return step_size, x_len, y_len
 
 
-def draw_env(surface, layout, x_len: int, y_len: int, step_size: int):
+def scale_corr(cor: (int, int), scale: float):
+    return cor[0] * scale, cor[1] * scale
+
+def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: float = 1):
     # draw grounds
     for i in range(0, y_len):
         for j in range(0, x_len):
             color = 50 if (i + j) % 2 == 0 else 150
-            x, y = grid_to_pos(i, j, step_size)
+            x, y = scale_corr(grid_to_pos(i, j, step_size), scale)
+            size = (step_size * scale) + 1
 
             if layout[i][j] == "R":
-                pygame.draw.rect(surface, (200, 100, 100), pygame.Rect(x, y, step_size, step_size))
+                pygame.draw.rect(surface, DARK_GERY, pygame.Rect(x, y, size, size))
             elif layout[i][j] == "S":
-                pygame.draw.rect(surface, (100, 10, 10),
-                                 pygame.Rect(x, y, int(step_size),
-                                             int(step_size)))
+                pygame.draw.rect(surface, GREENY, pygame.Rect(x, y, size, size))
             elif layout[i][j] == ".":
-                pygame.draw.rect(surface, (50, 10, 240),
-                                 pygame.Rect(x, y, int(step_size),
-                                             int(step_size)))
+                pygame.draw.rect(surface, GREEN, pygame.Rect(x, y, size, size))
             else:
-                pygame.draw.rect(surface, (color, 220, 222),
-                                 pygame.Rect(x, y, int(step_size),
-                                             int(step_size)))
+                pygame.draw.rect(surface, (color, 220, 222), pygame.Rect(x, y, size, size))
 
 
-def create_layout_env(world_size: int, ground_size: int, road_size: int = 2):
+def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5):
     m = world_size + road_size
     g = ground_size
 
@@ -92,20 +90,27 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2):
                 else:
                     layout[i][j] = "."
 
-    return provide_dp(layout, m, ground_size, road_size)
+    return provide_dp(layout, m, ground_size, road_size, change_of_customer)
 
 
-def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int):
+def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
     size = ground_size - road_size
+
+    delivery_sports = []
 
     for i in range(road_size, world_size, ground_size):
         for j in range(road_size, world_size, ground_size):
-            x = math.floor(random.uniform(i, i + size))
-            y = math.floor(random.uniform(j, j + size))
+            if random.uniform(0, 1) < change_of_customer:  # change of the ground being signed up for delivery
+                # assign the delivery spot to a random point on the ground
+                x = math.floor(random.uniform(i, i + size))
+                y = math.floor(random.uniform(j, j + size))
 
-            layout[x][y] = "S"
+                # add address to list
+                delivery_sports.append((x, y))
 
-    return layout
+                layout[x][y] = "S"
+
+    return layout, delivery_sports
 
 
 def print_layout(layout: Layout):
@@ -116,5 +121,5 @@ def print_layout(layout: Layout):
 
 
 if __name__ == "__main__":
-    layout = create_layout_env(200, 10)
+    layout = create_layout_env(200, 100)
     print_layout(layout)

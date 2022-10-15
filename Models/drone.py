@@ -25,10 +25,10 @@ def get_move_obj(move: Move):
 
 
 class Drone(pygame.sprite.Sprite):
-    size = 70
+
     lift: float = 22.5
 
-    def __init__(self, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
+    def __init__(self, scale, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
         self.logger = logger
         self.env_ref = env
@@ -36,6 +36,7 @@ class Drone(pygame.sprite.Sprite):
         self.moves = []
         self.attachment = None
         self.curr_move = None
+        self.size = 15 * scale
 
         self.images = []
 
@@ -116,7 +117,9 @@ class Drone(pygame.sprite.Sprite):
             s = self.name + " move to: (" + str(self.curr_move[0][0]) + ", " + str(self.curr_move[0][1]) + ")"
             self.logger.log(s)
 
-    def update(self):
+    def update(self, scale):
+        self.size = 15 * scale
+
         # take new task
         self.take_task()
 
