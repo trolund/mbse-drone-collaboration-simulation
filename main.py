@@ -14,7 +14,7 @@ from Models.task import Task
 from GUI.UI import UI
 from Models.drone import Drone
 from Models.truck import Truck
-from Services.env_service import draw_layout, create_layout_env, get_world_size
+from Services.env_service import draw_layout, create_layout_env, get_world_size, grid_to_pos
 from containers import Container
 
 pygame.init()
@@ -23,7 +23,7 @@ pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCALE = 4.5
+SCALE = 1 # 4.5
 
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
@@ -73,11 +73,12 @@ def update_drones(env: Env):
     for drone in env.drones:
         drone.update()
 
-
-def create_env(env: Env):
-    truck = Truck(SCALE)
+def create_truck(env: Env, pos):
+    truck = Truck(pos, SCALE)
     env.home = truck.get_home()
     env.trucks.add(truck)
+
+def create_env(env: Env):
     create_tasks(env)
     create_grounds(env)
     create_drones(env)
@@ -103,8 +104,6 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
 
 @inject
 def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
-    print(config)
-
     (layout, addresses), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
@@ -120,6 +119,7 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
     )
 
     # create all objects in the environment
+    create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size))
     create_env(env)
 
     # Simulation/game loop

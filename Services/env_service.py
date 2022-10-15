@@ -71,7 +71,7 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
             elif layout[i][j] == ".":
                 pygame.draw.rect(surface, GREEN, pygame.Rect(x, y, size, size))
             else:
-                pygame.draw.rect(surface, (color, 220, 222), pygame.Rect(x, y, size, size))
+                pygame.draw.rect(surface, GREY, pygame.Rect(x, y, size, size))
 
 
 def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5):
@@ -96,7 +96,6 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
 
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)
-
     layout[pos[0]][pos[1]] = "T"
     return layout, pos
 

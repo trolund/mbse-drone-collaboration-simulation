@@ -9,7 +9,7 @@ from Models.package import Package
 class Truck(pygame.sprite.Sprite):
     packages: List[Package] = []
 
-    def __init__(self, scale, packages=None, number_of_attachment_points=1):
+    def __init__(self, pos, scale, packages=None, number_of_attachment_points=1):
         super().__init__()
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
@@ -31,8 +31,8 @@ class Truck(pygame.sprite.Sprite):
         self.image = rot_image
         self.rect = rot_rect
 
-        self.rect.x = 560
-        self.rect.y = 800
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
 
     def update(self, scale):
         self.width = 27 * scale
