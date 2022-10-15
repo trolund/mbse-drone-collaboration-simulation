@@ -23,7 +23,7 @@ pygame.mixer.init()
 
 # WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-SCALE = 1.5 # 4.5
+SCALE = 1
 
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
@@ -101,9 +101,17 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
     env.drones.update(SCALE)
     env.drones.draw(WIN)
 
-
+def set_scale(val):
+    global SCALE
+    temp = SCALE + val
+    if temp < 1:
+        SCALE = 1
+    else:
+        SCALE = temp
 @inject
 def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
+    global SCALE
+    SCALE = float(config["setup"]["scale"])
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
@@ -112,7 +120,7 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
     print(tanslated_pos, truck_pos, pos_to_grid(tanslated_pos[0], tanslated_pos[1], step_size, SCALE))
 
     # instance of UI
-    ui = UI(WIN)
+    ui = UI(set_scale, WIN)
 
     is_paused = True
 
@@ -154,7 +162,7 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
             draw_layers(layout, x_len, y_len, step_size, env)
 
         # update and draw UI
-        ui.update(time_delta, clock.get_fps())
+        ui.update(time_delta, clock.get_fps(), SCALE)
 
         # update screen with drawing
         draw_window()

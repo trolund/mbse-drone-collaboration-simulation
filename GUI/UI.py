@@ -13,11 +13,12 @@ from containers import Container
 
 class UI:
 
-    def __init__(self, screen: Surface, logger: EventLogger = Provide[Container.event_logger],
+    def __init__(self, setScale, screen: Surface, logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config]):
         self.logger = logger
         self.config = config
         self.scale = float(self.config["setup"]["scale"])
+        self.set_scale = setScale
 
         self.ui_width = 400
         self.margin = 30
@@ -49,13 +50,13 @@ class UI:
         )
 
         self.button_scale_down = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 200, 100, 30),
+            relative_rect=pygame.Rect(self.ui_x + self.margin, 235, 100, 30),
             text='scale down',
             manager=self.manager
         )
 
         self.scale_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 200, 100),
+            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 300, 100),
             text="scale: ",
             manager=self.manager
         )
@@ -89,20 +90,20 @@ class UI:
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.button_scale_up:
-                    self.scale = self.scale + 1
+                    self.set_scale(0.2)
                 if event.ui_element == self.button_scale_down:
-                    self.scale = self.scale - 1
+                    self.set_scale(-0.2)
                 if event.ui_element == self.use_battery_btn:
                     self.use_battery = not self.use_battery
                     self.use_battery_btn.set_text(str(self.use_battery))
 
         self.manager.process_events(event)
 
-    def update(self, time_delta: float, fps: float):
+    def update(self, time_delta: float, fps: float, scale: float):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
-        self.scale_label.set_text(str(self.scale))
+        self.scale_label.set_text(str(scale))
         self.update_event_list()
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
