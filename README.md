@@ -21,7 +21,35 @@ The config file **config.ini** contains all the global parameters. the file is g
 * Road : "R"
 * Ground: “.”
 * Delivery spot: "S"
-* House : "H" (could be nice)
+* Truck: "T"
+
+### ENV service (env_service.py) 
+
+creates the 2D representation of a neighborhood
+  
+For instance will the input (world_size=15, ground_size=5, road_size=1, customer_density=0.5) result in the neighborhood
+below. This representation is called a layout in the code.
+
+  **(layout, addresses), truck_pos = create_layout_env(15, 5, 1, 0.5)**
+
+   R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+   R  .  .  .  .  R  .  S  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  T  .  .  .  .  R  .  .  .  .  R 
+   R  S  .  .  .  R  .  .  .  .  R  .  .  S  .  R 
+   R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+   R  .  .  S  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+   R  .  .  .  .  R  .  .  S  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+   R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+
+A layout can be printed out byt using **print_layout(layout)**.
 
 # Ideas to investigate 
 

@@ -141,5 +141,5 @@ def print_layout(layout: Layout):
 
 
 if __name__ == "__main__":
-    layout = create_layout_env(200, 100)
+    (layout, addresses), truck_pos = create_layout_env(15, 5, 1, 0.5)
     print_layout(layout)
