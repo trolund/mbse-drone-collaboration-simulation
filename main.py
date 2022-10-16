@@ -7,8 +7,8 @@ from dependency_injector.wiring import inject, Provide
 from Models.basic_types import Pos
 from Models.colors import WHITE
 from Models.env import Env
+
 # Basic setup
-from Models.move_type import Move_Type
 from Models.setup import FPS
 from Models.task import Task
 from GUI.UI import UI
@@ -24,7 +24,7 @@ pygame.mixer.init()
 WIN = pygame.display.set_mode((1200, 800))
 #WIN: pygame.Surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
-SCALE: int = 1
+scale: int = 1
 TRUCK_POS_RANDOM: bool = False
 FIXED_TRUCK_POS: Pos = (0, 0)
 
@@ -39,7 +39,7 @@ pygame.font.Font(None, 22)
 
 def create_drones(env: Env, number_of_drones: int):
     for d in range(0, number_of_drones):
-        drone = Drone(SCALE, "done_" + str(d))
+        drone = Drone(scale, "done_" + str(d))
         # start at x, y
         drone.rect.x = env.home[0]
         drone.rect.y = env.home[1]
@@ -71,26 +71,26 @@ def draw_window():
 
 
 def create_truck(env: Env, pos):
-    truck = Truck(pos, SCALE)
+    truck = Truck(pos, scale)
     env.home = truck.get_home()
     env.sprites.add(truck)
 
 
 def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
     # draw the basic layout
-    draw_layout(WIN, layout, x_len, y_len, step_size, SCALE, OffsetX, OffsetY)
+    draw_layout(WIN, layout, x_len, y_len, step_size, scale, OffsetX, OffsetY)
 
     # update all sprites
-    env.sprites.update(SCALE)
+    env.sprites.update(scale)
     # draw all sprites
     for t in env.sprites:
         # scale images
-        t.image = pygame.transform.scale(t.images[0], (t.width * SCALE, t.height * SCALE))
-        WIN.blit(t.image, [(t.rect.x * SCALE + OffsetX), (t.rect.y * SCALE + OffsetY)])
+        t.image = pygame.transform.scale(t.images[0], (t.width * scale, t.height * scale))
+        WIN.blit(t.image, [(t.rect.x * scale + OffsetX), (t.rect.y * scale + OffsetY)])
 
 
 def set_scale(val):
-    global SCALE
+    global scale
     temp = SCALE + val
     if temp < 1:
         SCALE = 1
@@ -109,7 +109,7 @@ def create_window(config):
         WIN = pygame.display.set_mode((w, h))
 
 def get_config(config):
-    global SCALE
+    global scale
     global FIXED_TRUCK_POS
     global TRUCK_POS_RANDOM
 
@@ -182,7 +182,7 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
     )
 
     # create all objects in the environment
-    create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, SCALE))
+    create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, scale))
     create_drones(env, number_of_drones)
 
     # Simulation/game loop
@@ -210,7 +210,7 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
             draw_layers(layout, x_len, y_len, step_size, env)
 
         # update and draw UI
-        ui.update(time_delta, clock.get_fps(), SCALE)
+        ui.update(time_delta, clock.get_fps(), scale)
 
         pygame.display.flip()
 
