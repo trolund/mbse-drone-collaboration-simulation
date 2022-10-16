@@ -184,7 +184,6 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
     # create all objects in the environment
     create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, SCALE))
     create_drones(env, number_of_drones)
-    # create_env(env)
 
     # Simulation/game loop
     clock = pygame.time.Clock()
