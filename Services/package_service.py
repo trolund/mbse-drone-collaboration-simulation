@@ -6,7 +6,10 @@ from typing import List
 def distance_between(a, b):
     return math.dist(a, b)
 
+
 """Return the package with the smallest distance from home (truck) to the destination"""
+
+
 def get_package_best_package(addresses: List[(int, int)], home: (int, int)):
     best = None
     min_dist = sys.maxint

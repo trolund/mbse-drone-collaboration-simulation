@@ -58,12 +58,17 @@ def scale_corr(cor: (int, int), scale: float):
     return cor[0] * scale, cor[1] * scale
 
 
-def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: float = 1):
+def offset_corr(cor: (int, int), offset_x: int = 0, offset_y: int = 0):
+    return cor[0] + offset_x, cor[1] + offset_y
+
+
+def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: float = 1, offset_x: int = 0,
+                offset_y: int = 0):
     # draw grounds
     for i in range(0, y_len):
         for j in range(0, x_len):
-            color = 50 if (i + j) % 2 == 0 else 150
-            x, y = scale_corr(grid_to_pos(i, j, step_size), scale)
+
+            x, y = offset_corr(scale_corr(grid_to_pos(i, j, step_size), scale), offset_x, offset_y)
             size = (step_size * scale) + 1
 
             if layout[i][j] == "R":
@@ -76,7 +81,8 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
                 pygame.draw.rect(surface, GREY, pygame.Rect(x, y, size, size))
 
 
-def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5, random_truck_pos: bool = False):
+def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5,
+                      random_truck_pos: bool = False):
     m = world_size + road_size
     g = ground_size
 
@@ -97,6 +103,7 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
         return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
     else:
         return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
+
 
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)

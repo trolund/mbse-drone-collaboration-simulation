@@ -6,7 +6,7 @@ This project have been done as a part of the course 02223 - Model-Based Systems 
 
 To run the project please install the following packages by using pip or pip3:
 
-  pip3 install pygame pygame_gui dependency_injector
+    pip3 install pygame pygame_gui dependency_injector
 
 ## Config 
 

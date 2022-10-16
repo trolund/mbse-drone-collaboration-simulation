@@ -3,6 +3,7 @@ import sys
 import pygame
 import pygame_gui
 from dependency_injector.wiring import inject, Provide
+from pygame.event import Event
 
 from Models.basic_types import Pos
 from Models.colors import WHITE
@@ -28,6 +29,11 @@ SCALE: int = 1
 TRUCK_POS_RANDOM: bool = False
 FIXED_TRUCK_POS: Pos = (0, 0)
 
+
+OffsetX = 0
+OffsetY = 0
+
+is_running = True
 
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
@@ -62,11 +68,11 @@ def create_tasks(env: Env):
         env.tasks.add(task)
 
 
-def create_grounds(env: Env):
-    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
-    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
-    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
-    env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
+# def create_grounds(env: Env):
+#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
+#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
+#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
+#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
 
 
 def draw_window():
@@ -77,25 +83,34 @@ def update_drones(env: Env):
     for drone in env.drones:
         drone.update()
 
+
 def create_truck(env: Env, pos):
     truck = Truck(pos, SCALE)
     env.home = truck.get_home()
     env.trucks.add(truck)
 
+
 def create_env(env: Env):
-    create_tasks(env)
-    create_grounds(env)
-    create_drones(env)
+    print("create")
+    #create_tasks(env)
+    #create_grounds(env)
+    #create_drones(env)
+
+
+
 
 
 def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
-
     # draw the basic layout
-    draw_layout(WIN, layout, x_len, y_len, step_size, SCALE)
+    draw_layout(WIN, layout, x_len, y_len, step_size, SCALE, OffsetX, OffsetY)
 
     # draw truck
     env.trucks.update(SCALE)
-    env.trucks.draw(WIN)
+
+    for t in env.trucks:
+        WIN.blit(t.image, [(t.rect.x + OffsetX), (t.rect.y + OffsetY)])
+
+
     #
     # draw tasks
     env.tasks.update()
@@ -105,6 +120,9 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
     env.drones.update(SCALE)
     env.drones.draw(WIN)
 
+
+
+
 def set_scale(val):
     global SCALE
     temp = SCALE + val
@@ -112,6 +130,7 @@ def set_scale(val):
         SCALE = 1
     else:
         SCALE = temp
+
 
 def get_config(config):
     global SCALE
@@ -123,13 +142,44 @@ def get_config(config):
     a = config["setup"]["fixed_truck_pos"].split(",")
     FIXED_TRUCK_POS = (int(a[0]), int(a[1]))
 
+def keyboard_input():
+    global OffsetX
+    global OffsetY
+
+    keys = pygame.key.get_pressed()  # checking pressed keys
+    if keys[pygame.K_LEFT]:
+        OffsetX += 5
+    if keys[pygame.K_RIGHT]:
+        OffsetX -= 5
+    if keys[pygame.K_UP]:
+        OffsetY += 5
+    if keys[pygame.K_DOWN]:
+        OffsetY -= 5
+
+    # if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+    #     if event.mod == pygame.KMOD_NONE:
+
+        # else:
+        #     if event.mod & pygame.KMOD_LSHIFT:
+        #         print('Left shift was in a pressed state when this event '
+        #               'occurred.')
+        #     if event.mod & pygame.KMOD_RSHIFT:
+        #         print('Right shift was in a pressed state when this event '
+        #               'occurred.')
+        #     if event.mod & pygame.KMOD_SHIFT:
+        #         print('Left shift or right shift or both were in a '
+        #               'pressed state when this event occurred.')
+
 
 @inject
-def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
+def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
+    global is_running
+
     get_config(config)
 
     # setup layout
-    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10, change_of_customer=1.0)
+    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(50, 10,
+                                                                                                     change_of_customer=1.0)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
 
     # instance of UI
@@ -149,21 +199,20 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
 
     # Simulation/game loop
     clock = pygame.time.Clock()
-    is_running = True
 
 
     while is_running:
         time_delta = clock.tick(FPS) / 1000.0
-
+        keyboard_input()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 is_running = False
-                pygame.quit()
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == pause_btn:
                         is_paused = not is_paused
                         pause_btn.set_text("▶ Resume" if is_paused else "Pause")
+
 
             ui.handle_events(event)
 
@@ -172,13 +221,21 @@ def main(env: Env = Provide[Container.env], config = Provide[Container.config]):
             WIN.fill(WHITE)
 
             # draw object layers
+
             draw_layers(layout, x_len, y_len, step_size, env)
 
         # update and draw UI
         ui.update(time_delta, clock.get_fps(), SCALE)
 
+        # apply offsets
+        #offset_sprites(env)
+        pygame.display.flip()
+
         # update screen with drawing
         draw_window()
+
+
+    pygame.quit()
 
 
 if __name__ == "__main__":
