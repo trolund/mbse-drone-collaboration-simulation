@@ -28,7 +28,7 @@ class Drone(pygame.sprite.Sprite):
 
     lift: float = 22.5
 
-    def __init__(self, scale, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
+    def __init__(self, grid_pos, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
         self.logger = logger
         self.env_ref = env
@@ -38,10 +38,15 @@ class Drone(pygame.sprite.Sprite):
         self.curr_move = None
         self.size = 15
 
+        self.grid_pos = grid_pos
+
+        self.width = self.size
+        self.height = self.size
+
         self.images = []
 
         self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
-        img = pygame.transform.scale(self.img, (self.size, self.size))
+        img = pygame.transform.scale(self.img, (self.size * 100, self.size * 100))
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()

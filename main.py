@@ -36,23 +36,23 @@ pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
 
-def create_drones(env: Env):
-    for d in range(0, 4):
+def create_drones(env: Env, number_of_drones: int):
+    for d in range(0, number_of_drones):
         drone = Drone(SCALE, "done_" + str(d))
         # start at x, y
-        drone.rect.x = 0
-        drone.rect.y = 0
+        drone.rect.x = env.home[0]
+        drone.rect.y = env.home[1]
 
-        # movements
-        # drone.add_move_point(300, 300)
-        drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, env.get_task_at(200 + (d * 60), 200))
-        # drone.add_move_point(300 * d, 300)
-        # drone.add_move_point(900, 600 * d)
-        drone.add_move_point(env.grounds[d].get_landing_spot_pos(offset=True), Move_Type.DROP_OFF)
-        # drone.add_move_point(900, 600 * d)
-        drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
+        # # movements
+        # # drone.add_move_point(300, 300)
+        # drone.add_move_point((200 + (d * 60), 200), Move_Type.PICKUP, env.get_task_at(200 + (d * 60), 200))
+        # # drone.add_move_point(300 * d, 300)
+        # # drone.add_move_point(900, 600 * d)
+        # drone.add_move_point(env.grounds[d].get_landing_spot_pos(offset=True), Move_Type.DROP_OFF)
+        # # drone.add_move_point(900, 600 * d)
+        # drone.add_move_point((env.home[0], env.home[1] + (d * 70)))
 
-        env.drones.add(drone)
+        env.sprites.add(drone)
 
 
 def create_tasks(env: Env):
@@ -63,14 +63,6 @@ def create_tasks(env: Env):
         task.rect.y = 200
 
         env.tasks.add(task)
-
-
-# def create_grounds(env: Env):
-#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 0)))
-#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 0)))
-#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (0, 700)))
-#     env.grounds.append(Ground([(0, 0), (0, 500), (500, 500), (500, 0)], (700, 700)))
-
 
 def draw_window():
     pygame.display.update()
@@ -91,8 +83,9 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
     env.sprites.update(SCALE)
     # draw all sprites
     for t in env.sprites:
-        t.image = pygame.transform.scale(t.images[0], (t.width, t.height))
-        WIN.blit(t.image, [(t.rect.x + OffsetX), (t.rect.y + OffsetY)])
+        # scale images
+        t.image = pygame.transform.scale(t.images[0], (t.width * SCALE, t.height * SCALE))
+        WIN.blit(t.image, [(t.rect.x * SCALE + OffsetX), (t.rect.y * SCALE + OffsetY)])
 
 
 def set_scale(val):
@@ -121,7 +114,10 @@ def keyboard_input():
 
     offset_factor = 5
     zoom_factor = 0.5
+
     keys = pygame.key.get_pressed()  # checking pressed keys
+
+    # move camera
     if keys[pygame.K_LEFT]:
         OffsetX += offset_factor
     if keys[pygame.K_RIGHT]:
@@ -130,6 +126,7 @@ def keyboard_input():
         OffsetY += offset_factor
     if keys[pygame.K_DOWN]:
         OffsetY -= offset_factor
+    # zoom
     if keys[pygame.K_u]:
         set_scale(zoom_factor)
     if keys[pygame.K_d]:
@@ -139,19 +136,27 @@ def keyboard_input():
 def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
     global is_running
 
+    # get config
     get_config(config)
-
-    # setup layout
     world_size = int(config["setup"]["world_size"])
     ground_size = int(config["setup"]["ground_size"])
     road_size = int(config["setup"]["road_size"])
     customer_density = float(config["setup"]["customer_density"])
+    truck_pos_random = False if config["setup"]["truck_pos_random"] == "0" else True
+    a = config["setup"]["fixed_truck_pos"].split(",")
+    fixed_truck_pos = (int(a[0]), int(a[1]))
+    number_of_tasks = bool(config["setup"]["number_of_tasks"])
+    number_of_drones = bool(config["setup"]["number_of_drones"])
 
+    # setup layout
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(world_size,
                                                                                                      ground_size,
                                                                                                      road_size=road_size,
-                                                                                                     change_of_customer=customer_density)
+                                                                                                     change_of_customer=customer_density,
+                                                                                                     random_truck_pos=truck_pos_random)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
+
+
 
     # instance of UI
     ui = UI(set_scale, WIN)
@@ -166,6 +171,7 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
 
     # create all objects in the environment
     create_truck(env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, SCALE))
+    create_drones(env, number_of_drones)
     # create_env(env)
 
     # Simulation/game loop
@@ -190,14 +196,11 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
             WIN.fill(WHITE)
 
             # draw object layers
-
             draw_layers(layout, x_len, y_len, step_size, env)
 
         # update and draw UI
         ui.update(time_delta, clock.get_fps(), SCALE)
 
-        # apply offsets
-        # offset_sprites(env)
         pygame.display.flip()
 
         # update screen with drawing

@@ -9,19 +9,20 @@ from Models.package import Package
 class Truck(pygame.sprite.Sprite):
     packages: List[Package] = []
 
-    def __init__(self, pos, scale, packages=None, number_of_attachment_points=1):
+    def __init__(self, grid_pos, scale, packages=None, number_of_attachment_points=1):
         super().__init__()
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
+        self.grid_pos = grid_pos
 
         self.images = []
 
-        self.width = 27 * 100
-        self.height = 11 * 100
+        self.width = 27
+        self.height = 11
 
 
         img = pygame.image.load(os.path.join('Assets', 'Truck.png')).convert_alpha()
-        img = pygame.transform.scale(img, (self.width, self.height))
+        img = pygame.transform.scale(img, (self.width * 100, self.height * 100))
 
         self.images.append(img)
         self.image = self.images[0]
@@ -32,12 +33,15 @@ class Truck(pygame.sprite.Sprite):
         self.image = rot_image
         self.rect = rot_rect
 
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.rect.x = grid_pos[0]
+        self.rect.y = grid_pos[1]
 
     def update(self, scale):
-        self.width = 27 * scale
-        self.height = 11 * scale
+        # self.width = 27 * scale
+        # self.height = 11 * scale
+        pass
+
+
 
     def draw(self):
         pass
