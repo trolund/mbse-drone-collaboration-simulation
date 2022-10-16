@@ -22,9 +22,12 @@ pygame.mixer.init()
 pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
+
 # Main Class
 class MainRun(object):
-    def __init__(self, logger: EventLogger = Provide[Container.event_logger], config = Provide[Container.config], env: Env = Provide[Container.env]):
+
+    def __init__(self, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config],
+                 env: Env = Provide[Container.env]):
         logger.log("Starting Simulation 🚀")
         self.env = env
         self.config = config
@@ -43,7 +46,7 @@ class MainRun(object):
 
     def create_drones(self, env: Env, number_of_drones: int):
         for d in range(0, number_of_drones):
-            drone = Drone(scale, "done_" + str(d))
+            drone = Drone(self.scale, "done_" + str(d))
             # start at x, y
             drone.rect.x = env.home[0]
             drone.rect.y = env.home[1]
@@ -62,29 +65,43 @@ class MainRun(object):
         pygame.display.update()
 
     def create_truck(self, env: Env, pos):
-        truck = Truck(pos, scale)
+        truck = Truck(pos, self.scale)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
     def draw_layers(self, layout, x_len: int, y_len: int, step_size: int, env):
         # draw the basic layout
-        draw_layout(self.screen, layout, x_len, y_len, step_size, scale, self.OffsetX, self.OffsetY)
+        draw_layout(self.screen, layout, x_len, y_len, step_size, self.scale, self.OffsetX, self.OffsetY)
 
         # update all sprites
-        env.sprites.update(scale)
+        env.sprites.update(self.scale)
         # draw all sprites
         for t in env.sprites:
             # scale images
-            t.image = pygame.transform.scale(t.images[0], (t.width * scale, t.height * scale))
-            self.screen.blit(t.image, [(t.rect.x * scale + self.OffsetX), (t.rect.y * scale + self.OffsetY)])
+            t.image = pygame.transform.scale(t.images[0], (t.width * self.scale, t.height * self.scale))
+            self.screen.blit(t.image, [(t.rect.x * self.scale + self.OffsetX), (t.rect.y * self.scale + self.OffsetY)])
 
     def set_scale(self, val):
-        global scale
-        temp = scale + val
+        temp = self.scale + val
         if temp < 1:
-            scale = 1
+            self.scale = 1
+            # self.adjust_zoom_offset(val)
         else:
-            scale = temp
+            if not temp > 10:
+                self.scale = temp
+                # self.adjust_zoom_offset(val)
+
+
+    def adjust_zoom_offset(self, change):
+        locationX = (self.world_size - self.screen.get_width()) / self.scale
+        locationY = (self.world_size - self.screen.get_height()) / self.scale
+
+        if change < 0:
+           self.OffsetX += locationX
+           self.OffsetY += locationY
+        else:
+           self.OffsetX -= locationX
+           self.OffsetY -= locationY
 
     def create_window(self, config):
         is_fullscreen = False if config["graphics"]["fullscreen"] == "0" else True
@@ -97,14 +114,20 @@ class MainRun(object):
             self.screen = pygame.display.set_mode((w, h))
 
     def get_config(self, config):
-        global scale
-        global FIXED_TRUCK_POS
-        global TRUCK_POS_RANDOM
-
-        scale = float(config["graphics"]["scale"])
-        TRUCK_POS_RANDOM = bool(config["setup"]["truck_pos_random"])
+        self.scale = float(config["graphics"]["scale"])
+        self.truck_pos_random = bool(config["setup"]["truck_pos_random"])
         a = config["setup"]["fixed_truck_pos"].split(",")
-        FIXED_TRUCK_POS = (int(a[0]), int(a[1]))
+        self.fixed_truck_pos = (int(a[0]), int(a[1]))
+
+        self.world_size = int(self.config["setup"]["world_size"])
+        self.ground_size = int(self.config["setup"]["ground_size"])
+        self.road_size = int(self.config["setup"]["road_size"])
+        self.customer_density = float(self.config["setup"]["customer_density"])
+        self.truck_pos_random = False if self.config["setup"]["truck_pos_random"] == "0" else True
+        a = self.config["setup"]["fixed_truck_pos"].split(",")
+        self.fixed_truck_pos = (int(a[0]), int(a[1]))
+        self.number_of_tasks = bool(self.config["setup"]["number_of_tasks"])
+        self.number_of_drones = bool(self.config["setup"]["number_of_drones"])
 
     def keyboard_input(self):
         offset_factor = 5
@@ -121,11 +144,13 @@ class MainRun(object):
             self.OffsetY += offset_factor
         if keys[pygame.K_DOWN]:
             self.OffsetY -= offset_factor
+
         # zoom
         if keys[pygame.K_u]:
             self.set_scale(zoom_factor)
         if keys[pygame.K_d]:
             self.set_scale(-zoom_factor)
+
 
     def Main(self):
         # create the window from config
@@ -133,22 +158,13 @@ class MainRun(object):
 
         # get config
         self.get_config(self.config)
-        world_size = int(self.config["setup"]["world_size"])
-        ground_size = int(self.config["setup"]["ground_size"])
-        road_size = int(self.config["setup"]["road_size"])
-        customer_density = float(self.config["setup"]["customer_density"])
-        truck_pos_random = False if self.config["setup"]["truck_pos_random"] == "0" else True
-        a = self.config["setup"]["fixed_truck_pos"].split(",")
-        fixed_truck_pos = (int(a[0]), int(a[1]))
-        number_of_tasks = bool(self.config["setup"]["number_of_tasks"])
-        number_of_drones = bool(self.config["setup"]["number_of_drones"])
 
         # setup layout
-        (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(world_size,
-                                                                                                         ground_size,
-                                                                                                         road_size=road_size,
-                                                                                                         change_of_customer=customer_density,
-                                                                                                         random_truck_pos=truck_pos_random)
+        (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(self.world_size,
+                                                                                                         self.ground_size,
+                                                                                                         road_size=self.road_size,
+                                                                                                         change_of_customer=self.customer_density,
+                                                                                                         random_truck_pos=self.truck_pos_random)
         (step_size, x_len, y_len) = get_world_size(self.screen, layout)
 
         # instance of UI
@@ -163,8 +179,8 @@ class MainRun(object):
         )
 
         # create all objects in the environment
-        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, scale))
-        self.create_drones(self.env, number_of_drones)
+        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, self.scale))
+        self.create_drones(self.env, self.number_of_drones)
 
         # Simulation/game loop
         clock = pygame.time.Clock()
@@ -192,7 +208,7 @@ class MainRun(object):
                 self.draw_layers(layout, x_len, y_len, step_size, self.env)
 
             # update and draw UI
-            ui.update(time_delta, clock.get_fps(), scale)
+            ui.update(time_delta, clock.get_fps(), self.scale)
 
             pygame.display.flip()
 
@@ -200,6 +216,7 @@ class MainRun(object):
             self.draw_window()
 
         pygame.quit()
+
 
 if __name__ == "__main__":
     # setup dependency injection
