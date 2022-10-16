@@ -17,7 +17,7 @@ class UI:
                  config=Provide[Container.config]):
         self.logger = logger
         self.config = config
-        self.scale = float(self.config["setup"]["scale"])
+        self.scale = float(self.config["graphics"]["scale"])
         self.set_scale = setScale
 
         self.ui_width = 400

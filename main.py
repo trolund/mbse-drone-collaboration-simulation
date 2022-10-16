@@ -21,8 +21,9 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-# WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-WIN: pygame.Surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+WIN = pygame.display.set_mode((1200, 800))
+#WIN: pygame.Surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
 SCALE: int = 1
 TRUCK_POS_RANDOM: bool = False
 FIXED_TRUCK_POS: Pos = (0, 0)
@@ -96,13 +97,23 @@ def set_scale(val):
     else:
         SCALE = temp
 
+def create_window(config):
+    global WIN
+    is_fullscreen = False if config["graphics"]["fullscreen"] == "0" else True
+
+    if is_fullscreen:
+        WIN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    else:
+        w = float(config["graphics"]["window_w"])
+        h = float(config["graphics"]["window_h"])
+        WIN = pygame.display.set_mode((w, h))
 
 def get_config(config):
     global SCALE
     global FIXED_TRUCK_POS
     global TRUCK_POS_RANDOM
 
-    SCALE = float(config["setup"]["scale"])
+    SCALE = float(config["graphics"]["scale"])
     TRUCK_POS_RANDOM = bool(config["setup"]["truck_pos_random"])
     a = config["setup"]["fixed_truck_pos"].split(",")
     FIXED_TRUCK_POS = (int(a[0]), int(a[1]))
@@ -113,7 +124,7 @@ def keyboard_input():
     global OffsetY
 
     offset_factor = 5
-    zoom_factor = 0.5
+    zoom_factor = 0.2
 
     keys = pygame.key.get_pressed()  # checking pressed keys
 
@@ -136,6 +147,9 @@ def keyboard_input():
 def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
     global is_running
 
+    # create the window from config
+    create_window(config)
+
     # get config
     get_config(config)
     world_size = int(config["setup"]["world_size"])
@@ -155,8 +169,6 @@ def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
                                                                                                      change_of_customer=customer_density,
                                                                                                      random_truck_pos=truck_pos_random)
     (step_size, x_len, y_len) = get_world_size(WIN, layout)
-
-
 
     # instance of UI
     ui = UI(set_scale, WIN)
