@@ -36,7 +36,7 @@ class Drone(pygame.sprite.Sprite):
         self.moves = []
         self.attachment = None
         self.curr_move = None
-        self.size = 70 * scale
+        self.size = 15
 
         self.images = []
 
@@ -118,8 +118,8 @@ class Drone(pygame.sprite.Sprite):
             self.logger.log(s)
 
     def update(self, scale):
-        self.size = 15 * scale
-        self.image = pygame.transform.scale(self.images[0], (self.size, self.size))
+        #self.size = 15 * scale
+
 
         # take new task
         self.take_task()
@@ -139,6 +139,8 @@ class Drone(pygame.sprite.Sprite):
         # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
 
     def is_in_drop_zone(self):
+        return True
+        # TODO change to new layout
         for g in self.env_ref.grounds:
             if self.in_zone(g):
                 return True

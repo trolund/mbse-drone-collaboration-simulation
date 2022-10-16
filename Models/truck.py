@@ -16,8 +16,9 @@ class Truck(pygame.sprite.Sprite):
 
         self.images = []
 
-        self.width = 27 * scale
-        self.height = 11 * scale
+        self.width = 27 * 100
+        self.height = 11 * 100
+
 
         img = pygame.image.load(os.path.join('Assets', 'Truck.png')).convert_alpha()
         img = pygame.transform.scale(img, (self.width, self.height))

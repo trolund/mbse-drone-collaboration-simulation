@@ -87,10 +87,11 @@ def draw_layers(layout, x_len: int, y_len: int, step_size: int, env):
     # draw the basic layout
     draw_layout(WIN, layout, x_len, y_len, step_size, SCALE, OffsetX, OffsetY)
 
-    # draw tasks
+    # update all sprites
     env.sprites.update(SCALE)
-
+    # draw all sprites
     for t in env.sprites:
+        t.image = pygame.transform.scale(t.images[0], (t.width, t.height))
         WIN.blit(t.image, [(t.rect.x + OffsetX), (t.rect.y + OffsetY)])
 
 
@@ -127,7 +128,10 @@ def keyboard_input():
         OffsetY += 5
     if keys[pygame.K_DOWN]:
         OffsetY -= 5
-
+    if keys[pygame.K_u]:
+        set_scale(1)
+    if keys[pygame.K_d]:
+        set_scale(-1)
 
 @inject
 def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
