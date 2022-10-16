@@ -11,16 +11,23 @@ class Task(pygame.sprite.Sprite):
     packages: List[Package] = []
     number_of_attachment_points: int
     size: int = 50
+    address: list
+    width: int
+    height: int
 
-    def __init__(self, packages=None, number_of_attachment_points=1):
+    def __init__(self, address, packages=None, number_of_attachment_points=1):
         super().__init__()
         self.packages = packages
+        self.address = address
         self.number_of_attachment_points = number_of_attachment_points
+
+        self.width = 5
+        self.height = 5
 
         self.images = []
 
         img = pygame.image.load(os.path.join('Assets', 'task.png')).convert_alpha()
-        img = pygame.transform.scale(img, (self.size, self.size))
+        img = pygame.transform.scale(img, (self.size * 100, self.size * 100))
 
         self.images.append(img)
         self.image = self.images[0]
@@ -28,3 +35,5 @@ class Task(pygame.sprite.Sprite):
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
+    def __str__(self):
+        return (f"Packages weight is {self.get_lift_requirement()}, and should be delivered to {self.address}")
