@@ -10,7 +10,7 @@ To run the project please install the following packages by using pip or pip3:
 
 ## Config 
 
-The config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
+The main config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
 
 * scale - the scale the simulation starts at.
 
@@ -30,7 +30,7 @@ Creates the 2D representation of a neighborhood
 
   
 For instance will the input (world_size=15, ground_size=5, road_size=1, customer_density=0.5) result in the neighborhood
-below. This representation is called a layout in the code.
+below. This representation is called a layout in the code. **Please change the parameters in the main config file**.
 
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
 
