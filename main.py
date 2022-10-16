@@ -119,19 +119,21 @@ def keyboard_input():
     global OffsetX
     global OffsetY
 
+    offset_factor = 5
+    zoom_factor = 0.5
     keys = pygame.key.get_pressed()  # checking pressed keys
     if keys[pygame.K_LEFT]:
-        OffsetX += 5
+        OffsetX += offset_factor
     if keys[pygame.K_RIGHT]:
-        OffsetX -= 5
+        OffsetX -= offset_factor
     if keys[pygame.K_UP]:
-        OffsetY += 5
+        OffsetY += offset_factor
     if keys[pygame.K_DOWN]:
-        OffsetY -= 5
+        OffsetY -= offset_factor
     if keys[pygame.K_u]:
-        set_scale(1)
+        set_scale(zoom_factor)
     if keys[pygame.K_d]:
-        set_scale(-1)
+        set_scale(-zoom_factor)
 
 @inject
 def main(env: Env = Provide[Container.env], config=Provide[Container.config]):
