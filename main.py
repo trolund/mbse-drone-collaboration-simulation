@@ -13,7 +13,7 @@ from Models.setup import FPS
 from Models.task import Task
 from Models.truck import Truck
 from Services.env_service import draw_layout, grid_to_pos, get_world_size, create_layout_env
-from Services.task_manager import create_random_tasks
+from Services.task_manager import create_random_tasks, sort_tasks, print_tasks
 from containers import Container
 
 pygame.init()
@@ -63,6 +63,11 @@ class MainRun(object):
 
             env.task_ref.append(t)
             env.sprites.add(t)
+
+        env.task_ref = sort_tasks(env.task_ref, env.home)
+
+        print_tasks(env.task_ref, env.home)
+
 
     def create_truck(self, env: Env, pos):
         truck = Truck(pos, self.scale)
@@ -126,8 +131,8 @@ class MainRun(object):
         self.truck_pos_random = False if self.config["setup"]["truck_pos_random"] == "0" else True
         a = self.config["setup"]["fixed_truck_pos"].split(",")
         self.fixed_truck_pos = (int(a[0]), int(a[1]))
-        self.number_of_tasks = bool(self.config["setup"]["number_of_tasks"])
-        self.number_of_drones = bool(self.config["setup"]["number_of_drones"])
+        self.number_of_tasks = int(self.config["setup"]["number_of_tasks"])
+        self.number_of_drones = int(self.config["setup"]["number_of_drones"])
 
     def keyboard_input(self):
         offset_factor = 5

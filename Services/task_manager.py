@@ -1,4 +1,7 @@
 import random
+from typing import List
+
+import math
 
 from Models.package import Package
 from Models.task import Task
@@ -19,6 +22,10 @@ from Models.task import Task
 #         package = Task(weight, address)
 #         queue.append(package)
 #     return queue
+
+def distance_between(a, b):
+    return math.dist(a, b)
+
 
 def create_packages(amount_of_packages, max_weight):
     min_weight = 200
@@ -51,6 +58,15 @@ def create_random_tasks(possible_addresses, number_of_tasks):
         tasks.append(t)
 
     return tasks
+
+
+def sort_tasks(tasks: List[Task], home):
+    return sorted(tasks, key=lambda x: distance_between(home, (x.rect.x, x.rect.y)))
+
+
+def print_tasks(tasks: List[Task], home):
+    for t in tasks:
+        print(distance_between(home, (t.rect.x, t.rect.y)))
 
 # if __name__ == "__main__":
 #     possible_addresses = [[1,1],[2,2],[3,3],[4,4]]
