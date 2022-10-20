@@ -1,9 +1,11 @@
 import os
+import uuid
 
 import pygame
 from dependency_injector.wiring import Provide, inject
 from pygame.rect import Rect
 
+from Cominication_hub.BaseMediator import BaseMediator
 from Logging.eventlogger import EventLogger
 from Models.basic_types import Move, Pos
 from Models.env import Env
@@ -24,12 +26,13 @@ def get_move_obj(move: Move):
     return move[2]
 
 
-class Drone(pygame.sprite.Sprite):
+class Drone(pygame.sprite.Sprite, BaseMediator):
 
     lift: float = 22.5
 
     def __init__(self, grid_pos, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
+        self.id = uuid.uuid4()
         self.logger = logger
         self.env_ref = env
         self.name = name
@@ -87,6 +90,8 @@ class Drone(pygame.sprite.Sprite):
             by = point[1]
 
             self.do_move(ax, ay, bx, by)
+        else:
+            self.ready()  # send a ready signal to the drone controller
 
     def do_move(self, ax, ay, bx, by):
         steps_number = max(abs(bx - ax), abs(by - ay))
@@ -161,3 +166,6 @@ class Drone(pygame.sprite.Sprite):
             return True
         else:
             return False
+
+    def ready(self):
+        self.mediator.notify(self, "Ready")

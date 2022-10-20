@@ -6,7 +6,6 @@ from dependency_injector.wiring import Provide
 
 from Logging.eventlogger import EventLogger
 from Models.env import Env
-from Models.package import Package
 from Models.task import Task
 from containers import Container
 
@@ -23,38 +22,17 @@ class TaskManager:
         self.logger = logger
         self.env_ref = env
 
+        # sort the packages
+        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
+
+    def get_head_package(self):
+        return self.env_ref.task_ref.pop()
+
+    def is_done(self):
+        return len(self.env_ref.task_ref) == 0
+
     def distance_between(self, a, b):
         return math.dist(a, b)
-
-    def create_packages(self, amount_of_packages, max_weight):
-        min_weight = 200
-        packages = []
-
-        for i in range(amount_of_packages):
-            if min_weight == max_weight:
-                weight = min_weight
-            else:
-                weight = random.randrange(min_weight, max_weight)
-
-            package = Package(weight)
-            packages.append(package)
-
-        return packages
-
-    def get_random_address(self, possible_addresses):
-        index = random.randrange(0, len(possible_addresses))
-        return possible_addresses[index]
-
-    def create_random_tasks(self, possible_addresses, number_of_tasks):
-        tasks = []
-
-        for i in range(number_of_tasks):
-            point = self.get_random_address(possible_addresses)
-            packages = self.create_packages(1, 200)
-            t = Task(point, packages)
-            tasks.append(t)
-
-        return tasks
 
     def sort_tasks(self, tasks: List[Task]):
         return sorted(tasks, key=lambda x: self.distance_between(self.env_ref.home, (x.rect.x, x.rect.y)))

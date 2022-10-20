@@ -10,6 +10,7 @@ from Models.drone import Drone
 from Models.env import Env
 from Models.setup import FPS
 from Models.truck import Truck
+from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
 from Services.task_manager import TaskManager
 from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
@@ -28,6 +29,7 @@ class MainRun(object):
     def __init__(self, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
 
+        self.task_manager = None
         name = "DRONE SIMULATION - MBSE - GROUP 2 (2022)"
         pygame.display.set_caption(name)
         logger.log("Starting Simulation 🚀 - " + name)
@@ -63,8 +65,8 @@ class MainRun(object):
         self.drone_controller = DroneController(self.task_manager, self.drones_ref)
 
     def create_tasks(self, env: Env, possible_addresses, number_of_tasks):
-        self.task_manager = TaskManager()
-        tasks = self.task_manager.create_random_tasks(possible_addresses, number_of_tasks)
+        
+        tasks = create_random_tasks(possible_addresses, number_of_tasks)
 
         for idx, t in enumerate(tasks):
             # start at truck
@@ -74,7 +76,7 @@ class MainRun(object):
             env.task_ref.append(t)
             env.sprites.add(t)
 
-        env.task_ref = self.task_manager.sort_tasks(env.task_ref)
+        self.task_manager = TaskManager()
 
     def create_truck(self, env: Env, pos):
         truck = Truck(pos, self.scale)

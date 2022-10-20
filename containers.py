@@ -8,7 +8,6 @@ from Logging.eventlogger import EventLogger
 from Models.env import Env
 
 
-
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration(ini_files=["config.ini"])
 
