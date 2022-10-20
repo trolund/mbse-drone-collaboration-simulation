@@ -8,6 +8,7 @@ from Logging.eventlogger import EventLogger
 from Models.env import Env
 
 
+
 class Container(containers.DeclarativeContainer):
     config = providers.Configuration(ini_files=["config.ini"])
 
@@ -17,5 +18,6 @@ class Container(containers.DeclarativeContainer):
     )
 
     env = providers.Singleton(Env)
-    event_logger = providers.Singleton(EventLogger)
+
+    event_logger = providers.Factory(EventLogger)
 

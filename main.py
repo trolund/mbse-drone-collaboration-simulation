@@ -1,4 +1,3 @@
-# Load and initialize Modules here
 import pygame
 import pygame_gui
 from dependency_injector.wiring import Provide
@@ -10,17 +9,16 @@ from Models.colors import WHITE
 from Models.drone import Drone
 from Models.env import Env
 from Models.setup import FPS
-from Models.task import Task
 from Models.truck import Truck
-from Services.env_service import draw_layout, grid_to_pos, get_world_size, create_layout_env
-from Services.task_manager import create_random_tasks, sort_tasks, print_tasks
+from Services.drone_controller import DroneController
+from Services.task_manager import TaskManager
+from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
 from containers import Container
 
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-pygame.display.set_caption("DRONE SIMULATION - MBSE - GROUP 2 (2022)")
 pygame.font.Font(None, 22)
 
 
@@ -29,7 +27,12 @@ class MainRun(object):
 
     def __init__(self, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
-        logger.log("Starting Simulation 🚀")
+
+        name = "DRONE SIMULATION - MBSE - GROUP 2 (2022)"
+        pygame.display.set_caption(name)
+        logger.log("Starting Simulation 🚀 - " + name)
+
+        self.drone_controller = None
         self.env = env
         self.config = config
 
@@ -46,28 +49,32 @@ class MainRun(object):
         self.Main()
 
     def create_drones(self, env: Env, number_of_drones: int):
+
+        self.drones_ref = []
+
         for d in range(0, number_of_drones):
             drone = Drone(self.scale, "done_" + str(d))
             # start at x, y
             drone.rect.x = env.home[0]
             drone.rect.y = env.home[1]
             env.sprites.add(drone)
+            self.drones_ref.append(drone)
+
+        self.drone_controller = DroneController(self.task_manager, self.drones_ref)
 
     def create_tasks(self, env: Env, possible_addresses, number_of_tasks):
-        tasks = create_random_tasks(possible_addresses, number_of_tasks)
+        self.task_manager = TaskManager()
+        tasks = self.task_manager.create_random_tasks(possible_addresses, number_of_tasks)
 
         for idx, t in enumerate(tasks):
             # start at truck
-            t.rect.x = env.home[0] + (5 * idx)
+            t.rect.x = env.home[0]  # + (5 * idx)
             t.rect.y = env.home[1]
 
             env.task_ref.append(t)
             env.sprites.add(t)
 
-        env.task_ref = sort_tasks(env.task_ref, env.home)
-
-        print_tasks(env.task_ref, env.home)
-
+        env.task_ref = self.task_manager.sort_tasks(env.task_ref)
 
     def create_truck(self, env: Env, pos):
         truck = Truck(pos, self.scale)
@@ -96,32 +103,31 @@ class MainRun(object):
                 self.scale = temp
                 # self.adjust_zoom_offset(val)
 
-
     def adjust_zoom_offset(self, change):
         locationX = (self.world_size - self.screen.get_width()) / self.scale
         locationY = (self.world_size - self.screen.get_height()) / self.scale
 
         if change < 0:
-           self.OffsetX += locationX
-           self.OffsetY += locationY
+            self.OffsetX += locationX
+            self.OffsetY += locationY
         else:
-           self.OffsetX -= locationX
-           self.OffsetY -= locationY
+            self.OffsetX -= locationX
+            self.OffsetY -= locationY
 
-    def create_window(self, config):
-        is_fullscreen = False if config["graphics"]["fullscreen"] == "0" else True
+    def create_window(self):
+        is_fullscreen = False if self.config["graphics"]["fullscreen"] == "0" else True
 
         if is_fullscreen:
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
-            w = float(config["graphics"]["window_w"])
-            h = float(config["graphics"]["window_h"])
+            w = float(self.config["graphics"]["window_w"])
+            h = float(self.config["graphics"]["window_h"])
             self.screen = pygame.display.set_mode((w, h))
 
-    def get_config(self, config):
-        self.scale = float(config["graphics"]["scale"])
-        self.truck_pos_random = bool(config["setup"]["truck_pos_random"])
-        a = config["setup"]["fixed_truck_pos"].split(",")
+    def get_config(self):
+        self.scale = float(self.config["graphics"]["scale"])
+        self.truck_pos_random = bool(self.config["setup"]["truck_pos_random"])
+        a = self.config["setup"]["fixed_truck_pos"].split(",")
         self.fixed_truck_pos = (int(a[0]), int(a[1]))
 
         self.world_size = int(self.config["setup"]["world_size"])
@@ -156,20 +162,20 @@ class MainRun(object):
         if keys[pygame.K_d]:
             self.set_scale(-zoom_factor)
 
-
     def Main(self):
-        # create the window from config
-        self.create_window(self.config)
-
         # get config
-        self.get_config(self.config)
+        self.get_config()
+
+        # create the window from config
+        self.create_window()
 
         # setup layout
-        (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(self.world_size,
-                                                                                                         self.ground_size,
-                                                                                                         road_size=self.road_size,
-                                                                                                         change_of_customer=self.customer_density,
-                                                                                                         random_truck_pos=self.truck_pos_random)
+        (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
+            self.world_size,
+            self.ground_size,
+            road_size=self.road_size,
+            change_of_customer=self.customer_density,
+            random_truck_pos=self.truck_pos_random)
         (step_size, x_len, y_len) = get_world_size(self.screen, layout)
 
         # instance of UI
