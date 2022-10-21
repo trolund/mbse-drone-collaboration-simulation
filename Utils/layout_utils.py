@@ -1,9 +1,9 @@
-import math
 import random
 
+import math
 import pygame
 
-from Models.basic_types import Layout
+from Models.basic_types import Layout, Pos
 from Models.colors import GREY, GREEN, GREENY, DARK_GERY
 
 
@@ -11,7 +11,7 @@ def grid_to_pos(i, j, step_size, scale: float = 1.0):
     return step_size * i * scale, step_size * j * scale
 
 
-def grid_to_pos_tuple(pos: (int, int), step_size, scale: float = 1.0):
+def grid_to_pos_tuple(pos: Pos, step_size, scale: float = 1.0):
     return grid_to_pos(pos[0], pos[1], step_size, scale)
 
 
@@ -20,28 +20,28 @@ def pos_to_grid(i, j, step_size, scale: float = 1.0):
     return math.floor(x), math.floor(y)
 
 
-def pos_to_grid_tuple(pos: (int, int), step_size, scale: float = 1.0):
+def pos_to_grid_tuple(pos: Pos, step_size, scale: float = 1.0):
     return pos_to_grid(pos[0], pos[1], step_size, scale)
 
 
-def translate_moves(list: list[(int, int)], step_size: int, scale: float = 1.0):
+def translate_moves(arr: list[Pos], step_size: int, scale: float = 1.0):
     moves = []
-    for p in list:
+    for p in arr:
         moves.append(grid_to_pos(p[0], p[1], step_size, scale))
 
     return moves
 
 
-def safe_list_get(l, x, y):
+def safe_list_get(arr, x, y):
     try:
-        return l[x][y], (x, y)
+        return arr[x][y], (x, y)
     except IndexError:
         return "#", (0, 0)
 
 
-def create_world(len):
+def create_world(length):
     world = []
-    for i in range(0, len):
+    for i in range(0, length):
         world.append(pygame.sprite.Group())
 
     return world
@@ -62,11 +62,11 @@ def get_world_size(surface: pygame.Surface, layout: Layout):
     return step_size, x_len, y_len
 
 
-def scale_corr(cor: (int, int), scale: float):
+def scale_corr(cor: Pos, scale: float):
     return cor[0] * scale, cor[1] * scale
 
 
-def offset_corr(cor: (int, int), offset_x: int = 0, offset_y: int = 0):
+def offset_corr(cor: Pos, offset_x: int = 0, offset_y: int = 0):
     return cor[0] + offset_x, cor[1] + offset_y
 
 
@@ -94,7 +94,7 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
     m = world_size + road_size
     g = ground_size
 
-    layout: Layout = [[""] * m for i in range(m)]
+    layout: Layout = [[""] * m for _ in range(m)]
 
     for i in range(m):
         for j in range(m):
@@ -166,10 +166,6 @@ def print_layout(layout: Layout):
 
     print()
 
+
 def distance_between(a, b):
     return math.dist(a, b)
-
-# if __name__ == "__main__":
-#     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
-#     print_layout(layout)
-#     print(number_of_customers, number_of_grounds, truck_pos, delivery_sports)

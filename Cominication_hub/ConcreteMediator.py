@@ -1,5 +1,3 @@
-from typing import List
-
 from Cominication_hub.Mediator import Mediator
 
 

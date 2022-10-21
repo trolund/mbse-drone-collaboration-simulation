@@ -9,12 +9,11 @@ from Models.drone import Drone
 from Models.env import Env
 from Models.move_type import Move_Type
 from Services.task_manager import TaskManager
-from Utils.layout_utils import pos_to_grid_tuple, grid_to_pos_tuple
+from Utils.layout_utils import grid_to_pos_tuple
 from containers import Container
 
 
 class DroneController(ConcreteMediator, threading.Thread):
-
     task_manager: TaskManager
 
     # contain the plan the drones will execute
@@ -22,13 +21,12 @@ class DroneController(ConcreteMediator, threading.Thread):
 
     def __init__(self, task_manager, drones_ref, step_size,
                  logger: EventLogger = Provide[Container.event_logger],
-                 config = Provide[Container.config],
+                 config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
         threading.Thread.__init__(self)
         super().__init__(drones_ref)
         self.step_size = step_size
         self.thread_name = "Drone controller"
-        self.thread_ID = 42
 
         self.config = config
         self.logger = logger
@@ -47,7 +45,6 @@ class DroneController(ConcreteMediator, threading.Thread):
 
     def start_delivery(self):
         while not self.task_manager.is_done():
-            self.logger.log(str(self.task_manager.get_number_of_packages_left()) + ", " + str(len(self.ready_list)))
             if len(self.ready_list) > 0:
                 curr_drone: Drone = self.ready_list.pop()
                 next_task = self.task_manager.get_head_package()
@@ -58,12 +55,7 @@ class DroneController(ConcreteMediator, threading.Thread):
                 curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
                 curr_drone.add_move_point(self.env_ref.home)
             else:
-                sleep(1)
+                sleep(.5)
+
     def run(self):
         self.start_delivery()
-
-
-
-
-
-

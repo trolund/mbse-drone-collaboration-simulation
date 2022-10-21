@@ -2,12 +2,13 @@ import os
 import uuid
 
 import pygame
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import Provide
 from pygame.rect import Rect
 
 from Cominication_hub.BaseMediator import BaseMediator
 from Logging.eventlogger import EventLogger
 from Models.basic_types import Move, Pos
+from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
@@ -30,16 +31,24 @@ def get_move_obj(move: Move):
 class Drone(pygame.sprite.Sprite, BaseMediator):
 
     lift: float = 22.5
+    status: DroneMode
+    def __init__(self, grid_pos, name="",
+                 logger: EventLogger = Provide[Container.event_logger],
+                 env: Env = Provide[Container.env]):
 
-    def __init__(self, grid_pos, name="", logger: EventLogger = Provide[Container.event_logger], env: Env = Provide[Container.env]):
         pygame.sprite.Sprite.__init__(self)
-        self.id = uuid.uuid4()
+
         self.logger = logger
         self.env_ref = env
+
+        self.id = uuid.uuid4()
+        self.status = DroneMode.IDLE
         self.name = name
+
         self.moves = []
         self.attachment = None
         self.curr_move = None
+
         self.size = 15
 
         self.grid_pos = grid_pos
@@ -69,6 +78,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if self.attachment is None:
             raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
 
+        self.logger.log(f"{self.name} - DROP, package {self.attachment}")
         self.attachment = None
 
     def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):
@@ -111,7 +121,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             self.rotate(ax, ay, ax + step_x, ay + step_y)
 
         # is we at the distinction?
-        if ax == bx and ay == by or distance_between((ax, ay), (bx, by)) < 2:
+        if ax == bx and ay == by or distance_between((ax, ay), (bx, by)) < 1:
             move_type = get_move_type(self.curr_move)
 
             if move_type == Move_Type.PICKUP:
@@ -129,8 +139,11 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
     def take_task(self):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
-            s = self.name + " move to: (" + str(self.curr_move[0][0]) + ", " + str(self.curr_move[0][1]) + ")"
-            self.logger.log(s)
+            self.status = DroneMode.BUSY
+
+            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])})")
+        else:
+            self.status = DroneMode.IDLE
 
     def update(self, scale):
         # take new task
@@ -171,3 +184,6 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
 
     def ready(self):
         self.mediator.notify(self, "Ready")
+
+    def __str__(self):
+        return (f"{self.id}, {self.name} - {self.status}")

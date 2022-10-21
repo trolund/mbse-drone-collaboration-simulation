@@ -13,11 +13,18 @@ from containers import Container
 
 class UI:
 
-    def __init__(self, setScale, screen: Surface, logger: EventLogger = Provide[Container.event_logger],
+    def __init__(self, setScale, screen: Surface,
+                 logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config]):
+        self.log_list = None
+        self.FPS_label = None
+        self.delta_label = None
+        self.label1 = None
+        self.scale_label = None
+        self.button_scale_down = None
+        self.button_scale_up = None
         self.logger = logger
         self.config = config
-        self.scale = float(self.config["graphics"]["scale"])
         self.set_scale = setScale
 
         self.ui_width = 400
@@ -30,18 +37,9 @@ class UI:
         self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()),
                                             os.path.join("GUI", 'theme.json'))
 
-        self.use_battery = False
-        self.log = []
-
         self.create_ui_elements()
 
     def create_ui_elements(self):
-
-        self.use_battery_btn = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 500, 100, 30),
-            text="True" if self.use_battery else "False",
-            manager=self.manager
-        )
 
         self.button_scale_up = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(self.ui_x + self.margin, 200, 100, 30),
@@ -71,17 +69,17 @@ class UI:
             relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 80, 200, 100),
             text="Delta: 0.0",
             manager=self.manager,
-            object_id=ObjectID(class_id='#debug_text')
+            object_id=ObjectID(class_id='#debug_text', object_id="debug")
         )
 
         self.FPS_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect(self.screen.get_width() - 150, self.screen.get_height() - 60, 200, 100),
             text="FPS: 0.0",
             manager=self.manager,
-            object_id=ObjectID(class_id='#debug_text')
+            object_id=ObjectID(class_id='#debug_text', object_id="debug")
         )
 
-        self.list = pygame_gui.elements.UISelectionList(
+        self.log_list = pygame_gui.elements.UISelectionList(
             relative_rect=pygame.Rect(self.ui_x, self.screen.get_height() - 200, 400, 150),
             manager=self.manager, item_list=[]
         )
@@ -93,9 +91,6 @@ class UI:
                     self.set_scale(0.2)
                 if event.ui_element == self.button_scale_down:
                     self.set_scale(-0.2)
-                if event.ui_element == self.use_battery_btn:
-                    self.use_battery = not self.use_battery
-                    self.use_battery_btn.set_text(str(self.use_battery))
 
         self.manager.process_events(event)
 
@@ -109,8 +104,7 @@ class UI:
         self.manager.draw_ui(self.screen)
 
     def update_event_list(self):
-        if len(self.logger.get_log()) != len(self.list.item_list):
-            self.list.set_item_list(self.logger.get_log())
+        self.log_list.set_item_list(self.logger.get_log())
 
     def get_manager(self):
         return self.manager

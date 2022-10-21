@@ -1,7 +1,5 @@
-import random
 from typing import List
 
-import math
 from dependency_injector.wiring import Provide
 
 from Logging.eventlogger import EventLogger
@@ -16,7 +14,6 @@ class TaskManager:
     logger: EventLogger
     env_ref: Env
 
-# tasks: List[Task], delivery_addresses
     def __init__(self, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config], env: Env = Provide[Container.env]):
 
         self.config = config

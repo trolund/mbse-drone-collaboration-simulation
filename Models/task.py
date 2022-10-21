@@ -7,7 +7,6 @@ from Models.package import Package
 
 
 class Task(pygame.sprite.Sprite):
-
     packages: List[Package] = []
     number_of_attachment_points: int
     size: int = 50
@@ -35,5 +34,6 @@ class Task(pygame.sprite.Sprite):
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
+
     def __str__(self):
         return (f"Packages weight is {self.get_lift_requirement()}, and should be delivered to {self.address}")
