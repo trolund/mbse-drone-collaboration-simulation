@@ -7,6 +7,7 @@ from dependency_injector.wiring import Provide
 from Logging.eventlogger import EventLogger
 from Models.env import Env
 from Models.task import Task
+from Utils.layout_utils import distance_between
 from containers import Container
 
 
@@ -25,21 +26,21 @@ class TaskManager:
         # sort the packages
         self.env_ref.task_ref = self.sort_tasks(env.task_ref)
 
+    def get_number_of_packages_left(self):
+        return len(self.env_ref.task_ref)
+
     def get_head_package(self):
         return self.env_ref.task_ref.pop()
 
     def is_done(self):
         return len(self.env_ref.task_ref) == 0
 
-    def distance_between(self, a, b):
-        return math.dist(a, b)
-
     def sort_tasks(self, tasks: List[Task]):
-        return sorted(tasks, key=lambda x: self.distance_between(self.env_ref.home, (x.rect.x, x.rect.y)))
+        return sorted(tasks, key=lambda x: distance_between(self.env_ref.home, (x.rect.x, x.rect.y)))
 
     def print_tasks(self, tasks: List[Task], home):
         for t in tasks:
-            print(self.distance_between(home, (t.rect.x, t.rect.y)))
+            print(distance_between(home, (t.rect.x, t.rect.y)))
 
 # def queue_package(amount_of_packages, possible_addresses, max_weight):
 #     min_weight = 200

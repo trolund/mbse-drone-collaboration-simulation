@@ -11,9 +11,17 @@ def grid_to_pos(i, j, step_size, scale: float = 1.0):
     return step_size * i * scale, step_size * j * scale
 
 
+def grid_to_pos_tuple(pos: (int, int), step_size, scale: float = 1.0):
+    return grid_to_pos(pos[0], pos[1], step_size, scale)
+
+
 def pos_to_grid(i, j, step_size, scale: float = 1.0):
     x, y = (i / step_size) / scale, (j / step_size) / scale
     return math.floor(x), math.floor(y)
+
+
+def pos_to_grid_tuple(pos: (int, int), step_size, scale: float = 1.0):
+    return pos_to_grid(pos[0], pos[1], step_size, scale)
 
 
 def translate_moves(list: list[(int, int)], step_size: int, scale: float = 1.0):
@@ -157,6 +165,9 @@ def print_layout(layout: Layout):
             print(f' {layout[i][j]} ', end="")
 
     print()
+
+def distance_between(a, b):
+    return math.dist(a, b)
 
 # if __name__ == "__main__":
 #     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)

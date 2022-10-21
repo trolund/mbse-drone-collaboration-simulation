@@ -5,7 +5,7 @@ from Cominication_hub.Mediator import Mediator
 
 class ConcreteMediator(Mediator):
 
-    _ready_drones = []
+    ready_list = []
 
     def __init__(self, drones_ref) -> None:
         self.setUpDrones(drones_ref)
@@ -18,7 +18,7 @@ class ConcreteMediator(Mediator):
     # adapt to messages from drones
     def notify(self, sender: object, event: str) -> None:
         if event == "Ready":
-            self._ready_drones.append(sender)
+            self.ready_list.append(sender)
         elif event == "Error":
             print("Drone have error")
         elif event == "Battery Low":

@@ -50,7 +50,7 @@ class MainRun(object):
         self.is_running = True
         self.Main()
 
-    def create_drones(self, env: Env, number_of_drones: int):
+    def create_drones(self, env: Env, step_size, number_of_drones: int):
 
         self.drones_ref = []
 
@@ -62,7 +62,7 @@ class MainRun(object):
             env.sprites.add(drone)
             self.drones_ref.append(drone)
 
-        self.drone_controller = DroneController(self.task_manager, self.drones_ref)
+        self.drone_controller = DroneController(self.task_manager, self.drones_ref, step_size)
 
     def create_tasks(self, env: Env, possible_addresses, number_of_tasks):
         
@@ -194,7 +194,7 @@ class MainRun(object):
         # create all objects in the environment
         self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, self.scale))
         self.create_tasks(self.env, delivery_sports, self.number_of_tasks)
-        self.create_drones(self.env, self.number_of_drones)
+        self.create_drones(self.env, step_size, self.number_of_drones)
 
         self.drone_controller.start()
 

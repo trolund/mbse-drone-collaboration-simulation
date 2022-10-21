@@ -11,6 +11,7 @@ from Models.basic_types import Move, Pos
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
+from Utils.layout_utils import distance_between
 from containers import Container
 
 
@@ -80,6 +81,10 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             self.attachment.rect.y = self.rect.y
 
     def process_task(self):
+        if self.curr_move is None and len(self.moves) == 0:
+            self.ready()  # send a ready signal to the drone controller
+           # self.logger.log("Ready drone: " + self.name)
+
         if self.curr_move is not None:
             ay = self.rect.y
             ax = self.rect.x
@@ -90,14 +95,14 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             by = point[1]
 
             self.do_move(ax, ay, bx, by)
-        else:
-            self.ready()  # send a ready signal to the drone controller
 
     def do_move(self, ax, ay, bx, by):
         steps_number = max(abs(bx - ax), abs(by - ay))
 
         if steps_number == 0:
             self.rect = Rect(bx, by, self.size, self.size)
+        #  elif distance_between((ax, ay), (bx, by)) < 2:
+        #     self.rect = Rect(bx, by, self.size, self.size)
         else:
             step_x = float(bx - ax) / steps_number
             step_y = float(by - ay) / steps_number
@@ -106,8 +111,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             self.rotate(ax, ay, ax + step_x, ay + step_y)
 
         # is we at the distinction?
-        if ax == bx and ay == by:
-            # print("!", self.rect.x, self.rect.y, self.name)
+        if ax == bx and ay == by or distance_between((ax, ay), (bx, by)) < 2:
             move_type = get_move_type(self.curr_move)
 
             if move_type == Move_Type.PICKUP:
@@ -116,8 +120,9 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             elif move_type == Move_Type.DROP_OFF:
                 self.drop()
 
-                if not self.is_in_drop_zone():
-                    print(self.name + " did a drop of that was not in a drop zone 🤬.")
+               # TODO reimpliment drop zone check
+               #  if not self.is_in_drop_zone():
+               #     print(self.name + " did a drop of that was not in a drop zone 🤬.")
 
             self.curr_move = None
 
@@ -128,9 +133,6 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
             self.logger.log(s)
 
     def update(self, scale):
-        #self.size = 15 * scale
-
-
         # take new task
         self.take_task()
 
