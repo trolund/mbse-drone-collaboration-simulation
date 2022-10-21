@@ -196,6 +196,8 @@ class MainRun(object):
         self.create_tasks(self.env, delivery_sports, self.number_of_tasks)
         self.create_drones(self.env, self.number_of_drones)
 
+        self.drone_controller.start()
+
         # Simulation/game loop
         clock = pygame.time.Clock()
 
