@@ -53,6 +53,10 @@ below. This representation is called a layout in the code. **Please change the p
 
 A layout can be printed out byt using **print_layout(layout)**.
 
+# TODO list
+
+  * Make sure the Drones fly with a realistic speed that is based on size of the world.
+
 # Ideas to investigate 
 
 * speed of truck 
