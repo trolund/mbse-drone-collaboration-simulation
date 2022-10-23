@@ -8,6 +8,7 @@ from pygame_gui.core import ObjectID
 
 from Logging.eventlogger import EventLogger
 from Models.colors import GREY
+from Models.env import Env
 from Models.settings import Settings
 from Utils.Timer import Timer
 from containers import Container
@@ -17,11 +18,13 @@ class UI:
 
     def __init__(self, setScale, toggle_paused, settings: Settings, screen: Surface,
                  logger: EventLogger = Provide[Container.event_logger],
-                 config=Provide[Container.config]):
+                 config=Provide[Container.config],
+                 env: Env = Provide[Container.env]):
 
         # setup
         self.logger = logger
         self.config = config
+        self.env = env
 
         self.ui_width = 400
         self.margin = 30
@@ -42,6 +45,7 @@ class UI:
         self.button_scale_down = None
         self.button_scale_up = None
         self.pause_btn = None
+        self.packages_left_label = None
 
         # funcs
         self.toggle_paused = toggle_paused
@@ -71,7 +75,14 @@ class UI:
         )
 
         self.timer_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 150, 75),
+            relative_rect=pygame.Rect(self.ui_x + 50, self.screen.get_height() - 280, 150, 75),
+            text="time",
+            manager=self.manager,
+            object_id=ObjectID(class_id='#timer')
+        )
+
+        self.packages_left_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(self.ui_x + 150 + 51, self.screen.get_height() - 280, 150, 75),
             text="time",
             manager=self.manager,
             object_id=ObjectID(class_id='#timer')
@@ -118,6 +129,7 @@ class UI:
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text(F"Delta: {'{0:.2f}'.format(time_delta)}")
         self.FPS_label.set_text(f"FPS: {'{0:.1f}'.format(fps)}")
+        self.packages_left_label.set_text(str(len(self.env.task_ref)))
         self.scale_label.set_text(str(scale))
         self.update_event_list()
         self.timer_label.set_text(timer.get_time_string())

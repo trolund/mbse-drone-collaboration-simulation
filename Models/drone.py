@@ -93,7 +93,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
     def process_task(self):
         if self.curr_move is None and len(self.moves) == 0:
             self.ready()  # send a ready signal to the drone controller
-           # self.logger.log("Ready drone: " + self.name)
+            self.logger.log("Ready drone: " + self.name)
 
         if self.curr_move is not None:
             ay = self.rect.y

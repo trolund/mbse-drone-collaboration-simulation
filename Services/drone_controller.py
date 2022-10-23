@@ -13,7 +13,7 @@ from Utils.layout_utils import grid_to_pos_tuple
 from containers import Container
 
 
-class DroneController(ConcreteMediator, threading.Thread):
+class DroneController(ConcreteMediator):
     task_manager: TaskManager
 
     # contain the plan the drones will execute
@@ -23,8 +23,8 @@ class DroneController(ConcreteMediator, threading.Thread):
                  logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
-        threading.Thread.__init__(self)
-        super().__init__(drones_ref)
+        # threading.Thread.__init__(self)
+        super().__init__(drones_ref, logger)
         self.step_size = step_size
         self.thread_name = "Drone controller"
 
@@ -43,19 +43,13 @@ class DroneController(ConcreteMediator, threading.Thread):
         for d in self.all_drones:
             self.plan[d.id] = []
 
-    def start_delivery(self):
-        while not self.task_manager.is_done():
-            if len(self.ready_list) > 0:
-                curr_drone: Drone = self.ready_list.pop()
-                next_task = self.task_manager.get_head_package()
-                delivery_address = grid_to_pos_tuple(next_task.address, self.step_size)
+    def assign_tasks(self):
+        if len(self.ready_list) > 0:
+            curr_drone: Drone = self.ready_list.pop()
+            next_task = self.task_manager.get_head_package()
+            delivery_address = grid_to_pos_tuple(next_task.address, self.step_size)
 
-                # movements
-                curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
-                curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
-                curr_drone.add_move_point(self.env_ref.home)
-            else:
-                sleep(.5)
-
-    def run(self):
-        self.start_delivery()
+            # movements
+            curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
+            curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
+            curr_drone.add_move_point(self.env_ref.home)

@@ -188,8 +188,6 @@ class Simulation(object):
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
         self.create_drones(self.env, step_size, self.settings.number_of_drones)
 
-        self.drone_controller.start()
-
         # Simulation/game loop
         timer = Timer()
         clock = pygame.time.Clock()
@@ -216,8 +214,14 @@ class Simulation(object):
                 # draw object layers
                 self.draw_layers(layout, x_len, y_len, step_size, self.env)
 
+                # let drone controller do its thing
+                self.drone_controller.assign_tasks()
+
             # update and draw UI
-            ui.update(time_delta, clock.get_fps(), self.settings.scale, timer)
+            ui.update(time_delta,
+                      clock.get_fps(),
+                      self.settings.scale,
+                      timer)
 
             pygame.display.flip()
 
