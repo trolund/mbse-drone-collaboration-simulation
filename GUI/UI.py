@@ -8,24 +8,20 @@ from pygame_gui.core import ObjectID
 
 from Logging.eventlogger import EventLogger
 from Models.colors import GREY
+from Models.settings import Settings
+from Utils.Timer import Timer
 from containers import Container
 
 
 class UI:
 
-    def __init__(self, setScale, screen: Surface,
+    def __init__(self, setScale, toggle_paused, settings: Settings, screen: Surface,
                  logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config]):
-        self.log_list = None
-        self.FPS_label = None
-        self.delta_label = None
-        self.label1 = None
-        self.scale_label = None
-        self.button_scale_down = None
-        self.button_scale_up = None
+
+        # setup
         self.logger = logger
         self.config = config
-        self.set_scale = setScale
 
         self.ui_width = 400
         self.margin = 30
@@ -37,6 +33,21 @@ class UI:
         self.manager = pygame_gui.UIManager((screen.get_width(), screen.get_height()),
                                             os.path.join("GUI", 'theme.json'))
 
+        # elements
+        self.log_list = None
+        self.FPS_label = None
+        self.delta_label = None
+        self.timer_label = None
+        self.scale_label = None
+        self.button_scale_down = None
+        self.button_scale_up = None
+        self.pause_btn = None
+
+        # funcs
+        self.toggle_paused = toggle_paused
+        self.set_scale = setScale
+
+        # create all elements
         self.create_ui_elements()
 
     def create_ui_elements(self):
@@ -59,10 +70,11 @@ class UI:
             manager=self.manager
         )
 
-        self.label1 = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 200, 100),
-            text="Value",
-            manager=self.manager
+        self.timer_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(self.ui_x + self.margin, 100, 150, 75),
+            text="time",
+            manager=self.manager,
+            object_id=ObjectID(class_id='#timer')
         )
 
         self.delta_label = pygame_gui.elements.UILabel(
@@ -84,6 +96,12 @@ class UI:
             manager=self.manager, item_list=[]
         )
 
+        self.pause_btn = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(self.screen.get_width() - 400, self.screen.get_height() - 40, 100, 30),
+            text="▶ Start",
+            manager=self.manager
+        )
+
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
@@ -91,15 +109,18 @@ class UI:
                     self.set_scale(0.2)
                 if event.ui_element == self.button_scale_down:
                     self.set_scale(-0.2)
+                if event.ui_element == self.pause_btn:
+                    self.toggle_paused(self.pause_btn)
 
         self.manager.process_events(event)
 
-    def update(self, time_delta: float, fps: float, scale: float):
+    def update(self, time_delta: float, fps: float, scale: float, timer: Timer):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
         self.delta_label.set_text("Delta: " + str(time_delta))
         self.FPS_label.set_text("FPS: " + str(fps))
         self.scale_label.set_text(str(scale))
         self.update_event_list()
+        self.timer_label.set_text(timer.get_time_string())
         self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
 

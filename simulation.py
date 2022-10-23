@@ -1,11 +1,10 @@
 import pygame
-import pygame_gui
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
 from Logging.eventlogger import EventLogger
 from Models.settings import Settings
-from Models.colors import WHITE
+from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
 from Models.env import Env
 from Models.setup import FPS
@@ -13,6 +12,7 @@ from Models.truck import Truck
 from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
 from Services.task_manager import TaskManager
+from Utils.Timer import Timer
 from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
 from containers import Container
 
@@ -20,7 +20,7 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-pygame.font.Font(None, 22)
+font = pygame.font.Font(None, 40)
 
 name = "DRONE SIMULATION - MBSE - GROUP 2 (2022)"
 
@@ -39,16 +39,17 @@ class Simulation(object):
 
         self.drone_controller = None
         self.task_manager = None
+
         self.env = env
         self.config = config
+        self.is_paused = False
+        self.is_running = True
 
         self.screen = None
         self.drones_ref = None
 
         self.OffsetX = 0
         self.OffsetY = 0
-
-        self.is_running = True
 
         # create the window from config
         self.create_window()
@@ -112,6 +113,10 @@ class Simulation(object):
                 self.settings.scale = temp
                 # self.adjust_zoom_offset(val)
 
+    def toggle_paused(self, btn):
+        self.is_paused = not self.is_paused
+        btn.set_text("▶ Resume" if self.is_paused else "Pause")
+
     def adjust_zoom_offset(self, change):
         locationX = (self.settings.world_size - self.screen.get_width()) / self.settings.scale
         locationY = (self.settings.world_size - self.screen.get_height()) / self.settings.scale
@@ -151,7 +156,24 @@ class Simulation(object):
         if keys[pygame.K_d]:
             self.set_scale(-zoom_factor)
 
+    def draw_paused(self):
+        text = font.render('Paused', True, GREY, BLACK)
+
+        # create a rectangular object for the
+        # text surface object
+        textRect = text.get_rect()
+
+        # set the center of the rectangular object.
+        textRect.center = ((self.screen.get_width() - 400) // 2, self.screen.get_height() // 2)
+
+        self.screen.blit(text, textRect)
+
     def Main(self):
+        # instance of UI
+        ui = UI(self.set_scale, self.toggle_paused, self.settings, self.screen)
+
+        self.is_paused = True
+
         # setup layout
         (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
@@ -161,17 +183,6 @@ class Simulation(object):
             random_truck_pos=self.settings.truck_pos_random)
         (step_size, x_len, y_len) = get_world_size(self.screen, layout)
 
-        # instance of UI
-        ui = UI(self.set_scale, self.screen)
-
-        is_paused = True
-
-        pause_btn = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect(self.screen.get_width() - 400, self.screen.get_height() - 40, 100, 30),
-            text="▶ Start",
-            manager=ui.get_manager()
-        )
-
         # create all objects in the environment
         self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, self.settings.scale))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
@@ -180,6 +191,7 @@ class Simulation(object):
         self.drone_controller.start()
 
         # Simulation/game loop
+        timer = Timer()
         clock = pygame.time.Clock()
 
         while self.is_running:
@@ -189,15 +201,15 @@ class Simulation(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.is_running = False
-                if event.type == pygame.USEREVENT:
-                    if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                        if event.ui_element == pause_btn:
-                            is_paused = not is_paused
-                            pause_btn.set_text("▶ Resume" if is_paused else "Pause")
 
                 ui.handle_events(event)
 
-            if not is_paused:
+            if self.is_paused:
+                self.draw_paused()
+            else:
+                # only 'count' time if nor paused
+                timer.add_delta_time(time_delta)
+
                 # clear background
                 self.screen.fill(WHITE)
 
@@ -205,7 +217,7 @@ class Simulation(object):
                 self.draw_layers(layout, x_len, y_len, step_size, self.env)
 
             # update and draw UI
-            ui.update(time_delta, clock.get_fps(), self.settings.scale)
+            ui.update(time_delta, clock.get_fps(), self.settings.scale, timer)
 
             pygame.display.flip()
 

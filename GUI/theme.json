@@ -22,12 +22,34 @@
              "text_horiz_alignment": "left"
          }
     },
-       "#debug_text":
+     "#debug_text":
      {
          "colours":
          {
              "normal_text": "#c5cbd8",
              "text_shadow": "#505050"
+         },
+         "misc":
+         {
+             "text_shadow": "1",
+             "text_shadow_size": "1",
+             "text_shadow_offset": "0,0"
+         }
+     },
+     "#timer":
+     {
+         "colours":
+         {
+             "dark_bg": "#25292e",
+             "normal_text": "#c5cbd8",
+             "text_shadow": "#505050"
+         },
+         "font":
+         {
+             "name": "montserrat",
+             "size": "32",
+             "bold": "0",
+             "italic": "0"
          },
          "misc":
          {
