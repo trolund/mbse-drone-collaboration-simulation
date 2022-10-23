@@ -116,8 +116,8 @@ class UI:
 
     def update(self, time_delta: float, fps: float, scale: float, timer: Timer):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
-        self.delta_label.set_text("Delta: " + str(time_delta))
-        self.FPS_label.set_text("FPS: " + str(fps))
+        self.delta_label.set_text(F"Delta: {'{0:.2f}'.format(time_delta)}")
+        self.FPS_label.set_text(f"FPS: {'{0:.1f}'.format(fps)}")
         self.scale_label.set_text(str(scale))
         self.update_event_list()
         self.timer_label.set_text(timer.get_time_string())
