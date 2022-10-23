@@ -21,7 +21,7 @@ class TaskManager:
         self.env_ref = env
 
         # sort the packages
-        # self.env_ref.task_ref = self.sort_tasks(env.task_ref)
+        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
 
     def get_number_of_packages_left(self):
         return len(self.env_ref.task_ref)
