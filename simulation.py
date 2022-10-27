@@ -181,10 +181,13 @@ class Simulation(object):
             road_size=self.settings.road_size,
             change_of_customer=self.settings.customer_density,
             random_truck_pos=self.settings.truck_pos_random)
-        (step_size, x_len, y_len) = get_world_size(self.screen, layout)
+
+        (step_size, x_len, y_len, scale) = get_world_size(self.screen, layout)
+
+        self.settings.scale = scale
 
         # create all objects in the environment
-        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size, self.settings.scale))
+        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
         self.create_drones(self.env, step_size, self.settings.number_of_drones)
 
