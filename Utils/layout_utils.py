@@ -52,14 +52,16 @@ def add_offset(pos: (int, int), step_size):
 
 
 def get_world_size(surface: pygame.Surface, layout: Layout):
-    space = min(surface.get_height(), surface.get_width())
+    init_size = 500
+
+    scale = min(surface.get_height(), surface.get_width()) / init_size
 
     x_len = len(layout)
     y_len = len(layout[0])
 
-    step_size = space / x_len
+    step_size = init_size / x_len
 
-    return step_size, x_len, y_len
+    return step_size, x_len, y_len, scale
 
 
 def scale_corr(cor: Pos, scale: float):
