@@ -1,13 +1,6 @@
 class Package:
+    weight: int
 
-    wight: int
-    width: int
-    height: int
-
-    def __init__(self, wight, width, height):
+    def __init__(self, weight):
         super().__init__()
-        self.wight = wight
-        self.width = width
-        self.height = height
-
-
+        self.weight = weight

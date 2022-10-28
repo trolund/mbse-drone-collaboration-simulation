@@ -6,7 +6,7 @@ from Models.basic_types import Pos
 
 class Ground:
 
-    def __init__(self, ground, pos: Pos=None, landing_spot: Pos=None):
+    def __init__(self, ground, pos: Pos = None, landing_spot: Pos = None):
         self.pos = pos
         self.ground = ground
         self.landing_spot = (10, 10) if landing_spot is None else landing_spot

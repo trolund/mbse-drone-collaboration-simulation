@@ -2,14 +2,60 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
-# Definitions 
+## Dependencies 
 
-## Neighborhood (env) structure
+To run the project please install the following packages by using pip or pip3:
+
+    pip3 install pygame pygame_gui dependency_injector
+
+## Config 
+
+The main config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
+
+* scale - the scale the simulation starts at.
+
+# Definitions (Conventions of the project)
+
+
+## ENV service (env_service.py) 
+
+Creates the 2D representation of a neighborhood
+
+#### Neighborhood (env) structure
 
 * Road : "R"
-* Ground: "G"
+* Ground: “.”
 * Delivery spot: "S"
-* House : "H" (could be nice)
+* Truck: "T"
+
+  
+For instance will the input (world_size=15, ground_size=5, road_size=1, customer_density=0.5) result in the neighborhood
+below. This representation is called a layout in the code. **Please change the parameters in the main config file**.
+
+    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(15, 5, 1, 0.5)
+
+     R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+     R  .  .  .  .  R  .  S  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  T  .  .  .  .  R  .  .  .  .  R 
+     R  S  .  .  .  R  .  .  .  .  R  .  .  S  .  R 
+     R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+     R  .  .  S  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+     R  .  .  .  .  R  .  .  S  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  R 
+     R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  R 
+
+A layout can be printed out byt using **print_layout(layout)**.
+
+# TODO list
+
+  * Make sure the Drones fly with a realistic speed that is based on size of the world.
 
 # Ideas to investigate 
 

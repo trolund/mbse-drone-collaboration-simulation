@@ -1,7 +1,6 @@
 """Containers module."""
 
 import logging.config
-from datetime import datetime
 
 from dependency_injector import containers, providers
 
