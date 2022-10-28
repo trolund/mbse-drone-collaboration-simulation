@@ -12,6 +12,7 @@ from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
+from Models.truck import Truck
 from Utils.layout_utils import distance_between
 from containers import Container
 
@@ -141,7 +142,6 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-
             self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])})")
 
     def update(self, scale):

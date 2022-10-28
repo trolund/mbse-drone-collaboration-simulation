@@ -37,3 +37,6 @@ class Truck(pygame.sprite.Sprite):
         pass
     def get_home(self):
         return self.rect.x, self.rect.y
+    
+    def get_pos(self):
+        return self.grid_pos

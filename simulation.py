@@ -32,10 +32,10 @@ class Simulation(object):
                  env: Env = Provide[Container.env]):
 
         pygame.display.set_caption(name)
-        logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
+        logger.log("Starting Simulation - " + name, show_in_ui=False)
 
         self.settings = Settings(config)
-        logger.log("Config loaded 🛠", show_in_ui=False)
+        logger.log("Config loaded ", show_in_ui=False)
 
         self.drone_controller = None
         self.task_manager = None
@@ -61,7 +61,7 @@ class Simulation(object):
         self.drones_ref = []
 
         for d in range(0, number_of_drones):
-            drone = Drone(self.settings.scale, "done_" + str(d))
+            drone = Drone(self.settings.scale, "drone_" + str(d))
             # start at x, y
             drone.rect.x = env.home[0]
             drone.rect.y = env.home[1]
@@ -84,8 +84,9 @@ class Simulation(object):
 
         self.task_manager = TaskManager()
 
-    def create_truck(self, env: Env, pos):
+    def create_truck(self, env: Env, pos, logger: EventLogger = Provide[Container.event_logger]):
         truck = Truck(pos, self.settings.scale)
+        logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
