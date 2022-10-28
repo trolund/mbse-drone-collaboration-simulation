@@ -1,6 +1,6 @@
 import os
 from typing import List
-
+import itertools
 import pygame
 
 from Models.package import Package
@@ -13,13 +13,13 @@ class Task(pygame.sprite.Sprite):
     address: list
     width: int
     height: int
-
     def __init__(self, address, packages=None, number_of_attachment_points=1):
+        
+
         super().__init__()
         self.packages = packages
         self.address = address
         self.number_of_attachment_points = number_of_attachment_points
-
         self.width = 5
         self.height = 5
 
@@ -31,9 +31,17 @@ class Task(pygame.sprite.Sprite):
         self.images.append(img)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
+        self.id = self.rect
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
 
+    def get_p_id(self):
+        temp = []
+        for p in self.packages:
+            print(p.id)
+            temp.append(p.id)
+        return temp
+
     def __str__(self):
-        return (f"Packages weight is {self.get_lift_requirement()}, and should be delivered to {self.address}")
+        return (f"package with id {self.get_p_id()} with weight {self.get_lift_requirement()}, and should be delivered to {self.address}")

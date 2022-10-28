@@ -79,7 +79,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if self.attachment is None:
             raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
 
-        self.logger.log(f"{self.name} - DROP, package {self.attachment}")
+        self.logger.log(f"{self.name} - DROP, {self.attachment}")
         self.attachment = None
 
     def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):

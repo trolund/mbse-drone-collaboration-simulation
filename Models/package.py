@@ -4,3 +4,4 @@ class Package:
     def __init__(self, weight):
         super().__init__()
         self.weight = weight
+
