@@ -92,7 +92,7 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
 
 
 def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5,
-                      random_truck_pos: bool = False):
+                      optimal_truck_pos: bool = True):
     m = world_size + road_size
     g = ground_size
 
@@ -108,18 +108,52 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
                 else:
                     layout[i][j] = "."
 
-    if random_truck_pos:
-        new_layout, truck_pos = create_random_truck_pos(layout)
-        return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
+    if optimal_truck_pos:
+        layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, m, ground_size, road_size, change_of_customer)
+        new_layout, truck_pos = find_optimal_truck_pos(layout, delivery_spots)
+        provide_dp_values = [new_layout, delivery_spots, number_of_grounds, number_of_customers]
+        return provide_dp_values, truck_pos
     else:
         return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
 
+def find_optimal_truck_pos(layout: Layout, pack_pos):
+
+    road_pos = find_all_road_pos(layout)
+
+    n = len(pack_pos)
+
+    if n % 2 != 0:
+        x = pack_pos[int((n+1)/2)][0]
+        y = pack_pos[int((n+1)/2)][1]
+    else:
+        print(type(int(n/2)+1))
+        x = int((pack_pos[int(n/2)][0] + pack_pos[int(n/2)+1][0]) / 2)
+        y = int((pack_pos[int(n/2)][1] + pack_pos[int(n/2)+1][1]) / 2)
+
+    med_package_pos = (x, y)
+    
+    pos = min(road_pos, key=lambda c: (c[0]- med_package_pos[0])**2 + (c[1]-med_package_pos[1])**2)
+    layout[pos[0]][pos[1]] = "T"
+
+    return layout, pos
+
+def distance(co1, co2):
+    return math.sqrt(pow(abs(co1[0] - co2[0]), 2) + pow(abs(co1[1] - co2[2]), 2))
+    
+def find_all_road_pos(layout):
+    
+    pos = []
+    for i in range(len(layout)):
+        for j in range(len(layout[0])):
+                if (layout[i][j] == "R"):
+                    pos.append(tuple((i, j)))
+
+    return pos
 
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)
     layout[pos[0]][pos[1]] = "T"
     return layout, pos
-
 
 def find_random_road_pos(layout: Layout):
     curr = None
@@ -136,7 +170,7 @@ def find_random_road_pos(layout: Layout):
 
 
 def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
-    delivery_sports = []
+    delivery_spots = []
     number_of_grounds = 0
     number_of_customers = 0
 
@@ -151,13 +185,13 @@ def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int
                 number_of_customers += 1
 
                 # add address to list
-                delivery_sports.append((x, y))
+                delivery_spots.append((x, y))
 
                 layout[x][y] = "S"
 
             number_of_grounds += 1
 
-    return layout, delivery_sports, number_of_grounds, number_of_customers
+    return layout, delivery_spots, number_of_grounds, number_of_customers
 
 
 def print_layout(layout: Layout):
