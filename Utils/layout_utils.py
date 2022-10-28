@@ -111,8 +111,7 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
     if optimal_truck_pos:
         layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, m, ground_size, road_size, change_of_customer)
         new_layout, truck_pos = find_optimal_truck_pos(layout, delivery_spots)
-        provide_dp_values = [new_layout, delivery_spots, number_of_grounds, number_of_customers]
-        return provide_dp_values, truck_pos
+        return [new_layout, delivery_spots, number_of_grounds, number_of_customers], truck_pos
     else:
         return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
 
