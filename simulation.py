@@ -33,6 +33,7 @@ class Simulation(object):
 
         pygame.display.set_caption(name)
         logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
+        self.logger = logger
 
         self.settings = Settings(config)
         logger.log("Config loaded 🛠", show_in_ui=False)
@@ -198,10 +199,12 @@ class Simulation(object):
         # update screen with new drawings
         pygame.display.update()
 
+    def set_simulation_speed(self, scale): 
+        self.gl.scale_simulation(scale)
 
     def Main(self):
         # instance of UI
-        self.ui = UI(self.set_scale, self.toggle_paused, self.settings, self.screen)
+        self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
         # setup layout
         (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
@@ -225,7 +228,7 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : print(f'TPS: {ticks} | FPS: {frames}')
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
         )
         self.gl.start()
         pygame.quit()
