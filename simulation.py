@@ -11,10 +11,11 @@ from Models.setup import FPS
 from Models.truck import Truck
 from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
+from Services.path_finder import PatchFinder
 from Services.task_manager import TaskManager
 from Utils.CompelxityCalulator import calc_complexity
 from Utils.Timer import Timer
-from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
+from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env, translate_moves
 from containers import Container
 
 pygame.init()
@@ -86,8 +87,11 @@ class Simulation(object):
 
         self.task_manager = TaskManager()
 
-    def create_truck(self, env: Env, pos):
-        truck = Truck(pos, self.settings.scale)
+    def create_truck(self, layout, step_size, env: Env, pos):
+        planner = PatchFinder()
+        route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+
+        truck = Truck(pos, path=translate_moves(route, step_size), size=step_size)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
@@ -215,7 +219,7 @@ class Simulation(object):
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
 

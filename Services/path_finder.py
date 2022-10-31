@@ -83,30 +83,33 @@ class PatchFinder:
                     heapq.heappush(oheap, (fscore[neighbor], neighbor))
 
     def find_path(self, layout, start: Pos, goal: Pos):
+        r = self.astar(layout, start, goal)
+        r.reverse()
+
         route = []
         route.append(start)
-        route.extend(planner.astar(layout, start, goal))
+        route.extend(r)
         route.append(goal)
 
         return route
 
 
-if __name__ == "__main__":
-    (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
-        world_size=15,
-        ground_size=5,
-        road_size=1,
-        customer_density=0.5)
-
-    planner = PatchFinder()
-
-    route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
-
-    print(route)
-
-    for i in range(len(layout)):
-        for j in range(len(layout)):
-            if (i, j) in route:
-                layout[i][j] = "M"
-
-    print_layout(layout)
+# if __name__ == "__main__":
+#     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
+#         world_size=15,
+#         ground_size=5,
+#         road_size=1,
+#         customer_density=0.5)
+#
+#     planner = PatchFinder()
+#
+#     route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+#
+#     print(route)
+#
+#     for i in range(len(layout)):
+#         for j in range(len(layout)):
+#             if (i, j) in route:
+#                 layout[i][j] = "M"
+#
+#     print_layout(layout)
