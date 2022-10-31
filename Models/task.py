@@ -36,12 +36,6 @@ class Task(pygame.sprite.Sprite):
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
 
-    def get_p_id(self):
-        temp = []
-        for p in self.packages:
-            print(p.id)
-            temp.append(p.id)
-        return temp
 
     def __str__(self):
-        return (f"package with id {self.get_p_id()} with weight {self.get_lift_requirement()}, and should be delivered to {self.address}")
+        return (f"package with id with weight {self.get_lift_requirement()}, and should be delivered to {self.address}")

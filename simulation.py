@@ -1,8 +1,9 @@
+import datetime
 import pygame
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
-from Logging.eventlogger import EventLogger
+from Logging.eventlogger import EventLogger, LogFile
 from Models.settings import Settings
 from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
@@ -36,7 +37,7 @@ class Simulation(object):
 
         self.settings = Settings(config)
         logger.log("Config loaded ", show_in_ui=False)
-
+        self.logger = logger
         self.drone_controller = None
         self.task_manager = None
 
@@ -169,6 +170,11 @@ class Simulation(object):
 
         self.screen.blit(text, textRect)
 
+    def is_done(self, logger: EventLogger = Provide[Container.event_logger]):
+        date_time_str = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M")
+        msg = date_time_str + "TASK_REF IS FINISHED"
+        logger.log(msg, show_in_ui=False)
+
     def Main(self):
         # instance of UI
         ui = UI(self.set_scale, self.toggle_paused, self.settings, self.screen)
@@ -231,6 +237,7 @@ class Simulation(object):
 
             # update screen with new drawings
             pygame.display.update()
+
 
         pygame.quit()
 
