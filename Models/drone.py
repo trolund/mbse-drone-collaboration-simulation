@@ -14,7 +14,7 @@ from Models.move_type import Move_Type
 from Models.task import Task
 from Utils.layout_utils import distance_between
 from containers import Container
-
+from Models.drawable import Drawable
 
 def get_cor(move: Move):
     return move[0][0], move[0][1]
@@ -28,7 +28,7 @@ def get_move_obj(move: Move):
     return move[2]
 
 
-class Drone(pygame.sprite.Sprite, BaseMediator):
+class Drone(Drawable, BaseMediator):
 
     lift: float = 22.5
     status: DroneMode
@@ -144,14 +144,9 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
 
             self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])})")
 
-    def update(self, scale):
-        # take new task
+    def on_tick(self, delta):
         self.take_task()
-
-        # process task
         self.process_task()
-
-        # move package if it is attached
         self.move_package_with_drone()
 
     # not done (trying to turn the drone in the direction of flying)
