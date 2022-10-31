@@ -12,6 +12,7 @@ from Models.truck import Truck
 from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
 from Services.task_manager import TaskManager
+from Utils.CompelxityCalulator import calc_complexity
 from Utils.Timer import Timer
 from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
 from containers import Container
@@ -32,10 +33,11 @@ class Simulation(object):
                  env: Env = Provide[Container.env]):
 
         pygame.display.set_caption(name)
-        logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
+        self.logger = logger
+        self.logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
 
         self.settings = Settings(config)
-        logger.log("Config loaded 🛠", show_in_ui=False)
+        self.logger.log("Config loaded 🛠", show_in_ui=False)
 
         self.drone_controller = None
         self.task_manager = None
@@ -190,6 +192,8 @@ class Simulation(object):
         self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
         self.create_drones(self.env, step_size, self.settings.number_of_drones)
+
+        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_sports, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
 
         # Simulation/game loop
         timer = Timer()
