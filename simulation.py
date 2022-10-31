@@ -210,7 +210,7 @@ class Simulation(object):
             self.settings.world_size,
             self.settings.ground_size,
             road_size=self.settings.road_size,
-            change_of_customer=self.settings.customer_density,
+            customer_density=self.settings.customer_density,
             random_truck_pos=self.settings.truck_pos_random)
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 

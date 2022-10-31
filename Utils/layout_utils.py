@@ -91,7 +91,7 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
                 pygame.draw.rect(surface, GREY, pygame.Rect(x, y, size, size))
 
 
-def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5,
+def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, customer_density: float = 0.5,
                       random_truck_pos: bool = False):
     m = world_size + road_size
     g = ground_size
@@ -110,9 +110,9 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
 
     if random_truck_pos:
         new_layout, truck_pos = create_random_truck_pos(layout)
-        return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
+        return provide_dp(new_layout, m, ground_size, road_size, customer_density), truck_pos
     else:
-        return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
+        return provide_dp(layout, m, ground_size, road_size, customer_density), (0, 0)
 
 
 def create_random_truck_pos(layout: Layout):

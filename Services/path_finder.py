@@ -5,6 +5,8 @@ from Models.basic_types import Pos
 from Utils.layout_utils import create_layout_env, print_layout
 
 
+# inspiration - https://www.analytics-link.com/post/2018/09/14/applying-the-a-path-finding-algorithm-in-python-part-1
+# -2d-square-grid
 class PatchFinder:
 
     def heuristic(self, a: Pos, b: Pos):
@@ -14,7 +16,11 @@ class PatchFinder:
 
         layout = np.array(layout)
 
-        neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        # can move diagonally
+        # neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+        # only move in 90deg
+        neighbors = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
         close_set = set()
 
@@ -79,34 +85,28 @@ class PatchFinder:
     def find_path(self, layout, start: Pos, goal: Pos):
         route = []
         route.append(start)
-        route.append(planner.astar(layout, start, goal))
+        route.extend(planner.astar(layout, start, goal))
         route.append(goal)
 
         return route
 
 
-
-
-
 if __name__ == "__main__":
     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
-        200,
-        10,
-        2,
-        0.2)
+        world_size=15,
+        ground_size=5,
+        road_size=1,
+        customer_density=0.5)
 
     planner = PatchFinder()
 
-    route = planner.find_path(layout, (0, 0), (len(layout)-1, len(layout)-1))
+    route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+
+    print(route)
 
     for i in range(len(layout)):
-        print()
         for j in range(len(layout)):
             if (i, j) in route:
                 layout[i][j] = "M"
 
     print_layout(layout)
-
-
-
-
