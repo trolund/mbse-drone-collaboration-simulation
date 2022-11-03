@@ -142,7 +142,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: {'{0:.2f}'.format(self.grid_pos)} (should be current pos)")
+            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
 
     def update(self, scale):
         # take new task
