@@ -95,7 +95,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if self.curr_move is None and len(self.moves) == 0 and self.status != DroneMode.IDLE:
             self.ready()  # send a ready signal to the drone controller
             self.status = DroneMode.IDLE
-            self.logger.log("Ready drone: " + self.name)
+            #self.logger.log("Ready drone: " + self.name)
 
         if self.curr_move is not None:
             ay = self.rect.y
@@ -142,7 +142,7 @@ class Drone(pygame.sprite.Sprite, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: {'{0:.2f}'.format(self.grid_pos)}")
+            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: {'{0:.2f}'.format(self.grid_pos)} (should be current pos)")
 
     def update(self, scale):
         # take new task
