@@ -38,4 +38,4 @@ class Task(pygame.sprite.Sprite):
 
 
     def __str__(self):
-        return (f"package with id with weight {self.get_lift_requirement()}, and should be delivered to {self.address}")
+        return (f"Package with id xx and weight {self.get_lift_requirement()}, should be delivered to {self.address}")

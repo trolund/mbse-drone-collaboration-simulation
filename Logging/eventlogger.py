@@ -6,7 +6,8 @@ class EventLogger:
     def __init__(self) -> None:
         self.log_in_memory = []
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}", )
-        date_time_str = datetime.datetime.strftime("%Y_%m_%d-%H_%M")
+        now = datetime.datetime.now()
+        date_time_str = now.strftime("%Y_%m_%d-%H_%M")
         self.date = date_time_str
         file_name = ("Logging\Files\logfile_"+date_time_str+".log")
         file = LogFile(file_name)
@@ -38,3 +39,11 @@ class LogFile(object):
             line = f"{date_time_str};{msg}\n"
             file.write(line)
             file.close()
+
+if __name__ == "__main__":
+    # setup dependency injection
+    now = datetime.datetime.now()
+    print(now.strftime("Y"))
+
+    date_time_str = now.strftime("%Y_%m_%d-%H_%M")       
+    print(date_time_str)     
