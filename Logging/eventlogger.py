@@ -6,6 +6,9 @@ class EventLogger:
     def __init__(self) -> None:
         self.log_in_memory = []
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}", )
+
+        self.logger.setLevel(logging.INFO)
+
         now = datetime.datetime.now()
         date_time_str = now.strftime("%Y_%m_%d-%H_%M")
         self.date = date_time_str
