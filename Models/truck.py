@@ -4,9 +4,9 @@ from typing import List
 import pygame
 
 from Models.package import Package
+from Models.drawable import Drawable
 
-
-class Truck(pygame.sprite.Sprite):
+class Truck(Drawable):
     packages: List[Package] = []
 
     def __init__(self, grid_pos, scale, packages=None, number_of_attachment_points=1):
@@ -30,10 +30,14 @@ class Truck(pygame.sprite.Sprite):
         self.rect.x = grid_pos[0]
         self.rect.y = grid_pos[1]
 
-    def update(self, scale):
+    def on_tick(self, delta):
         pass
 
-    def draw(self):
+    def on_frame(self, delta):
         pass
+
     def get_home(self):
         return self.rect.x, self.rect.y
+    
+    def get_pos(self):
+        return self.grid_pos

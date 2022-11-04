@@ -27,7 +27,7 @@ class TaskManager:
         return len(self.env_ref.task_ref)
 
     def get_head_package(self):
-        self.logger.log(f"packages left in que: {len(self.env_ref.task_ref)}", show_in_ui=False)
+        self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
         return self.env_ref.task_ref.pop()
 
     def is_done(self):

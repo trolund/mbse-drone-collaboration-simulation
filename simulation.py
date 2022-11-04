@@ -1,8 +1,9 @@
+import datetime
 import pygame
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
-from Logging.eventlogger import EventLogger
+from Logging.eventlogger import EventLogger, LogFile
 from Models.settings import Settings
 from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
@@ -32,11 +33,13 @@ class Simulation(object):
                  env: Env = Provide[Container.env]):
 
         pygame.display.set_caption(name)
-        logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
+
+        logger.log("Starting Simulation - " + name, show_in_ui=False)
+
 
         self.settings = Settings(config)
-        logger.log("Config loaded 🛠", show_in_ui=False)
-
+        logger.log("Config loaded ", show_in_ui=False)
+        self.logger = logger
         self.drone_controller = None
         self.task_manager = None
 
@@ -61,7 +64,7 @@ class Simulation(object):
         self.drones_ref = []
 
         for d in range(0, number_of_drones):
-            drone = Drone(self.settings.scale, "done_" + str(d))
+            drone = Drone(self.settings.scale, "drone_" + str(d))
             # start at x, y
             drone.rect.x = env.home[0]
             drone.rect.y = env.home[1]
@@ -84,8 +87,9 @@ class Simulation(object):
 
         self.task_manager = TaskManager()
 
-    def create_truck(self, env: Env, pos):
+    def create_truck(self, env: Env, pos, logger: EventLogger = Provide[Container.event_logger]):
         truck = Truck(pos, self.settings.scale)
+        logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
@@ -93,8 +97,6 @@ class Simulation(object):
         # draw the basic layout
         draw_layout(self.screen, layout, x_len, y_len, step_size, self.settings.scale, self.OffsetX, self.OffsetY)
 
-        # update all sprites
-        env.sprites.update(self.settings.scale)
         # draw all sprites on top of layout
         for t in env.sprites:
             # scale images
@@ -168,68 +170,72 @@ class Simulation(object):
 
         self.screen.blit(text, textRect)
 
+
+
+    def _on_tick(self, delta):
+        self.keyboard_input()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.gl.is_running = False
+            self.ui.handle_events(event)
+        
+        self.ui.on_tick(delta)
+        for sprite in self.env.sprites:
+            sprite.on_tick(delta)
+        # only 'count' time if nor paused
+        self.timer.add_delta_time(delta)
+        self.drone_controller.assign_tasks()
+
+
+    def _on_frame(self, delta_frame):
+        if self.is_paused:
+            self.draw_paused()
+        # clear background
+        self.screen.fill(WHITE)
+        # draw object layers
+        self.draw_layers(self.layout, self.x_len, self.y_len, self.step_size, self.env)
+
+        # update and draw UI
+        self.ui.on_frame(self.settings.scale, self.timer)
+
+        pygame.display.flip()
+
+        # update screen with new drawings
+        pygame.display.update()
+
+    def set_simulation_speed(self, scale): 
+        self.gl.scale_simulation(scale)
+
+
     def Main(self):
         # instance of UI
-        ui = UI(self.set_scale, self.toggle_paused, self.settings, self.screen)
-
-        self.is_paused = True
+        self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
         # setup layout
-        (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
+        (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
             self.settings.ground_size,
             road_size=self.settings.road_size,
             change_of_customer=self.settings.customer_density,
             optimal_truck_pos=self.settings.optimal_truck_pos)
-
-        (step_size, x_len, y_len, scale) = get_world_size(self.screen, layout)
-
-        self.settings.scale = scale
+        (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], step_size))
+        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
-        self.create_drones(self.env, step_size, self.settings.number_of_drones)
+        self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
 
         # Simulation/game loop
-        timer = Timer()
-        clock = pygame.time.Clock()
+        self.timer = Timer()
 
-        while self.is_running:
-            time_delta = clock.tick(FPS) / 1000.0
-            self.keyboard_input()
+        from game_loop import GameLoop
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.is_running = False
-
-                ui.handle_events(event)
-
-            if self.is_paused:
-                self.draw_paused()
-            else:
-                # only 'count' time if nor paused
-                timer.add_delta_time(time_delta)
-
-                # clear background
-                self.screen.fill(WHITE)
-
-                # draw object layers
-                self.draw_layers(layout, x_len, y_len, step_size, self.env)
-
-                # let drone controller do its thing
-                self.drone_controller.assign_tasks()
-
-            # update and draw UI
-            ui.update(time_delta,
-                      clock.get_fps(),
-                      self.settings.scale,
-                      timer)
-
-            pygame.display.flip()
-
-            # update screen with new drawings
-            pygame.display.update()
+        self.gl = GameLoop(
+            self._on_tick,
+            self._on_frame, 
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
+        )
+        self.gl.start()
 
         pygame.quit()
 
