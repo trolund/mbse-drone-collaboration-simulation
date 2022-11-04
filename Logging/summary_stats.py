@@ -45,10 +45,6 @@ def distances(coordinate_list,no_drones):
         distances.append(dist)
         dist = 0
     return distances
-
-
-
-
                         
 def get_files(from_date, to_date):
     files = os.listdir('./Logging/Files')
@@ -93,10 +89,6 @@ def main():
         dist = distances(list,get_drones(file))
     
     print(f'Distances travelled by drones: {dist}')
-    
-    
-
-
 
 if __name__ == "__main__":
     # setup dependency injection
