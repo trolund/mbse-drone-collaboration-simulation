@@ -16,7 +16,7 @@ from containers import Container
 
 class UI:
 
-    def __init__(self, setScale, toggle_paused, settings: Settings, screen: Surface,
+    def __init__(self, setScale, set_simulation_speed, toggle_paused, settings: Settings, screen: Surface,
                  logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
@@ -49,6 +49,7 @@ class UI:
 
         # funcs
         self.toggle_paused = toggle_paused
+        self.set_simulation_speed = set_simulation_speed
         self.set_scale = setScale
 
         # create all elements
@@ -113,6 +114,11 @@ class UI:
             manager=self.manager
         )
 
+        self.simulation_speed_input = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect(self.ui_x + 50, self.screen.get_height() - 380, 250, 75),
+            manager=self.manager,
+        )
+
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
@@ -122,19 +128,29 @@ class UI:
                     self.set_scale(-0.2)
                 if event.ui_element == self.pause_btn:
                     self.toggle_paused(self.pause_btn)
+            if event.user_type == pygame_gui.UI_TEXT_ENTRY_CHANGED:
+                if event.ui_element == self.simulation_speed_input:
+                    try:
+                        f = float(event.text)
+                        if f <= 0:
+                            return
+                        self.set_simulation_speed(f)
+                    except ValueError:
+                        pass
+                    
 
         self.manager.process_events(event)
 
-    def update(self, time_delta: float, fps: float, scale: float, timer: Timer):
+    def on_frame(self, scale: float, timer: Timer):
         pygame.draw.rect(self.screen, GREY, pygame.Rect(self.ui_x, 0, self.ui_width, self.screen.get_height()))
-        self.delta_label.set_text(F"Delta: {'{0:.2f}'.format(time_delta)}")
-        self.FPS_label.set_text(f"FPS: {'{0:.1f}'.format(fps)}")
         self.packages_left_label.set_text(str(len(self.env.task_ref)))
         self.scale_label.set_text(str(scale))
-        self.update_event_list()
         self.timer_label.set_text(timer.get_time_string())
-        self.manager.update(time_delta)
         self.manager.draw_ui(self.screen)
+        self.update_event_list()
+    
+    def on_tick(self, delta):
+        self.manager.update(delta)
 
     def update_event_list(self):
         self.log_list.set_item_list(self.logger.get_log())

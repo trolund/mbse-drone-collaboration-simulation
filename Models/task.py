@@ -4,9 +4,10 @@ from typing import List
 import pygame
 
 from Models.package import Package
+from Models.drawable import Drawable
 
 
-class Task(pygame.sprite.Sprite):
+class Task(Drawable):
     packages: List[Package] = []
     number_of_attachment_points: int
     size: int = 50
