@@ -79,8 +79,8 @@ class Simulation(object):
 
         for idx, t in enumerate(tasks):
             # start at truck
-            t.rect.x = env.home[0]  # + (5 * idx)
-            t.rect.y = env.home[1]
+            # t.rect.x = env.home[0]  # + (5 * idx)
+            # t.rect.y = env.home[1]
 
             env.task_ref.append(t)
             env.sprites.add(t)
@@ -91,7 +91,7 @@ class Simulation(object):
         planner = PatchFinder()
         route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
 
-        truck = Truck(pos, path=translate_moves(route, step_size), size=step_size)
+        truck = Truck(pos, path=translate_moves(route, step_size), size=step_size, packages=env.task_ref)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
@@ -219,8 +219,8 @@ class Simulation(object):
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
 
         self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_sports, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")

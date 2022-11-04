@@ -8,6 +8,7 @@ from Logging.eventlogger import EventLogger
 from Models.drone import Drone
 from Models.env import Env
 from Models.move_type import Move_Type
+from Models.truck import Truck
 from Services.task_manager import TaskManager
 from Utils.layout_utils import grid_to_pos_tuple
 from containers import Container
@@ -19,7 +20,10 @@ class DroneController(ConcreteMediator):
     # contain the plan the drones will execute
     plan = {}
 
-    def __init__(self, task_manager, drones_ref, step_size,
+    def __init__(self,
+                 task_manager,
+                 drones_ref,
+                 step_size,
                  logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
@@ -44,6 +48,7 @@ class DroneController(ConcreteMediator):
             self.plan[d.id] = []
 
     def assign_tasks(self):
+
         if len(self.ready_list) > 0 and self.task_manager.get_number_of_packages_left() > 0:
             curr_drone: Drone = self.ready_list.pop()
             next_task = self.task_manager.get_head_package()
@@ -52,4 +57,4 @@ class DroneController(ConcreteMediator):
             # movements
             curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
             curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
-            curr_drone.add_move_point(self.env_ref.home)
+            curr_drone.add_move_point(self.env_ref.home, Move_Type.HOME)

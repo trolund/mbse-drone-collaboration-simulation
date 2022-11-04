@@ -15,7 +15,7 @@ class GameLoop(object):
 
         self.max_TPS = 100
         self.max_FPS = 60
-        self.min_FPS = 50
+        self.min_FPS = 30
 
         # if TPS_scale = max_TPS then it is real-time
         self.TPS_scale = 25

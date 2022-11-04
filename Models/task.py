@@ -20,6 +20,7 @@ class Task(Drawable):
         self.packages = packages
         self.address = address
         self.number_of_attachment_points = number_of_attachment_points
+        self.taken = False
 
         self.width = 5
         self.height = 5
@@ -35,6 +36,12 @@ class Task(Drawable):
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
+
+    def set_taken(self):
+        self.taken = True
+
+    def is_taken(self):
+        return self.taken
 
     def __str__(self):
         return (f"Packages weight is {self.get_lift_requirement()}, and should be delivered to {self.address}")

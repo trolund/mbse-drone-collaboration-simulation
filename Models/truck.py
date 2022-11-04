@@ -6,13 +6,13 @@ from dependency_injector.wiring import Provide
 from pygame.rect import Rect
 
 from Models.env import Env
-from Models.package import Package
 from Models.drawable import Drawable
+from Models.task import Task
 from containers import Container
 
 
 class Truck(Drawable):
-    packages: List[Package] = []
+    packages: List[Task] = []
     curr_task = None
 
     def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, env: Env = Provide[Container.env]):
@@ -47,19 +47,25 @@ class Truck(Drawable):
             self.moves = path
         self.curr_move = None
 
+    def move_package_with_truck(self):
+        for t in self.packages:
+            if not t.is_taken():
+                x, y = self.get_home()
+                t.rect.x = x
+                t.rect.y = y
+
     def on_frame(self, delta):
         pass
 
     def get_home(self):
-        return self.rect.x, self.rect.y
+        return self.rect.x + (self.size / 2), self.rect.y + (self.size / 2)
 
     def add_coordinates(self, x, y):
         self.moves.append((x, y))
 
     def on_tick(self, delta):
         self.env.home = (self.rect.x, self.rect.y)
-        
-        
+
         # take new task
         if len(self.moves) > 0 and self.curr_task is None:
             self.curr_task = self.moves.pop(0)
@@ -72,7 +78,7 @@ class Truck(Drawable):
             bx = self.curr_task[0]
             by = self.curr_task[1]
 
-            steps_number = max(abs(bx - ax), abs(by - ay))
+            steps_number = min(abs(bx - ax), abs(by - ay))
 
             if steps_number == 0:
                 self.rect = Rect(bx, by, self.size, self.size)
@@ -83,3 +89,6 @@ class Truck(Drawable):
 
             if ax == bx and ay == by:
                 self.curr_task = None
+
+        # move packages with truck
+        self.move_package_with_truck()

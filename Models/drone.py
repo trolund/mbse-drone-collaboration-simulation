@@ -72,6 +72,7 @@ class Drone(Drawable, BaseMediator):
                             (self.rect.x, self.rect.y))
 
         self.attachment = task
+        self.attachment.set_taken()
 
     def drop(self):
 
@@ -100,13 +101,22 @@ class Drone(Drawable, BaseMediator):
             ay = self.rect.y
             ax = self.rect.x
 
-            point = get_cor(self.curr_move)
+            bx = 0
+            by = 0
 
-            bx = point[0]
-            by = point[1]
+            if get_move_type(self.curr_move) == Move_Type.HOME:
+                point = self.env_ref.home
+
+                bx = point[0]
+                by = point[1]
+
+                print(bx, by)
+            else:
+                point = get_cor(self.curr_move)
+                bx = point[0]
+                by = point[1]
 
             self.do_move(ax, ay, bx, by)
-
     def do_move(self, ax, ay, bx, by):
         steps_number = max(abs(bx - ax), abs(by - ay))
 
