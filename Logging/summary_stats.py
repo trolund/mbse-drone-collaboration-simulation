@@ -7,25 +7,31 @@ def readLog(infile):
     keep = ["move to"]
     print(infile)
     filepos = "./Logging/Files/"+infile
+    drones = get_drones(infile)
+    temp = []
     with open(filepos) as f:
         f = f.readlines()
 
-    for line in f:
-        line.replace("\n", "")
-        parts = line.split(";")
-        if parts[0] != "\n":
+    for i in range(0,drones):
+        for line in f:
+            line.replace("\n", "")
+            parts = line.split(";")
             stats = parts[1].split(" ")
-            if stats[0]:
-                print(stats[0])
-        
+            for stat in stats:
+                if stat == (f"drone_{str(i)},"):
+                    coordinates = parts[1].split(" ")
+                    dict = {
+                        "drone": (f"drone_{str(i)},"),
+                        "FromCordinateX" : coordinates[3].replace("(","").replace(",",""),
+                        "FromCordinateY" : coordinates[4].replace(")",""),
+                        "ToCordinateX" : coordinates[6].replace("(","").replace(",",""),
+                        "ToCordinatey" : coordinates[7].replace(")","").replace("\n","")
+                    }
+                   # endstring = (f"From {},{cordinates[4]} To {cordinates[6]},{cordinates[7]}")
+                    temp.append(dict)
+    return temp
 
-        for phrase in keep:
-            if phrase in line:
-                positions.append(line)
-                break
-
-    print(positions)
-
+                        
 def get_files(from_date, to_date):
     files = os.listdir('./Logging/Files')
     files_temp = []
@@ -59,18 +65,16 @@ def get_drones(filename):
         
     
     return no_drones
-        
-
-                
 
 
 def main():
     files = get_files("20221104","20221105")
-
     for file in files:
         print("NEWFILE")
-        readLog(file)
-        print(f'no_Drones {get_drones(file)}')
+        list = readLog(file)
+    print(list)
+    
+
 
 
 if __name__ == "__main__":
