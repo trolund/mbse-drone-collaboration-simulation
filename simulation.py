@@ -88,10 +88,14 @@ class Simulation(object):
         self.task_manager = TaskManager()
 
     def create_truck(self, layout, step_size, env: Env, pos):
-        planner = PatchFinder()
-        route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+        route = None
 
-        truck = Truck(pos, path=translate_moves(route, step_size), size=step_size, packages=env.task_ref)
+        if self.settings.moving_truck:
+            planner = PatchFinder()
+            route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+            route = translate_moves(route, step_size)
+
+        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
