@@ -39,11 +39,4 @@ class LogFile(object):
             line = f"{date_time_str};{msg}\n"
             file.write(line)
             file.close()
-
-if __name__ == "__main__":
-    # setup dependency injection
-    now = datetime.datetime.now()
-    print(now.strftime("Y"))
-
-    date_time_str = now.strftime("%Y_%m_%d-%H_%M")       
-    print(date_time_str)     
+    
