@@ -16,7 +16,7 @@ from containers import Container
 
 class UI:
 
-    def __init__(self, setScale, toggle_paused, settings: Settings, screen: Surface,
+    def __init__(self, setScale, set_simulation_speed, toggle_paused, settings: Settings, screen: Surface,
                  logger: EventLogger = Provide[Container.event_logger],
                  config=Provide[Container.config],
                  env: Env = Provide[Container.env]):
@@ -49,6 +49,7 @@ class UI:
 
         # funcs
         self.toggle_paused = toggle_paused
+        self.set_simulation_speed = set_simulation_speed
         self.set_scale = setScale
 
         # create all elements
@@ -113,6 +114,11 @@ class UI:
             manager=self.manager
         )
 
+        self.simulation_speed_input = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect(self.ui_x + 50, self.screen.get_height() - 380, 250, 75),
+            manager=self.manager,
+        )
+
     def handle_events(self, event):
         if event.type == pygame.USEREVENT:
             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
@@ -122,6 +128,16 @@ class UI:
                     self.set_scale(-0.2)
                 if event.ui_element == self.pause_btn:
                     self.toggle_paused(self.pause_btn)
+            if event.user_type == pygame_gui.UI_TEXT_ENTRY_CHANGED:
+                if event.ui_element == self.simulation_speed_input:
+                    try:
+                        f = float(event.text)
+                        if f <= 0:
+                            return
+                        self.set_simulation_speed(f)
+                    except ValueError:
+                        pass
+                    
 
         self.manager.process_events(event)
 

@@ -12,6 +12,7 @@ from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
+from Models.truck import Truck
 from Utils.layout_utils import distance_between
 from containers import Container
 from Models.drawable import Drawable
@@ -79,7 +80,7 @@ class Drone(Drawable, BaseMediator):
         if self.attachment is None:
             raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
 
-        self.logger.log(f"{self.name} - DROP, package {self.attachment}")
+        self.logger.log(f"{self.name} - DROP, {self.attachment}")
         self.attachment = None
 
     def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):
@@ -95,7 +96,7 @@ class Drone(Drawable, BaseMediator):
         if self.curr_move is None and len(self.moves) == 0 and self.status != DroneMode.IDLE:
             self.ready()  # send a ready signal to the drone controller
             self.status = DroneMode.IDLE
-            self.logger.log("Ready drone: " + self.name)
+            #self.logger.log("Ready drone: " + self.name)
 
         if self.curr_move is not None:
             ay = self.rect.y
@@ -151,8 +152,7 @@ class Drone(Drawable, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-
-            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])})")
+            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
 
     def on_tick(self, delta):
         self.take_task()
@@ -191,3 +191,6 @@ class Drone(Drawable, BaseMediator):
 
     def __str__(self):
         return (f"{self.id}, {self.name} - {self.status}")
+
+    def get_pos(self):
+        return self.grid_pos

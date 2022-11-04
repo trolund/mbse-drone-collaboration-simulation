@@ -1,8 +1,9 @@
+import datetime
 import pygame
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
-from Logging.eventlogger import EventLogger
+from Logging.eventlogger import EventLogger, LogFile
 from Models.settings import Settings
 from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
@@ -34,12 +35,13 @@ class Simulation(object):
                  env: Env = Provide[Container.env]):
 
         pygame.display.set_caption(name)
-        self.logger = logger
-        self.logger.log("Starting Simulation 🚀 - " + name, show_in_ui=False)
+
+        logger.log("Starting Simulation - " + name, show_in_ui=False)
+
 
         self.settings = Settings(config)
-        self.logger.log("Config loaded 🛠", show_in_ui=False)
-
+        logger.log("Config loaded ", show_in_ui=False)
+        self.logger = logger
         self.drone_controller = None
         self.task_manager = None
 
@@ -64,7 +66,7 @@ class Simulation(object):
         self.drones_ref = []
 
         for d in range(0, number_of_drones):
-            drone = Drone(self.settings.scale, "done_" + str(d))
+            drone = Drone(self.settings.scale, "drone_" + str(d))
             # start at x, y
             drone.rect.x = env.home[0]
             drone.rect.y = env.home[1]
@@ -95,6 +97,7 @@ class Simulation(object):
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
             route = translate_moves(route, step_size)
 
+        self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
         truck = Truck(pos, path=route, size=step_size, packages=env.task_ref)
         env.home = truck.get_home()
         env.sprites.add(truck)
@@ -177,6 +180,7 @@ class Simulation(object):
         self.screen.blit(text, textRect)
 
 
+
     def _on_tick(self, delta):
         self.keyboard_input()
         for event in pygame.event.get():
@@ -208,10 +212,13 @@ class Simulation(object):
         # update screen with new drawings
         pygame.display.update()
 
+    def set_simulation_speed(self, scale):
+        self.gl.scale_simulation(scale)
+
 
     def Main(self):
         # instance of UI
-        self.ui = UI(self.set_scale, self.toggle_paused, self.settings, self.screen)
+        self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
         # setup layout
         (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
@@ -219,7 +226,8 @@ class Simulation(object):
             self.settings.ground_size,
             road_size=self.settings.road_size,
             customer_density=self.settings.customer_density,
-            random_truck_pos=self.settings.truck_pos_random)
+            random_truck_pos=self.settings.truck_pos_random,
+            optimal_truck_pos=self.settings.optimal_truck_pos)
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
@@ -237,9 +245,10 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : print(f'TPS: {ticks} | FPS: {frames}')
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
         )
         self.gl.start()
+
         pygame.quit()
 
 

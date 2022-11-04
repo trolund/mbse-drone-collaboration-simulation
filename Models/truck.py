@@ -92,3 +92,7 @@ class Truck(Drawable):
 
         # move packages with truck
         self.move_package_with_truck()
+        return self.rect.x, self.rect.y
+
+    def get_pos(self):
+        return self.grid_pos
