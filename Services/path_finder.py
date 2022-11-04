@@ -2,7 +2,6 @@ import heapq
 import numpy as np
 
 from Models.basic_types import Pos
-from Utils.layout_utils import create_layout_env, print_layout
 
 
 # inspiration - https://www.analytics-link.com/post/2018/09/14/applying-the-a-path-finding-algorithm-in-python-part-1

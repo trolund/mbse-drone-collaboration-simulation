@@ -2,19 +2,23 @@ import os
 from typing import List
 
 import pygame
+from dependency_injector.wiring import Provide
 from pygame.rect import Rect
 
+from Models.env import Env
 from Models.package import Package
 from Models.drawable import Drawable
+from containers import Container
 
 
 class Truck(Drawable):
     packages: List[Package] = []
     curr_task = None
 
-    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None):
+    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, env: Env = Provide[Container.env]):
         super().__init__()
 
+        self.env = env
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
         self.grid_pos = grid_pos
@@ -43,9 +47,6 @@ class Truck(Drawable):
             self.moves = path
         self.curr_move = None
 
-    def on_tick(self, delta):
-        pass
-
     def on_frame(self, delta):
         pass
 
@@ -56,6 +57,9 @@ class Truck(Drawable):
         self.moves.append((x, y))
 
     def on_tick(self, delta):
+        self.env.home = (self.rect.x, self.rect.y)
+        
+        
         # take new task
         if len(self.moves) > 0 and self.curr_task is None:
             self.curr_task = self.moves.pop(0)
