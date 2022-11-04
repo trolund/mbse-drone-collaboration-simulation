@@ -15,8 +15,8 @@ def readLog(infile):
         parts = line.split(";")
         if parts[0] != "\n":
             stats = parts[1].split(" ")
-            if stats[0]
-            print(stats[0])
+            if stats[0]:
+                print(stats[0])
         
 
         for phrase in keep:
@@ -42,12 +42,35 @@ def get_files(from_date, to_date):
                 files_temp.append(file)
     return (files_temp)
 
+def get_drones(filename):
+    no_drones = 0
+    filepos = "./Logging/Files/"+filename
+
+    with open(filepos) as f:
+        f = f.readlines()
+    
+    for line in f:
+        parts = line.split(";")
+        init = parts[1].split(" ")
+        if init[1] == "TPS:":
+            break
+        if init[1] == "initialized\n":
+            no_drones = no_drones + 1
+        
+    
+    return no_drones
+        
+
+                
+
+
 def main():
     files = get_files("20221104","20221105")
 
     for file in files:
         print("NEWFILE")
         readLog(file)
+        print(f'no_Drones {get_drones(file)}')
 
 
 if __name__ == "__main__":

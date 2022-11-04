@@ -14,7 +14,7 @@ class EventLogger:
         self.date = date_time_str
         file_name = ("Logging\Files\logfile_"+date_time_str+".log")
         file = LogFile(file_name)
-        file.write(f"{date_time_str} New simulation started \n" )
+        file.write(f"{date_time_str} New simulation started" )
         self.file = file
 
     def log(self, msg, show_in_ui: bool = True):
