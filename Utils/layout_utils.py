@@ -118,16 +118,20 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
 def find_optimal_truck_pos(layout: Layout, pack_pos):
 
     road_pos = find_all_road_pos(layout)
+    pos_length = len(pack_pos)
+    n = pos_length - 1
 
-    n = len(pack_pos)
+    xcords = sorted(list(list(zip(*pack_pos))[0]))
+    ycords = sorted(list(list(zip(*pack_pos))[1]))
 
-    if n % 2 != 0:
-        x = pack_pos[int((n+1)/2)][0]
-        y = pack_pos[int((n+1)/2)][1]
+    if len(pack_pos) % 2 != 0:
+        x = xcords[int((n+1)/2)]
+        print(x)
+        y = ycords[int((n+1)/2)]
     else:
         print(type(int(n/2)+1))
-        x = int((pack_pos[int(n/2)][0] + pack_pos[int(n/2)+1][0]) / 2)
-        y = int((pack_pos[int(n/2)][1] + pack_pos[int(n/2)+1][1]) / 2)
+        x = int((xcords[int(n/2)] + xcords[int(n/2)+1]) / 2)
+        y = int((ycords[int(n/2)] + ycords[int(n/2)+1]) / 2)
 
     med_package_pos = (x, y)
     
