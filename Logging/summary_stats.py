@@ -1,7 +1,7 @@
+import math
 import os
 
 def readLog(infile):
-    #infile = r"C:\Users\odaby\Desktop\MBSE_Project\MBSE-Drone-Collaboration\Logging\Files\logfile_2022_11_03-10_53.log"
 
     positions = []
     keep = ["move to"]
@@ -22,14 +22,32 @@ def readLog(infile):
                     coordinates = parts[1].split(" ")
                     dict = {
                         "drone": (f"drone_{str(i)},"),
-                        "FromCordinateX" : coordinates[3].replace("(","").replace(",",""),
-                        "FromCordinateY" : coordinates[4].replace(")",""),
-                        "ToCordinateX" : coordinates[6].replace("(","").replace(",",""),
-                        "ToCordinatey" : coordinates[7].replace(")","").replace("\n","")
+                        "FromX" : coordinates[3].replace("(","").replace(",",""),
+                        "FromY" : coordinates[4].replace(")",""),
+                        "ToX" : coordinates[6].replace("(","").replace(",",""),
+                        "ToY" : coordinates[7].replace(")","").replace("\n","")
                     }
                    # endstring = (f"From {},{cordinates[4]} To {cordinates[6]},{cordinates[7]}")
                     temp.append(dict)
     return temp
+
+def distances(coordinate_list,no_drones):
+
+    distances = []
+    for drone in range(0,no_drones):
+        dist = 0
+        for i in coordinate_list:
+            #print(i['drone'])
+
+            if i['drone'] == 'drone_'+str(drone)+',':
+                dist = dist + math.hypot(float(i['FromX'])-float(i['ToX']), float(i['FromY'])-float(i['ToY']))
+        
+        distances.append(dist)
+        dist = 0
+    return distances
+
+
+
 
                         
 def get_files(from_date, to_date):
@@ -72,7 +90,10 @@ def main():
     for file in files:
         print("NEWFILE")
         list = readLog(file)
-    print(list)
+        dist = distances(list,get_drones(file))
+    
+    print(f'Distances travelled by drones: {dist}')
+    
     
 
 
