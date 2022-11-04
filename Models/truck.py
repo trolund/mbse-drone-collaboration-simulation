@@ -38,3 +38,6 @@ class Truck(Drawable):
 
     def get_home(self):
         return self.rect.x, self.rect.y
+    
+    def get_pos(self):
+        return self.grid_pos
