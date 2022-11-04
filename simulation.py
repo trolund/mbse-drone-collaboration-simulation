@@ -59,7 +59,7 @@ class Simulation(object):
 
         self.Main()
 
-    def create_drones(self, env: Env, step_size, number_of_drones: int):
+    def create_drones(self, env: Env, step_size, number_of_drones: int, ):
 
         self.drones_ref = []
 

@@ -58,7 +58,8 @@ class Drone(Drawable, BaseMediator):
         self.height = self.size
 
         self.images = []
-
+        msg = name + " initialized"
+        self.logger.log(msg,False)
         self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
         img = pygame.transform.scale(self.img, (self.size * 100, self.size * 100))
         self.images.append(img)

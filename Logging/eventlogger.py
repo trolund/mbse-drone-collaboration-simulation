@@ -10,7 +10,7 @@ class EventLogger:
         self.logger.setLevel(logging.INFO)
 
         now = datetime.datetime.now()
-        date_time_str = now.strftime("%Y_%m_%d-%H_%M")
+        date_time_str = now.strftime("%Y_%m_%d-%H_%M_%S")
         self.date = date_time_str
         file_name = ("Logging\Files\logfile_"+date_time_str+".log")
         file = LogFile(file_name)
@@ -38,7 +38,7 @@ class LogFile(object):
     def write(self, msg):
         with open(self.file_name, "a") as file:
             now = datetime.datetime.now()
-            date_time_str = now.strftime("%Y-%m-%d %H:%M")
+            date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
             line = f"{date_time_str};{msg}\n"
             file.write(line)
             file.close()
