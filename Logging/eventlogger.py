@@ -1,6 +1,8 @@
 import datetime
 import logging
 
+from Logging.summary_stats import make_summary_file
+
 class EventLogger:
 
     def __init__(self) -> None:
@@ -13,15 +15,22 @@ class EventLogger:
         date_time_str = now.strftime("%Y_%m_%d-%H_%M_%S")
         self.date = date_time_str
         file_name = ("Logging\Files\logfile_"+date_time_str+".log")
+        self.file_name = file_name
         file = LogFile(file_name)
         file.write(f"{date_time_str} New simulation started" )
         self.file = file
 
     def log(self, msg, show_in_ui: bool = True):
+
         if show_in_ui:
             self.log_in_memory.insert(0, msg)
         self.logger.debug(msg)
         self.logOA(msg)
+        if "Simulation finished at" in msg:
+            file_name = self.file_name.split("\\")[-1]
+            make_summary_file(file_name)
+
+
 
     def logOA(self,msg):
         file = self.file

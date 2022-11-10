@@ -66,17 +66,22 @@ def time_per_drone(distances,speed):
     return times
 
 def time_per_package(filename,time):
+    packages_left = number_of_packages(filename)
+    return time/float(packages_left)
+            
+def number_of_packages(filename):
     filepos = "./Logging/Files/"+filename
-
+    queue_size = []
     with open(filepos) as f:
         f = f.readlines() 
 
     for line in f:
         temp = line.split(';')
         if "Packages" in temp[1]:
-            print(temp[1].split(':'))
-        
-
+            number = temp[1].split(':')[1].strip()
+            queue_size.append(number)
+    packages_left = len(queue_size)
+    return packages_left
 
 def get_files(from_date, to_date):
     files = os.listdir('./Logging/Files')
@@ -112,20 +117,64 @@ def get_drones(filename):
     
     return no_drones
 
+def avg_package_per_drone(packages,drones):
+    return(packages/drones)
+
+def write_to_file(filename, msg):
+    with open(filename, "a") as file:
+        for m in msg:
+            line = f"{m}\n"
+            file.write(line)
+
+
+def make_summary_file(file):
+    list = readLog(file)
+    dist = distances(list,get_drones(file))
+    no_packages = number_of_packages(file)
+    number_of_drones = get_drones(file)
+    time = get_time(file)
+    speed = get_speed(time, float(max(dist)))
+
+
+    msg = f"Total Number of drones: {number_of_drones}"
+    msg1 = f"Total Number of packages: {no_packages}"
+    msg2 = f'Distances traveled by drones: {dist}'
+    msg3 = f'Working time of drones: {time_per_drone(dist,speed)}'
+    msg4 = f"Average time per package: {time_per_package(file,time)}"
+    msg5 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
+
+    messages = [msg,msg1,msg2,msg3,msg4,msg5]
+    newfilename = "Logging\Files\\" + file.split(".")[0] + "_summary.log"
+    write_to_file(newfilename,messages)
+
 
 def main():
-    files = get_files("20221110","20221111")
+    files = get_files("20211110","20231111")
+
     for file in files:
-        print("NEWFILE")
+        print(file)
         list = readLog(file)
         dist = distances(list,get_drones(file))
-
-        print(f'Distances travelled by drones: {dist}')
+        no_packages = number_of_packages(file)
+        number_of_drones = get_drones(file)
         time = get_time(file)
         speed = get_speed(time, float(max(dist)))
-        print(f'Working time of drones: {time_per_drone(dist,speed)}')
 
-        time_per_package(file,time)
+
+        msg = f"Total Number of drones: {number_of_drones}"
+        msg1 = f"Total Number of packages: {no_packages}"
+        msg2 = f'Distances traveled by drones: {dist}'
+        msg3 = f'Working time of drones: {time_per_drone(dist,speed)}'
+        msg4 = f"Average time per package: {time_per_package(file,time)}"
+        msg5 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
+
+        messages = [msg,msg1,msg2,msg3,msg4,msg5]
+        newfilename = "Logging\Files\\" + file.split(".")[0] + "_summary.log"
+        write_to_file(newfilename,messages)
+
+
+
+
 
 if __name__ == "__main__":
     # setup dependency injection

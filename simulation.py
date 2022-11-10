@@ -16,7 +16,7 @@ from Services.task_manager import TaskManager
 from Utils.Timer import Timer
 from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
 from containers import Container
-
+from Logging.summary_stats import main
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
