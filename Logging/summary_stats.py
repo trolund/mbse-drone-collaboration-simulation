@@ -2,11 +2,16 @@ import datetime
 import math
 import os
 
+def format_number(msg,decimals):
+    string_decimals = '{0:.'+str(decimals)+'f}'
+    return f"{string_decimals.format(msg)}"
+
+
 def readLog(infile):
 
     positions = []
     keep = ["move to"]
-    print(infile)
+
     filepos = "./Logging/Files/"+infile
     drones = get_drones(infile)
     temp = []
@@ -42,8 +47,8 @@ def distances(coordinate_list,no_drones):
 
             if i['drone'] == 'drone_'+str(drone)+',':
                 dist = dist + math.hypot(float(i['FromX'])-float(i['ToX']), float(i['FromY'])-float(i['ToY']))
-        
-        distances.append(dist)
+                dist_format = format_number(dist,2)
+        distances.append(dist_format)
         dist = 0
     return distances
 
@@ -62,12 +67,12 @@ def get_speed(time, distance):
 def time_per_drone(distances,speed):
     times = []
     for d in distances:
-        times.append(d/speed)
+        times.append(format_number(float(d)/speed,2))
     return times
 
 def time_per_package(filename,time):
     packages_left = number_of_packages(filename)
-    return time/float(packages_left)
+    return format_number(time/float(packages_left),2)
             
 def number_of_packages(filename):
     filepos = "./Logging/Files/"+filename
@@ -118,7 +123,7 @@ def get_drones(filename):
     return no_drones
 
 def avg_package_per_drone(packages,drones):
-    return(packages/drones)
+    return(format_number(packages/drones,2))
 
 def write_to_file(filename, msg):
     with open(filename, "a") as file:
@@ -138,12 +143,14 @@ def make_summary_file(file):
 
     msg = f"Total Number of drones: {number_of_drones}"
     msg1 = f"Total Number of packages: {no_packages}"
-    msg2 = f'Distances traveled by drones: {dist}'
-    msg3 = f'Working time of drones: {time_per_drone(dist,speed)}'
-    msg4 = f"Average time per package: {time_per_package(file,time)}"
-    msg5 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
+    msg2 = f"Total Time: {format_number(time,2)}"
+    msg2 = f"Average Speed: {format_number(speed,2)}"
+    msg3 = f'Distances traveled by drones: {dist}'
+    msg4 = f'Working time of drones: {time_per_drone(dist,speed)}'
+    msg5 = f"Average time per package: {time_per_package(file,time)}"
+    msg6 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
 
-    messages = [msg,msg1,msg2,msg3,msg4,msg5]
+    messages = [msg,msg1,msg2,msg3,msg4,msg5,msg6]
     newfilename = "Logging\Files\\" + file.split(".")[0] + "_summary.log"
     write_to_file(newfilename,messages)
 
@@ -163,12 +170,13 @@ def main():
 
         msg = f"Total Number of drones: {number_of_drones}"
         msg1 = f"Total Number of packages: {no_packages}"
-        msg2 = f'Distances traveled by drones: {dist}'
-        msg3 = f'Working time of drones: {time_per_drone(dist,speed)}'
-        msg4 = f"Average time per package: {time_per_package(file,time)}"
-        msg5 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
+        msg2 = f"Total Time: {format_number(time,2)}"
+        msg3 = f'Distances traveled by drones: {dist}'
+        msg4 = f'Working time of drones: {time_per_drone(dist,speed)}'
+        msg5 = f"Average time per package: {time_per_package(file,time)}"
+        msg6 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
 
-        messages = [msg,msg1,msg2,msg3,msg4,msg5]
+        messages = [msg,msg1,msg2,msg3,msg4,msg5,msg6]
         newfilename = "Logging\Files\\" + file.split(".")[0] + "_summary.log"
         write_to_file(newfilename,messages)
 
@@ -178,4 +186,6 @@ def main():
 
 if __name__ == "__main__":
     # setup dependency injection
-    main()
+   #main()
+   test = 1.444444444444444
+   print(format_number(test,2))

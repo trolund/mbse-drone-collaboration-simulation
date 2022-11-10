@@ -10,7 +10,7 @@ class EventLogger:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}", )
 
         self.logger.setLevel(logging.INFO)
-
+        self.done = False
         now = datetime.datetime.now()
         date_time_str = now.strftime("%Y_%m_%d-%H_%M_%S")
         self.date = date_time_str
@@ -21,14 +21,15 @@ class EventLogger:
         self.file = file
 
     def log(self, msg, show_in_ui: bool = True):
-
-        if show_in_ui:
-            self.log_in_memory.insert(0, msg)
-        self.logger.debug(msg)
-        self.logOA(msg)
-        if "Simulation finished at" in msg:
-            file_name = self.file_name.split("\\")[-1]
-            make_summary_file(file_name)
+        if not self.done:
+            if show_in_ui:
+                self.log_in_memory.insert(0, msg)
+                self.logger.debug(msg)
+            self.logOA(msg)
+            if "Simulation finished at" in msg:
+                file_name = self.file_name.split("\\")[-1]
+                make_summary_file(file_name)
+                self.done = True
 
 
 

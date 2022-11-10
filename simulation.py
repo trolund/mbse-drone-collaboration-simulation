@@ -182,9 +182,10 @@ class Simulation(object):
 
         if self.done:
             msg = f"Simulation finished at time:{self.timer.get_time_log()}"
-            self.logger.log(msg)
-            #MAKE SUMMARY FILE 
-            pygame.quit()
+            if msg != "":
+                self.logger.log(msg,False)
+            pygame.quit() #THIS DETERMINES IF THE SIMULATION WINDOW WILL CLOSE AUTOMATICALLY WHEN THE SIMULATION IS OVER
+            msg = ""
         
         if not self.done:
             if self.drone_controller.check_if_done():
