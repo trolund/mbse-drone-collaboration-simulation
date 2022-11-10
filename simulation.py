@@ -181,7 +181,7 @@ class Simulation(object):
             self.ui.handle_events(event)
 
         if self.done:
-            msg = f"Simulation finish. At time {self.timer.get_time_string()}"
+            msg = f"Simulation finished at time:{self.timer.get_time_log()}"
             self.logger.log(msg)
             #MAKE SUMMARY FILE 
             pygame.quit()

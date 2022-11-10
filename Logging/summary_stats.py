@@ -46,7 +46,38 @@ def distances(coordinate_list,no_drones):
         distances.append(dist)
         dist = 0
     return distances
-                        
+
+def get_time(filename):
+    filepos = "./Logging/Files/"+filename
+
+    with open(filepos) as f:
+        f = f.readlines()  
+    
+    temp = f[-1].split(':')
+    return float(temp[-1])
+
+def get_speed(time, distance):
+    return distance / time
+
+def time_per_drone(distances,speed):
+    times = []
+    for d in distances:
+        times.append(d/speed)
+    return times
+
+def time_per_package(filename,time):
+    filepos = "./Logging/Files/"+filename
+
+    with open(filepos) as f:
+        f = f.readlines() 
+
+    for line in f:
+        temp = line.split(';')
+        if "Packages" in temp[1]:
+            print(temp[1].split(':'))
+        
+
+
 def get_files(from_date, to_date):
     files = os.listdir('./Logging/Files')
     files_temp = []
@@ -83,13 +114,18 @@ def get_drones(filename):
 
 
 def main():
-    files = get_files("20221104","20221111")
+    files = get_files("20221110","20221111")
     for file in files:
         print("NEWFILE")
         list = readLog(file)
         dist = distances(list,get_drones(file))
 
         print(f'Distances travelled by drones: {dist}')
+        time = get_time(file)
+        speed = get_speed(time, float(max(dist)))
+        print(f'Working time of drones: {time_per_drone(dist,speed)}')
+
+        time_per_package(file,time)
 
 if __name__ == "__main__":
     # setup dependency injection

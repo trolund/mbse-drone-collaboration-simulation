@@ -21,3 +21,6 @@ class Timer:
 
     def get_time_string(self):
         return f"{'{0:.2f}'.format(self.time)}s"
+    
+    def get_time_log(self):
+        return f"{'{0:.5f}'.format(self.time)}"
