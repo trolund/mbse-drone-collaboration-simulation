@@ -39,4 +39,4 @@ class Task(Drawable):
 
 
     def __str__(self):
-        return (f"Package with id xx and weight {self.get_lift_requirement()}, should be delivered to {self.address}")
+        return (f"Package with id xx and weight {self.get_lift_requirement()}, should be delivered to ({self.rect.x},{self.rect.y})")
