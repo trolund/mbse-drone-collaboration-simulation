@@ -1,3 +1,4 @@
+import datetime
 import math
 import os
 
@@ -82,13 +83,13 @@ def get_drones(filename):
 
 
 def main():
-    files = get_files("20221104","20221105")
+    files = get_files("20221104","20221111")
     for file in files:
         print("NEWFILE")
         list = readLog(file)
         dist = distances(list,get_drones(file))
-    
-    print(f'Distances travelled by drones: {dist}')
+
+        print(f'Distances travelled by drones: {dist}')
 
 if __name__ == "__main__":
     # setup dependency injection

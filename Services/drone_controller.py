@@ -6,6 +6,7 @@ from dependency_injector.wiring import Provide
 from Cominication_hub.ConcreteMediator import ConcreteMediator
 from Logging.eventlogger import EventLogger
 from Models.drone import Drone
+from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Services.task_manager import TaskManager
@@ -53,3 +54,18 @@ class DroneController(ConcreteMediator):
             curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
             curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
             curr_drone.add_move_point(self.env_ref.home)
+
+    def check_if_done(self):
+        temp = []
+
+        if self.task_manager.is_done():
+            for d in self.all_drones:
+                if d.status == DroneMode.IDLE:
+                    temp.append(True)
+                else:
+                    temp.append(False)
+            if all(temp):
+                return True
+            else:
+                return False
+

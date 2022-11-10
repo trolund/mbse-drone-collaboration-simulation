@@ -54,6 +54,7 @@ class Simulation(object):
         self.OffsetX = 0
         self.OffsetY = 0
 
+        self.done = False
         # create the window from config
         self.create_window()
 
@@ -178,12 +179,25 @@ class Simulation(object):
             if event.type == pygame.QUIT:
                 self.gl.is_running = False
             self.ui.handle_events(event)
+
+        if self.done:
+            msg = f"Simulation finish. At time {self.timer.get_time_string()}"
+            self.logger.log(msg)
+            #MAKE SUMMARY FILE 
+            pygame.quit()
+        
+        if not self.done:
+            if self.drone_controller.check_if_done():
+                self.done = True
+
         
         self.ui.on_tick(delta)
         for sprite in self.env.sprites:
             sprite.on_tick(delta)
         # only 'count' time if nor paused
-        self.timer.add_delta_time(delta)
+        if not self.done:
+            self.timer.add_delta_time(delta)
+
         self.drone_controller.assign_tasks()
 
 
@@ -233,10 +247,10 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}',
+            )
         )
         self.gl.start()
-
         pygame.quit()
 
 
