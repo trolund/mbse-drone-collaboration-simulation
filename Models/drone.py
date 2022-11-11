@@ -58,13 +58,18 @@ class Drone(Drawable, BaseMediator):
         self.width = self.size
         self.height = self.size
 
+        self.max_speed = 20
+
         self.images = []
 
         self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
         img = pygame.transform.scale(self.img, (self.size * 100, self.size * 100))
         self.images.append(img)
         self.image = self.images[0]
+
         self.rect = self.image.get_rect()
+        self.vel = pygame.math.Vector2(0, 0)
+        self.pos = pygame.math.Vector2()
 
     def attach(self, task: Task):
         self.logger.log(self.name + " attach!")
@@ -93,7 +98,7 @@ class Drone(Drawable, BaseMediator):
             self.attachment.rect.x = self.rect.x
             self.attachment.rect.y = self.rect.y
 
-    def process_task(self):
+    def process_task(self, dt):
         if self.curr_move is None and len(self.moves) == 0 and self.status != DroneMode.IDLE:
             self.ready()  # send a ready signal to the drone controller
             self.status = DroneMode.IDLE
@@ -114,18 +119,38 @@ class Drone(Drawable, BaseMediator):
                 bx = point[0]
                 by = point[1]
 
-            self.do_move(ax, ay, bx, by)
-    def do_move(self, ax, ay, bx, by):
-        steps_number = max(abs(bx - ax), abs(by - ay))
+            self.do_move(ax, ay, bx, by, dt)
 
-        if steps_number == 0:
-            self.rect = Rect(bx, by, self.size, self.size)
+    def translate(self, value, leftMin, leftMax, rightMin, rightMax):
+        # Figure out how 'wide' each range is
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+
+        # Convert the left range into a 0-1 range (float)
+        valueScaled = float(value - leftMin) / float(leftSpan)
+
+        # Convert the 0-1 range into a value in the right range.
+        return rightMin + (valueScaled * rightSpan)
+
+    def move(self, ax, ay, bx, by, dt):
+        desired = pygame.Vector2(bx - ax, by - ay)
+        mag = desired.magnitude()
+        self.vel = pygame.Vector2(bx - ax, by - ay)
+
+        if mag > 0:
+            desired.normalize()
+
+        if mag < 100:
+            m = self.translate(mag, 0, 100, 0, self.max_speed)
+            desired.__mul__(m)
         else:
-            step_x = float(bx - ax) / steps_number
-            step_y = float(by - ay) / steps_number
+            desired.__mul__(self.max_speed)
 
-            self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
-            self.rotate(ax, ay, ax + step_x, ay + step_y)
+        self.rect.x += self.vel.x * dt
+        self.rect.y += self.vel.y * dt
+
+    def do_move(self, ax, ay, bx, by, dt):
+        self.move(ax, ay, bx, by, dt)
 
         # is we at the distinction?
         if ax == bx and ay == by or distance_between((ax, ay), (bx, by)) < 1:
@@ -151,7 +176,7 @@ class Drone(Drawable, BaseMediator):
 
     def on_tick(self, delta):
         self.take_task()
-        self.process_task()
+        self.process_task(delta)
         self.move_package_with_drone()
 
     # not done (trying to turn the drone in the direction of flying)

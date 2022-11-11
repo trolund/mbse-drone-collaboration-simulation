@@ -244,7 +244,7 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}', show_in_ui=False)
         )
         self.gl.start()
 
