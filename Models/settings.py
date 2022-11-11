@@ -13,6 +13,9 @@ class Settings:
         self.number_of_tasks = int(config["setup"]["number_of_tasks"])
         self.number_of_drones = int(config["setup"]["number_of_drones"])
         self.truck_pos = None
+        self.simulation_speed = int(config["setup"]["simulation_speed"])
+        self.auto_close_window = False if config["setup"]["auto_close_window"] == "0" else True
+
 
         # screen
         self.scale = float(config["graphics"]["scale"])

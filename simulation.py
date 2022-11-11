@@ -38,6 +38,10 @@ class Simulation(object):
 
 
         self.settings = Settings(config)
+        logger.log("World Size:" + str(self.settings.world_size), show_in_ui=False)
+        
+        logger.log("Customer density:" + str(self.settings.customer_density), show_in_ui=False)
+        
         logger.log("Config loaded ", show_in_ui=False)
         self.logger = logger
         self.drone_controller = None
@@ -184,13 +188,10 @@ class Simulation(object):
             msg = f"Simulation finished at time:{self.timer.get_time_log()}"
             if msg != "":
                 self.logger.log(msg,False)
-            pygame.quit() #THIS DETERMINES IF THE SIMULATION WINDOW WILL CLOSE AUTOMATICALLY WHEN THE SIMULATION IS OVER
+            if self.settings.auto_close_window:
+                pygame.quit() #THIS DETERMINES IF THE SIMULATION WINDOW WILL CLOSE AUTOMATICALLY WHEN THE SIMULATION IS OVER
             msg = ""
-        
-        if not self.done:
-            if self.drone_controller.check_if_done():
-                self.done = True
-
+    
         
         self.ui.on_tick(delta)
         for sprite in self.env.sprites:
@@ -198,6 +199,8 @@ class Simulation(object):
         # only 'count' time if nor paused
         if not self.done:
             self.timer.add_delta_time(delta)
+            if self.drone_controller.check_if_done():
+                self.done = True
 
         self.drone_controller.assign_tasks()
 
@@ -248,7 +251,8 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}',
+            self.settings.simulation_speed,
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}'
             )
         )
         self.gl.start()

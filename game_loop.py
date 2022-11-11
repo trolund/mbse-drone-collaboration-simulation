@@ -8,7 +8,10 @@ class GameLoop(object):
             self,
             on_tick: Callable[[float], None],
             on_frame: Callable[[float], None],
-            on_counter_update: Callable[[int, int], None]):
+            simulation_speed: Callable[[int],None],
+            on_counter_update: Callable[[int, int], None],
+
+            ):
         
         self.on_tick = on_tick
         self.on_frame = on_frame
@@ -19,7 +22,8 @@ class GameLoop(object):
 
         # if TPS_scale = max_TPS then it is real-time
         self.TPS_scale = 30
-        self.max_TPS = self.TPS_scale * 5
+        self.simulation_speed = simulation_speed
+        self.max_TPS = self.TPS_scale * self.simulation_speed
         self.RTC_start: Union[None, float] = None
         self.is_running = False
 

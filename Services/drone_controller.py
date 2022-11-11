@@ -57,7 +57,7 @@ class DroneController(ConcreteMediator):
 
     def check_if_done(self):
         temp = []
-
+        
         if self.task_manager.is_done():
             for d in self.all_drones:
                 if d.status == DroneMode.IDLE:
@@ -65,6 +65,7 @@ class DroneController(ConcreteMediator):
                 else:
                     temp.append(False)
             if all(temp):
+
                 return True
             else:
                 return False
