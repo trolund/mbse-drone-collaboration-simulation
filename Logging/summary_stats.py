@@ -132,12 +132,11 @@ def write_to_file(filename, msg):
             line = f"{m}\n"
             file.write(line)
 
-def write_to_csv(header, data, filename):
-    file_path = "Logging\Files\\" + filename + "_summary.csv"
+def write_to_csv(data, filename):
+    file_path = "Logging\Files\\" + filename + ".csv"
 
-    with open(file_path, 'w', encoding='UTF8', newline='') as f:
+    with open(file_path, 'a', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(header)
         writer.writerow(data)
 
 def make_summary_file(file):
@@ -148,52 +147,38 @@ def make_summary_file(file):
     time = get_time(file)
     speed = get_speed(time, float(max(dist)))
     
-    headers = ["File","No_drones","No_packages","Total_time","Avg_speed","Dist_drone","Working_time_drones","Avg_time_package","Avg_packages_drone"]
     #date = datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
     msg = number_of_drones
     msg1 = no_packages
     msg2 = format_number(time,2)
     msg3 = format_number(speed,2)
-    msg4= dist
+    msg4 = dist
     msg5 = time_per_drone(dist,speed)
     msg6 = time_per_package(file,time)
     msg7 = avg_package_per_drone(no_packages,number_of_drones)
 
     messages = [file,msg,msg1,msg2,msg3,msg4,msg5,msg6,msg7]
-    write_to_csv(headers,messages,file.split(".")[0])
+    return messages
+    #write_to_csv(headers,messages,file.split(".")[0])
 
 
 
 def main():
     files = get_files("20211110","20231111")
+    headers = ["File","No_drones","No_packages","Total_time","Avg_speed","Dist_drone","Working_time_drones","Avg_time_package","Avg_packages_drone"]
+
+    date = datetime.datetime.now().strftime("%Y_%m_%d")
+    Filename = "Summary_"+date
+    write_to_csv(headers, Filename)
 
     for file in files:
-        print(file)
-        list = readLog(file)
-        dist = distances(list,get_drones(file))
-        no_packages = number_of_packages(file)
-        number_of_drones = get_drones(file)
-        time = get_time(file)
-        speed = get_speed(time, float(max(dist)))
-
-
-        msg = f"Total Number of drones: {number_of_drones}"
-        msg1 = f"Total Number of packages: {no_packages}"
-        msg2 = f"Total Time: {format_number(time,2)}"
-        msg3 = f'Distances traveled by drones: {dist}'
-        msg4 = f'Working time of drones: {time_per_drone(dist,speed)}'
-        msg5 = f"Average time per package: {time_per_package(file,time)}"
-        msg6 = f"Average packages per drone: {avg_package_per_drone(no_packages,number_of_drones)}"
-
-        messages = [msg,msg1,msg2,msg3,msg4,msg5,msg6]
-  
-
+        summary = make_summary_file(file)
+        write_to_csv(summary,Filename)
 
 
 
 
 if __name__ == "__main__":
-    # setup dependency injection
-   #main()
-   test = 1.444444444444444
-   print(format_number(test,2))
+   # setup dependency injection
+   main()
+   
