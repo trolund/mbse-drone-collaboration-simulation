@@ -6,6 +6,7 @@ import pygame
 from dependency_injector.wiring import Provide
 from pygame.rect import Rect
 
+from Models.basic_types import Pos
 from Models.env import Env
 from Models.drawable import Drawable
 from Models.task import Task
@@ -16,14 +17,16 @@ class Truck(Drawable):
     packages: List[Task] = []
     curr_task = None
     speed = 0.00005  # 0.0 - 1.0
+    stop = False
 
-    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, env: Env = Provide[Container.env]):
+    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, stop_points=None, env: Env = Provide[Container.env]):
         super().__init__()
 
         self.env = env
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
         self.grid_pos = grid_pos
+        self.stop_points: list[(Pos, int)] = stop_points
 
         self.images = []
 
@@ -71,10 +74,21 @@ class Truck(Drawable):
         self.env.home = (self.rect.x, self.rect.y)
 
         # take new task
+        self.take_task(delta)
+
+        # process task
+        if not self.stop:
+            self.process_task()
+
+        # move packages with truck
+        self.move_package_with_truck()
+        return self.rect.x, self.rect.y
+
+    def take_task(self, delta):
         if len(self.moves) > 0 and self.curr_task is None:
             self.curr_task = self.moves.pop(0)
 
-        # process task
+    def process_task(self):
         if self.curr_task is not None:
             ay = self.rect.y
             ax = self.rect.x
@@ -93,10 +107,6 @@ class Truck(Drawable):
 
             if ax == bx and ay == by:
                 self.curr_task = None
-
-        # move packages with truck
-        self.move_package_with_truck()
-        return self.rect.x, self.rect.y
 
     def get_pos(self):
         return self.grid_pos

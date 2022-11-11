@@ -97,10 +97,19 @@ class Simulation(object):
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
             route = translate_moves(route, step_size)
 
+
+
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
-        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref)
+        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref, stop_points=self.compute_stop_points(route, 5, 10))
         env.home = truck.get_home()
         env.sprites.add(truck)
+
+    def compute_stop_points(self, route, time: int, steps: int = 5):
+        points = []
+        for idx in range(0, len(route), steps):
+            points.append((route[idx], time))
+
+        return points
 
     def draw_layers(self, layout, x_len: int, y_len: int, step_size: int, env):
         # draw the basic layout
@@ -244,7 +253,7 @@ class Simulation(object):
         self.gl = GameLoop(
             self._on_tick,
             self._on_frame, 
-            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}')
+            lambda ticks, frames : self.logger.log(f'TPS: {ticks} | FPS: {frames}', show_in_ui=False)
         )
         self.gl.start()
 
