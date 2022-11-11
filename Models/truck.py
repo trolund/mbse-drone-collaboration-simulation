@@ -1,3 +1,4 @@
+import math
 import os
 from typing import List
 
@@ -14,6 +15,7 @@ from containers import Container
 class Truck(Drawable):
     packages: List[Task] = []
     curr_task = None
+    speed = 0.00005  # 0.0 - 1.0
 
     def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, env: Env = Provide[Container.env]):
         super().__init__()
@@ -29,6 +31,8 @@ class Truck(Drawable):
 
         self.width = self.size
         self.height = self.size
+
+        self.velocity = 20
 
         img = pygame.image.load(os.path.join('Assets', 'Truck.png')).convert_alpha()
         img = pygame.transform.scale(img, (self.size * 100, self.size * 100))
@@ -78,7 +82,7 @@ class Truck(Drawable):
             bx = self.curr_task[0]
             by = self.curr_task[1]
 
-            steps_number = min(abs(bx - ax), abs(by - ay))
+            steps_number = steps_number = max(abs(bx - ax), abs(by - ay))
 
             if steps_number == 0:
                 self.rect = Rect(bx, by, self.size, self.size)

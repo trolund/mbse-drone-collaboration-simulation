@@ -33,6 +33,7 @@ class Drone(Drawable, BaseMediator):
 
     lift: float = 22.5
     status: DroneMode
+
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],
                  env: Env = Provide[Container.env]):
@@ -96,14 +97,10 @@ class Drone(Drawable, BaseMediator):
         if self.curr_move is None and len(self.moves) == 0 and self.status != DroneMode.IDLE:
             self.ready()  # send a ready signal to the drone controller
             self.status = DroneMode.IDLE
-            #self.logger.log("Ready drone: " + self.name)
 
         if self.curr_move is not None:
             ay = self.rect.y
             ax = self.rect.x
-
-            bx = 0
-            by = 0
 
             if get_move_type(self.curr_move) == Move_Type.HOME:
                 point = self.env_ref.home
@@ -123,8 +120,6 @@ class Drone(Drawable, BaseMediator):
 
         if steps_number == 0:
             self.rect = Rect(bx, by, self.size, self.size)
-        #  elif distance_between((ax, ay), (bx, by)) < 2:
-        #     self.rect = Rect(bx, by, self.size, self.size)
         else:
             step_x = float(bx - ax) / steps_number
             step_y = float(by - ay) / steps_number
