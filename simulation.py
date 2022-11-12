@@ -38,7 +38,6 @@ class Simulation(object):
 
         logger.log("Starting Simulation - " + name, show_in_ui=False)
 
-
         self.settings = Settings(config)
         logger.log("Config loaded ", show_in_ui=False)
         self.logger = logger
@@ -88,28 +87,37 @@ class Simulation(object):
             env.sprites.add(t)
 
         self.task_manager = TaskManager()
-
-    def create_truck(self, layout, step_size, env: Env, pos):
+        
+    def create_truck(self, layout, step_size, env: Env, pos, delivery_spots):
         route = None
-
+        stop_points = None
         if self.settings.moving_truck:
             planner = PatchFinder()
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+            stop_points = planner.compute_stop_points(route)
+            delivery_spot_clusters = planner.cluster_delivery(stop_points, delivery_spots)
             route = translate_moves(route, step_size)
+            stop_points = translate_moves(stop_points, step_size)
 
+            print("stop_points: ",stop_points)
+            # print("delivery_spots: ",delivery_spots)
+            # print("package_clusters: ",package_clusters)
+
+            # for i in package_clusters:
+            #     print("package_clusters_X= ", list(list(zip(*i))[0]))
+            #     print("package_clusters_Y= ", list(list(zip(*i))[1]))
+
+            # print("delivery_spots_X= ", list(list(zip(*delivery_spots))[0]))
+            # print("delivery_spots_Y= ", list(list(zip(*delivery_spots))[1]))
+
+            # print("stop_points_X=", list(list(zip(*stop_points))[0]))
+            # print("stop_points_Y= ", list(list(zip(*stop_points))[1]))
 
 
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
-        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref, stop_points=self.compute_stop_points(route, 5, 10))
+        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref, stop_points = stop_points)
         env.home = truck.get_home()
         env.sprites.add(truck)
-
-    def compute_stop_points(self, route, time: int, steps: int = 5):
-        points = []
-        for idx in range(0, len(route), steps):
-            points.append((route[idx], time))
-
-        return points
 
     def draw_layers(self, layout, x_len: int, y_len: int, step_size: int, env):
         # draw the basic layout
@@ -230,7 +238,7 @@ class Simulation(object):
         self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
         # setup layout
-        (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
+        (self.layout, delivery_spots, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
             self.settings.ground_size,
             road_size=self.settings.road_size,
@@ -239,11 +247,11 @@ class Simulation(object):
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
+        self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size), delivery_spots)
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
-
-        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_sports, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
+        
+        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_spots, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
 
         # Simulation/game loop
         self.timer = Timer()

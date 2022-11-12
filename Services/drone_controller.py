@@ -38,14 +38,8 @@ class DroneController(ConcreteMediator):
         self.task_manager = task_manager
         self.all_drones = drones_ref
 
-        self.init_plan()
-
         for d in self.all_drones:
             self.ready_list.append(d)
-
-    def init_plan(self):
-        for d in self.all_drones:
-            self.plan[d.id] = []
 
     def assign_tasks(self):
 
@@ -58,3 +52,11 @@ class DroneController(ConcreteMediator):
             curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
             curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
             curr_drone.add_move_point(self.env_ref.home, Move_Type.HOME)
+
+
+
+
+
+
+
+

@@ -76,11 +76,13 @@ class Drone(Drawable, BaseMediator):
         self.attachment = task
         self.attachment.set_taken()
 
+    ######
     def drop(self):
 
         if self.attachment is None:
             raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
 
+        # delivered bool
         self.logger.log(f"{self.name} - DROP, {self.attachment}")
         self.attachment = None
 
@@ -108,7 +110,7 @@ class Drone(Drawable, BaseMediator):
                 bx = point[0]
                 by = point[1]
 
-                print(bx, by)
+                # print(bx, by)
             else:
                 point = get_cor(self.curr_move)
                 bx = point[0]

@@ -19,7 +19,7 @@ class GameLoop(object):
         self.min_FPS = 50
 
         # if TPS_scale = max_TPS then it is real-time
-        self.TPS_scale = 30
+        self.TPS_scale = 500
         self.max_TPS = self.TPS_scale * 0.5
         self.RTC_start: Union[None, float] = None
         self.is_running = False

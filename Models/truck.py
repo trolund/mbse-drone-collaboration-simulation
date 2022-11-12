@@ -19,10 +19,11 @@ class Truck(Drawable):
     speed = 0.00005  # 0.0 - 1.0
     stop = False
 
-    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, stop_points=None, env: Env = Provide[Container.env]):
+    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, stop_points=None, config=Provide[Container.config], env: Env = Provide[Container.env]):
         super().__init__()
 
         self.env = env
+        self.config = config
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
         self.grid_pos = grid_pos
@@ -110,3 +111,6 @@ class Truck(Drawable):
 
     def get_pos(self):
         return self.grid_pos
+
+    def get_stop_points(self):
+        return self.stop_points
