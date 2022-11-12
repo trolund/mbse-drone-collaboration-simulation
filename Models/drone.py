@@ -13,6 +13,7 @@ from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
+from Utils.Utils import map_range
 from Utils.layout_utils import distance_between
 from containers import Container
 from Models.drawable import Drawable
@@ -37,9 +38,12 @@ class Drone(Drawable, BaseMediator):
 
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],
-                 env: Env = Provide[Container.env]):
+                 env: Env = Provide[Container.env],
+                 config=Provide[Container.config]):
 
         pygame.sprite.Sprite.__init__(self)
+
+        self.speed = int(config["setup"]["drone_speed"])
 
         self.logger = logger
         self.env_ref = env
@@ -118,23 +122,6 @@ class Drone(Drawable, BaseMediator):
 
             self.do_move(ax, ay, bx, by, dt)
 
-    def m(self, val):
-        if val > self.max_speed:
-            return self.max_speed + 1
-        else:
-            return val + 1
-
-    def translate(self, value, leftMin, leftMax, rightMin, rightMax):
-        # Figure out how 'wide' each range is
-        leftSpan = leftMax - leftMin
-        rightSpan = rightMax - rightMin
-
-        # Convert the left range into a 0-1 range (float)
-        valueScaled = float(value - leftMin) / float(leftSpan)
-
-        # Convert the 0-1 range into a value in the right range.
-        return rightMin + (valueScaled * rightSpan)
-
     def move(self, ax, ay, bx, by, dt):
         b = Vector2(bx, by)
         b_mag = b.magnitude()
@@ -142,7 +129,7 @@ class Drone(Drawable, BaseMediator):
         a = Vector2(ax, ay)
 
         if b_mag < 20:
-            m = self.translate(b_mag, 0, 100, 0, self.speed)
+            m = map_range(b_mag, 0, 100, 0, self.speed)
             a = a.move_towards(b, m * dt)
         else:
             a = a.move_towards(b, self.speed * dt)

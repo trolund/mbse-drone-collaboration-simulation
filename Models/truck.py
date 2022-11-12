@@ -3,21 +3,30 @@ from typing import List
 
 import pygame
 from dependency_injector.wiring import Provide
+from pygame import Vector2
 from pygame.rect import Rect
 
 from Models.env import Env
 from Models.drawable import Drawable
 from Models.task import Task
+from Utils.Utils import map_range
 from containers import Container
 
 
 class Truck(Drawable):
     packages: List[Task] = []
     curr_task = None
-    speed = 0.00005  # 0.0 - 1.0
+    speed = 50  # 0.0 - 1.0
 
-    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, env: Env = Provide[Container.env]):
+    def __init__(self, grid_pos,
+                 size,
+                 packages=None,
+                 number_of_attachment_points=1, path=None,
+                 env: Env = Provide[Container.env],
+                 config=Provide[Container.config]):
         super().__init__()
+
+        self.speed = int(config["setup"]["truck_speed"])
 
         self.env = env
         self.packages = packages
@@ -66,9 +75,24 @@ class Truck(Drawable):
     def add_coordinates(self, x, y):
         self.moves.append((x, y))
 
-    def on_tick(self, delta):
-        self.env.home = (self.rect.centerx, self.rect.centery)
+    def move(self, ax, ay, bx, by, dt):
+        b = Vector2(bx, by)
+        b_mag = b.magnitude()
 
+        a = Vector2(ax, ay)
+
+        if b_mag < 20:
+            m = map_range(b_mag, 0, 100, 0, self.speed)
+            a = a.move_towards(b, m * dt)
+        else:
+            a = a.move_towards(b, self.speed * dt)
+
+        self.rect.x = a.x
+        self.rect.y = a.y
+
+        self.env.home = (self.rect.x + self.size / 2, self.rect.y + self.size / 2)
+
+    def on_tick(self, delta):
         # take new task
         if len(self.moves) > 0 and self.curr_task is None:
             self.curr_task = self.moves.pop(0)
@@ -77,18 +101,10 @@ class Truck(Drawable):
         if self.curr_task is not None:
             ay = self.rect.y
             ax = self.rect.x
-
             bx = self.curr_task[0]
             by = self.curr_task[1]
 
-            steps_number = steps_number = max(abs(bx - ax), abs(by - ay))
-
-            if steps_number == 0:
-                self.rect = Rect(bx, by, self.size, self.size)
-            else:
-                stepx = float(bx - ax) / steps_number
-                stepy = float(by - ay) / steps_number
-                self.rect = Rect(ax + stepx, ay + stepy, self.size, self.size)
+            self.move(ax, ay, bx, by, delta)
 
             if ax == bx and ay == by:
                 self.curr_task = None
