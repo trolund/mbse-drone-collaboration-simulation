@@ -17,7 +17,7 @@ from Services.task_manager import TaskManager
 from Utils.CompelxityCalulator import calc_complexity
 from Utils.Timer import Timer
 from Utils.Random_utils import Random_util
-from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
+from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env, translate_moves
 from containers import Container
 
 pygame.init()

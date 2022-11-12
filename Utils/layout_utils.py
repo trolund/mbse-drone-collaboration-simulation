@@ -93,7 +93,7 @@ def create_layout_env(world_size: int,
                       ground_size: int,
                       rand: Random_util,
                       road_size: int = 2,
-                      change_of_customer: float = 0.5,
+                      customer_density: float = 0.5,
                       optimal_truck_pos: bool = True,
                       ):
 
@@ -113,11 +113,11 @@ def create_layout_env(world_size: int,
                     layout[i][j] = "."
 
     if optimal_truck_pos:
-        layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, rand, m, ground_size, road_size, change_of_customer)
+        layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, rand, m, ground_size, road_size, customer_density)
         new_layout, truck_pos = find_optimal_truck_pos(layout, delivery_spots)
         return [new_layout, delivery_spots, number_of_grounds, number_of_customers], truck_pos
     else:
-        return provide_dp(layout, rand, m, ground_size, road_size, change_of_customer), (0, 0)
+        return provide_dp(layout, rand, m, ground_size, road_size, customer_density), (0, 0)
 
 def find_optimal_truck_pos(layout: Layout, pack_pos):
 
