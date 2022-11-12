@@ -3,6 +3,7 @@ import uuid
 
 import pygame
 from dependency_injector.wiring import Provide
+from pygame import Vector2
 from pygame.rect import Rect
 
 from Cominication_hub.BaseMediator import BaseMediator
@@ -12,10 +13,10 @@ from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
-from Models.truck import Truck
 from Utils.layout_utils import distance_between
 from containers import Container
 from Models.drawable import Drawable
+
 
 def get_cor(move: Move):
     return move[0][0], move[0][1]
@@ -30,9 +31,9 @@ def get_move_obj(move: Move):
 
 
 class Drone(Drawable, BaseMediator):
-
     lift: float = 22.5
     status: DroneMode
+    speed: float = 100
 
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],
@@ -57,8 +58,6 @@ class Drone(Drawable, BaseMediator):
 
         self.width = self.size
         self.height = self.size
-
-        self.max_speed = 20
 
         self.images = []
 
@@ -112,14 +111,18 @@ class Drone(Drawable, BaseMediator):
 
                 bx = point[0]
                 by = point[1]
-
-                print(bx, by)
             else:
                 point = get_cor(self.curr_move)
                 bx = point[0]
                 by = point[1]
 
             self.do_move(ax, ay, bx, by, dt)
+
+    def m(self, val):
+        if val > self.max_speed:
+            return self.max_speed + 1
+        else:
+            return val + 1
 
     def translate(self, value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
@@ -133,21 +136,19 @@ class Drone(Drawable, BaseMediator):
         return rightMin + (valueScaled * rightSpan)
 
     def move(self, ax, ay, bx, by, dt):
-        desired = pygame.Vector2(bx - ax, by - ay)
-        mag = desired.magnitude()
-        self.vel = pygame.Vector2(bx - ax, by - ay)
+        b = Vector2(bx, by)
+        b_mag = b.magnitude()
 
-        if mag > 0:
-            desired.normalize()
+        a = Vector2(ax, ay)
 
-        if mag < 100:
-            m = self.translate(mag, 0, 100, 0, self.max_speed)
-            desired.__mul__(m)
+        if b_mag < 20:
+            m = self.translate(b_mag, 0, 100, 0, self.speed)
+            a = a.move_towards(b, m * dt)
         else:
-            desired.__mul__(self.max_speed)
+            a = a.move_towards(b, self.speed * dt)
 
-        self.rect.x += self.vel.x * dt
-        self.rect.y += self.vel.y * dt
+        self.rect.x = a.x
+        self.rect.y = a.y
 
     def do_move(self, ax, ay, bx, by, dt):
         self.move(ax, ay, bx, by, dt)
@@ -162,9 +163,9 @@ class Drone(Drawable, BaseMediator):
             elif move_type == Move_Type.DROP_OFF:
                 self.drop()
 
-               # TODO reimpliment drop zone check
-               #  if not self.is_in_drop_zone():
-               #     print(self.name + " did a drop of that was not in a drop zone 🤬.")
+            # TODO reimpliment drop zone check
+            #  if not self.is_in_drop_zone():
+            #     print(self.name + " did a drop of that was not in a drop zone 🤬.")
 
             self.curr_move = None
 
@@ -172,7 +173,8 @@ class Drone(Drawable, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
+            self.logger.log(
+                f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
 
     def on_tick(self, delta):
         self.take_task()
@@ -180,12 +182,6 @@ class Drone(Drawable, BaseMediator):
         self.move_package_with_drone()
 
     # not done (trying to turn the drone in the direction of flying)
-    def rotate(self, ax, ay, bx, by):
-        v1 = pygame.math.Vector2(ax, ay)
-        v2 = pygame.math.Vector2(bx, by)
-        angle_v1_v2_degree = v1.angle_to(v2)
-
-        # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
 
     def is_in_drop_zone(self):
         return True
