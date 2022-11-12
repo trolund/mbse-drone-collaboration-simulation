@@ -15,6 +15,7 @@ class Settings:
         self.number_of_tasks = int(config["setup"]["number_of_tasks"])
         self.number_of_drones = int(config["setup"]["number_of_drones"])
         self.truck_pos = None
+        self.seed = None
 
         # screen
         self.scale = float(config["graphics"]["scale"])

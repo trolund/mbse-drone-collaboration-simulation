@@ -16,6 +16,7 @@ from Services.path_finder import PatchFinder
 from Services.task_manager import TaskManager
 from Utils.CompelxityCalulator import calc_complexity
 from Utils.Timer import Timer
+from Utils.Random_utils import Random_util
 from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env, translate_moves
 from containers import Container
 
@@ -220,10 +221,14 @@ class Simulation(object):
         # instance of UI
         self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
+        # setup PRNG
+        self.rand = Random_util(self.settings.seed) 
+        
         # setup layout
         (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
             self.settings.ground_size,
+            self.rand,
             road_size=self.settings.road_size,
             customer_density=self.settings.customer_density,
             optimal_truck_pos=self.settings.optimal_truck_pos)
