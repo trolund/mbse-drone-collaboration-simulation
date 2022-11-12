@@ -180,8 +180,6 @@ class Simulation(object):
 
         self.screen.blit(text, textRect)
 
-
-
     def _on_tick(self, delta):
         self.keyboard_input()
         for event in pygame.event.get():

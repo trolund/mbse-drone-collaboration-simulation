@@ -4,7 +4,6 @@ import uuid
 import pygame
 from dependency_injector.wiring import Provide
 from pygame import Vector2
-from pygame.rect import Rect
 
 from Cominication_hub.BaseMediator import BaseMediator
 from Logging.eventlogger import EventLogger
@@ -122,6 +121,9 @@ class Drone(Drawable, BaseMediator):
 
             self.do_move(ax, ay, bx, by, dt)
 
+    def dock(self):
+        self.status = DroneMode.DOCK
+
     def move(self, ax, ay, bx, by, dt):
         b = Vector2(bx, by)
         b_mag = b.magnitude()
@@ -164,9 +166,14 @@ class Drone(Drawable, BaseMediator):
                 f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
 
     def on_tick(self, delta):
-        self.take_task()
-        self.process_task(delta)
-        self.move_package_with_drone()
+        if self.status != DroneMode.DOCK:
+            self.take_task()
+            self.process_task(delta)
+            self.move_package_with_drone()
+        else:
+            x, y = self.env_ref.home
+            self.rect.x = x
+            self.rect.y = y
 
     # not done (trying to turn the drone in the direction of flying)
 

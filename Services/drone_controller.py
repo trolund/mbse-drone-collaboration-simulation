@@ -6,6 +6,7 @@ from dependency_injector.wiring import Provide
 from Cominication_hub.ConcreteMediator import ConcreteMediator
 from Logging.eventlogger import EventLogger
 from Models.drone import Drone
+from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.truck import Truck
@@ -49,12 +50,18 @@ class DroneController(ConcreteMediator):
 
     def assign_tasks(self):
 
-        if len(self.ready_list) > 0 and self.task_manager.get_number_of_packages_left() > 0:
-            curr_drone: Drone = self.ready_list.pop()
-            next_task = self.task_manager.get_head_package()
-            delivery_address = grid_to_pos_tuple(next_task.address, self.step_size)
+        if len(self.ready_list) > 0:
+            if self.task_manager.get_number_of_packages_left() > 0:
+                curr_drone: Drone = self.ready_list.pop()
+                curr_drone.status = DroneMode.IDLE
+                next_task = self.task_manager.get_head_package()
+                delivery_address = grid_to_pos_tuple(next_task.address, self.step_size)
 
-            # movements
-            curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
-            curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
-            curr_drone.add_move_point(self.env_ref.home, Move_Type.HOME)
+                # movements
+                curr_drone.add_move_point((next_task.rect.x, next_task.rect.y), Move_Type.PICKUP, next_task)
+                curr_drone.add_move_point(delivery_address, Move_Type.DROP_OFF)
+                curr_drone.add_move_point(self.env_ref.home, Move_Type.HOME)
+            else:
+                for drone in self.ready_list:
+                    drone.dock()
+
