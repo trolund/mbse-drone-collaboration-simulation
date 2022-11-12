@@ -11,6 +11,7 @@ class Env:
     sprites = pygame.sprite.Group()
 
     task_ref: list[Task] = []
+    truck_ref = None
     # drone_ref: list[Drone] = []
 
     # def get_task_at(self, x, y):

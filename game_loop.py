@@ -14,12 +14,13 @@ class GameLoop(object):
         self.on_frame = on_frame
         self.on_counter_update = on_counter_update
 
+        self.max_TPS = 500
         self.max_FPS = 60
         self.min_FPS = 50
 
         # if TPS_scale = max_TPS then it is real-time
         self.TPS_scale = 30
-        self.max_TPS = self.TPS_scale * 5
+        self.max_TPS = self.TPS_scale * 0.5
         self.RTC_start: Union[None, float] = None
         self.is_running = False
 
@@ -74,5 +75,5 @@ class GameLoop(object):
 
             # program is running ahead
             else:
-                sleepTime = min(next_tick, next_frame) - time.time()
+                sleepTime = max(next_tick, next_frame) - time.time()
                 time.sleep(sleepTime)

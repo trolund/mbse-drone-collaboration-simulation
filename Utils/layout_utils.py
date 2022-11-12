@@ -50,7 +50,7 @@ def add_offset(pos: (int, int), step_size):
 
 
 def get_world_size(surface: pygame.Surface, layout: Layout):
-    init_size = 500
+    init_size = 50 * len(layout)
 
     scale = min(surface.get_height(), surface.get_width()) / init_size
 
@@ -96,6 +96,7 @@ def create_layout_env(world_size: int,
                       change_of_customer: float = 0.5,
                       optimal_truck_pos: bool = True,
                       ):
+
     m = world_size + road_size
     g = ground_size
 
@@ -137,7 +138,7 @@ def find_optimal_truck_pos(layout: Layout, pack_pos):
         y = int((ycords[int(n/2)] + ycords[int(n/2)+1]) / 2)
 
     med_package_pos = (x, y)
-    
+
     pos = min(road_pos, key=lambda c: (c[0]- med_package_pos[0])**2 + (c[1]-med_package_pos[1])**2)
     layout[pos[0]][pos[1]] = "T"
 
@@ -145,9 +146,9 @@ def find_optimal_truck_pos(layout: Layout, pack_pos):
 
 def distance(co1, co2):
     return math.sqrt(pow(abs(co1[0] - co2[0]), 2) + pow(abs(co1[1] - co2[2]), 2))
-    
+
 def find_all_road_pos(layout):
-    
+
     pos = []
     for i in range(len(layout)):
         for j in range(len(layout[0])):

@@ -1,6 +1,6 @@
 import os
 from typing import List
-import itertools
+
 import pygame
 
 from Models.package import Package
@@ -15,12 +15,14 @@ class Task(Drawable):
     width: int
     height: int
     def __init__(self, address, packages=None, number_of_attachment_points=1):
-        
+
 
         super().__init__()
         self.packages = packages
         self.address = address
         self.number_of_attachment_points = number_of_attachment_points
+        self.taken = False
+
         self.width = 5
         self.height = 5
 
@@ -36,6 +38,12 @@ class Task(Drawable):
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)
+
+    def set_taken(self):
+        self.taken = True
+
+    def is_taken(self):
+        return self.taken
 
 
     def __str__(self):

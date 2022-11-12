@@ -10,6 +10,8 @@ class Settings:
         self.road_size = int(config["setup"]["road_size"])
         self.customer_density = float(config["setup"]["customer_density"])
         self.optimal_truck_pos = False if config["setup"]["optimal_truck_pos"] == "0" else True
+        self.truck_pos_random = False if config["setup"]["truck_pos_random"] == "0" else True
+        self.moving_truck = False if config["setup"]["moving_truck"] == "0" else True
         self.number_of_tasks = int(config["setup"]["number_of_tasks"])
         self.number_of_drones = int(config["setup"]["number_of_drones"])
         self.truck_pos = None
