@@ -33,7 +33,7 @@ def get_move_obj(move: Move):
 class Drone(Drawable, BaseMediator):
     lift: float = 22.5
     status: DroneMode
-    speed: float = 100
+    speed: float = 200
 
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],

@@ -1,4 +1,3 @@
-import math
 import os
 from typing import List
 
@@ -68,7 +67,7 @@ class Truck(Drawable):
         self.moves.append((x, y))
 
     def on_tick(self, delta):
-        self.env.home = (self.rect.x, self.rect.y)
+        self.env.home = (self.rect.centerx, self.rect.centery)
 
         # take new task
         if len(self.moves) > 0 and self.curr_task is None:
