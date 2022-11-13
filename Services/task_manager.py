@@ -41,7 +41,6 @@ class TaskManager:
 
     def print_tasks(self, tasks: List[Task], home):
         for t in tasks:
-            self.logger.log(distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)), show_in_ui=False)
             print(t.address, distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)))
 
 # def queue_package(amount_of_packages, possible_addresses, max_weight):

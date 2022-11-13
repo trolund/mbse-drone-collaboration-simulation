@@ -62,9 +62,10 @@ class DroneController(ConcreteMediator):
     def check_if_done(self):
         temp = []
         
-        if self.task_manager.is_done():
+        if self.task_manager.get_number_of_packages_left() == 0:
+
             for d in self.all_drones:
-                if d.status == DroneMode.IDLE:
+                if d.status == DroneMode.DOCK:
                     temp.append(True)
                 else:
                     temp.append(False)

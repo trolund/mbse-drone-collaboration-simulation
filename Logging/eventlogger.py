@@ -26,6 +26,8 @@ class EventLogger:
                 self.log_in_memory.insert(0, msg)
                 self.logger.debug(msg)
             self.logOA(msg)
+        if "Simulation finished at" in msg:
+            self.done = True
 
     def logOA(self,msg):
         file = self.file
