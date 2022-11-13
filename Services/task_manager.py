@@ -5,7 +5,7 @@ from dependency_injector.wiring import Provide
 from Logging.eventlogger import EventLogger
 from Models.env import Env
 from Models.task import Task
-from Utils.layout_utils import distance_between
+from Utils.layout_utils import distance_between, grid_to_pos_tuple
 from containers import Container
 
 
@@ -14,11 +14,12 @@ class TaskManager:
     logger: EventLogger
     env_ref: Env
 
-    def __init__(self, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config], env: Env = Provide[Container.env]):
+    def __init__(self, step_size, logger: EventLogger = Provide[Container.event_logger], config=Provide[Container.config], env: Env = Provide[Container.env]):
 
         self.config = config
         self.logger = logger
         self.env_ref = env
+        self.step_size = step_size
 
         # sort the packages
         self.env_ref.task_ref = self.sort_tasks(env.task_ref)
@@ -34,11 +35,14 @@ class TaskManager:
         return len(self.env_ref.task_ref) == 0
 
     def sort_tasks(self, tasks: List[Task]):
-        return sorted(tasks, key=lambda x: distance_between(self.env_ref.home, (x.rect.x, x.rect.y)))
+        sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
+        self.print_tasks(sorted_tasks, self.env_ref.home)
+        return sorted_tasks
 
     def print_tasks(self, tasks: List[Task], home):
         for t in tasks:
-            print(distance_between(home, (t.rect.x, t.rect.y)))
+            self.logger.log(distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)), show_in_ui=False)
+            print(t.address, distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)))
 
 # def queue_package(amount_of_packages, possible_addresses, max_weight):
 #     min_weight = 200

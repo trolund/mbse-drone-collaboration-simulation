@@ -1,11 +1,9 @@
-import random
-
 import math
 import pygame
 
 from Models.basic_types import Layout, Pos
 from Models.colors import GREY, GREEN, GREENY, DARK_GERY
-
+from Utils.Random_utils import Random_util
 
 def grid_to_pos(i, j, step_size, scale: float = 1.0):
     return step_size * i * scale, step_size * j * scale
@@ -52,7 +50,7 @@ def add_offset(pos: (int, int), step_size):
 
 
 def get_world_size(surface: pygame.Surface, layout: Layout):
-    init_size = 500
+    init_size = 50 * len(layout)
 
     scale = min(surface.get_height(), surface.get_width()) / init_size
 
@@ -91,8 +89,14 @@ def draw_layout(surface, layout, x_len: int, y_len: int, step_size: int, scale: 
                 pygame.draw.rect(surface, GREY, pygame.Rect(x, y, size, size))
 
 
-def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, change_of_customer: float = 0.5,
-                      random_truck_pos: bool = False):
+def create_layout_env(world_size: int,
+                      ground_size: int,
+                      rand: Random_util,
+                      road_size: int = 2,
+                      customer_density: float = 0.5,
+                      optimal_truck_pos: bool = True,
+                      ):
+
     m = world_size + road_size
     g = ground_size
 
@@ -108,26 +112,63 @@ def create_layout_env(world_size: int, ground_size: int, road_size: int = 2, cha
                 else:
                     layout[i][j] = "."
 
-    if random_truck_pos:
-        new_layout, truck_pos = create_random_truck_pos(layout)
-        return provide_dp(new_layout, m, ground_size, road_size, change_of_customer), truck_pos
+    if optimal_truck_pos:
+        layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, rand, m, ground_size, road_size, customer_density)
+        new_layout, truck_pos = find_optimal_truck_pos(layout, delivery_spots)
+        return [new_layout, delivery_spots, number_of_grounds, number_of_customers], truck_pos
     else:
-        return provide_dp(layout, m, ground_size, road_size, change_of_customer), (0, 0)
+        return provide_dp(layout, rand, m, ground_size, road_size, customer_density), (0, 0)
 
+def find_optimal_truck_pos(layout: Layout, pack_pos):
+
+    road_pos = find_all_road_pos(layout)
+    pos_length = len(pack_pos)
+    n = pos_length - 1
+
+    xcords = sorted(list(list(zip(*pack_pos))[0]))
+    ycords = sorted(list(list(zip(*pack_pos))[1]))
+
+    if len(pack_pos) % 2 != 0:
+        x = xcords[int((n+1)/2)]
+        print(x)
+        y = ycords[int((n+1)/2)]
+    else:
+        print(type(int(n/2)+1))
+        x = int((xcords[int(n/2)] + xcords[int(n/2)+1]) / 2)
+        y = int((ycords[int(n/2)] + ycords[int(n/2)+1]) / 2)
+
+    med_package_pos = (x, y)
+
+    pos = min(road_pos, key=lambda c: (c[0]- med_package_pos[0])**2 + (c[1]-med_package_pos[1])**2)
+    layout[pos[0]][pos[1]] = "T"
+
+    return layout, pos
+
+def distance(co1, co2):
+    return math.sqrt(pow(abs(co1[0] - co2[0]), 2) + pow(abs(co1[1] - co2[2]), 2))
+
+def find_all_road_pos(layout):
+
+    pos = []
+    for i in range(len(layout)):
+        for j in range(len(layout[0])):
+                if (layout[i][j] == "R"):
+                    pos.append(tuple((i, j)))
+
+    return pos
 
 def create_random_truck_pos(layout: Layout):
     pos = find_random_road_pos(layout)
     layout[pos[0]][pos[1]] = "T"
     return layout, pos
 
-
-def find_random_road_pos(layout: Layout):
+def find_random_road_pos(layout: Layout, rand: Random_util):
     curr = None
     pos = (0, 0)
     while curr != "R":
         length = len(layout)
-        x = math.floor(random.uniform(0, length))
-        y = math.floor(random.uniform(0, length))
+        x = math.floor(rand.get_rand(0, length))
+        y = math.floor(rand.get_rand(0, length))
 
         curr = layout[x][y]
         pos = (x, y)
@@ -135,8 +176,13 @@ def find_random_road_pos(layout: Layout):
     return pos
 
 
-def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int, change_of_customer: float):
-    delivery_sports = []
+def provide_dp(layout: Layout,
+               rand: Random_util,
+               world_size: int,
+               ground_size: int,
+               road_size: int,
+               change_of_customer: float):
+    delivery_spots = []
     number_of_grounds = 0
     number_of_customers = 0
 
@@ -144,20 +190,20 @@ def provide_dp(layout: Layout, world_size: int, ground_size: int, road_size: int
 
     for i in range(road_size, world_size, ground_size):
         for j in range(road_size, world_size, ground_size):
-            if random.uniform(0, 1) < change_of_customer:  # change of the ground being signed up for delivery
+            if rand.get_rand(0, 1) < change_of_customer:  # change of the ground being signed up for delivery
                 # assign the delivery spot to a random point on the ground
-                x = math.floor(random.uniform(i, i + size))
-                y = math.floor(random.uniform(j, j + size))
+                x = math.floor(rand.get_rand(i, i + size))
+                y = math.floor(rand.get_rand(j, j + size))
                 number_of_customers += 1
 
                 # add address to list
-                delivery_sports.append((x, y))
+                delivery_spots.append((x, y))
 
                 layout[x][y] = "S"
 
             number_of_grounds += 1
 
-    return layout, delivery_sports, number_of_grounds, number_of_customers
+    return layout, delivery_spots, number_of_grounds, number_of_customers
 
 
 def print_layout(layout: Layout):

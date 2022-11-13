@@ -3,18 +3,20 @@ import pygame
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
-from Logging.eventlogger import EventLogger, LogFile
+from Logging.eventlogger import EventLogger
 from Models.settings import Settings
 from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
 from Models.env import Env
-from Models.setup import FPS
 from Models.truck import Truck
 from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
+from Services.path_finder import PatchFinder
 from Services.task_manager import TaskManager
+from Utils.CompelxityCalulator import calc_complexity
 from Utils.Timer import Timer
-from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env
+from Utils.Random_utils import Random_util
+from Utils.layout_utils import draw_layout, grid_to_pos, get_world_size, create_layout_env, translate_moves
 from containers import Container
 from Logging.summary_stats import main
 pygame.init()
@@ -84,17 +86,24 @@ class Simulation(object):
 
         for idx, t in enumerate(tasks):
             # start at truck
-            t.rect.x = env.home[0]  # + (5 * idx)
-            t.rect.y = env.home[1]
+            # t.rect.x = env.home[0]  # + (5 * idx)
+            # t.rect.y = env.home[1]
 
             env.task_ref.append(t)
             env.sprites.add(t)
 
-        self.task_manager = TaskManager()
+        self.task_manager = TaskManager(self.step_size)
 
-    def create_truck(self, env: Env, pos, logger: EventLogger = Provide[Container.event_logger]):
-        truck = Truck(pos, self.settings.scale)
-        logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
+    def create_truck(self, layout, step_size, env: Env, pos):
+        route = None
+
+        if self.settings.moving_truck:
+            planner = PatchFinder()
+            route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+            route = translate_moves(route, step_size)
+
+        self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
+        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
@@ -175,8 +184,6 @@ class Simulation(object):
 
         self.screen.blit(text, textRect)
 
-
-
     def _on_tick(self, delta):
         self.keyboard_input()
         for event in pygame.event.get():
@@ -221,7 +228,7 @@ class Simulation(object):
         # update screen with new drawings
         pygame.display.update()
 
-    def set_simulation_speed(self, scale): 
+    def set_simulation_speed(self, scale):
         self.gl.scale_simulation(scale)
 
 
@@ -229,19 +236,25 @@ class Simulation(object):
         # instance of UI
         self.ui = UI(self.set_scale, self.set_simulation_speed, self.toggle_paused, self.settings, self.screen)
 
+        # setup PRNG
+        self.rand = Random_util(self.settings.seed) 
+        
         # setup layout
         (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
             self.settings.ground_size,
+            self.rand,
             road_size=self.settings.road_size,
-            change_of_customer=self.settings.customer_density,
-            random_truck_pos=self.settings.truck_pos_random)
+            customer_density=self.settings.customer_density,
+            optimal_truck_pos=self.settings.optimal_truck_pos)
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_truck(self.env, grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
+
+        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_sports, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
 
         # Simulation/game loop
         self.timer = Timer()

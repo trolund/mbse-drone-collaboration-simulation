@@ -17,6 +17,7 @@ class GameLoop(object):
         self.on_frame = on_frame
         self.on_counter_update = on_counter_update
 
+        self.max_TPS = 500
         self.max_FPS = 60
         self.min_FPS = 50
 
@@ -78,5 +79,5 @@ class GameLoop(object):
 
             # program is running ahead
             else:
-                sleepTime = min(next_tick, next_frame) - time.time()
-                time.sleep(sleepTime)
+                sleepTime = max(next_tick, next_frame) - time.time()
+                # time.sleep(sleepTime)

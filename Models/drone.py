@@ -3,7 +3,7 @@ import uuid
 
 import pygame
 from dependency_injector.wiring import Provide
-from pygame.rect import Rect
+from pygame import Vector2
 
 from Cominication_hub.BaseMediator import BaseMediator
 from Logging.eventlogger import EventLogger
@@ -12,10 +12,11 @@ from Models.drone_mode import DroneMode
 from Models.env import Env
 from Models.move_type import Move_Type
 from Models.task import Task
-from Models.truck import Truck
+from Utils.Utils import map_range
 from Utils.layout_utils import distance_between
 from containers import Container
 from Models.drawable import Drawable
+
 
 def get_cor(move: Move):
     return move[0][0], move[0][1]
@@ -30,14 +31,18 @@ def get_move_obj(move: Move):
 
 
 class Drone(Drawable, BaseMediator):
-
     lift: float = 22.5
     status: DroneMode
+    speed: float = 200
+
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],
-                 env: Env = Provide[Container.env]):
+                 env: Env = Provide[Container.env],
+                 config=Provide[Container.config]):
 
         pygame.sprite.Sprite.__init__(self)
+
+        self.speed = int(config["setup"]["drone_speed"])
 
         self.logger = logger
         self.env_ref = env
@@ -64,7 +69,10 @@ class Drone(Drawable, BaseMediator):
         img = pygame.transform.scale(self.img, (self.size * 100, self.size * 100))
         self.images.append(img)
         self.image = self.images[0]
+
         self.rect = self.image.get_rect()
+        self.vel = pygame.math.Vector2(0, 0)
+        self.pos = pygame.math.Vector2()
 
     def attach(self, task: Task):
         self.logger.log(self.name + " attach!")
@@ -74,6 +82,7 @@ class Drone(Drawable, BaseMediator):
                             (self.rect.x, self.rect.y))
 
         self.attachment = task
+        self.attachment.set_taken()
 
     def drop(self):
 
@@ -92,36 +101,47 @@ class Drone(Drawable, BaseMediator):
             self.attachment.rect.x = self.rect.x
             self.attachment.rect.y = self.rect.y
 
-    def process_task(self):
+    def process_task(self, dt):
         if self.curr_move is None and len(self.moves) == 0 and self.status != DroneMode.IDLE:
             self.ready()  # send a ready signal to the drone controller
             self.status = DroneMode.IDLE
-            #self.logger.log("Ready drone: " + self.name)
 
         if self.curr_move is not None:
             ay = self.rect.y
             ax = self.rect.x
 
-            point = get_cor(self.curr_move)
+            if get_move_type(self.curr_move) == Move_Type.HOME:
+                point = self.env_ref.home
 
-            bx = point[0]
-            by = point[1]
+                bx = point[0]
+                by = point[1]
+            else:
+                point = get_cor(self.curr_move)
+                bx = point[0]
+                by = point[1]
 
-            self.do_move(ax, ay, bx, by)
+            self.do_move(ax, ay, bx, by, dt)
 
-    def do_move(self, ax, ay, bx, by):
-        steps_number = max(abs(bx - ax), abs(by - ay))
+    def dock(self):
+        self.status = DroneMode.DOCK
 
-        if steps_number == 0:
-            self.rect = Rect(bx, by, self.size, self.size)
-        #  elif distance_between((ax, ay), (bx, by)) < 2:
-        #     self.rect = Rect(bx, by, self.size, self.size)
+    def move(self, ax, ay, bx, by, dt):
+        b = Vector2(bx, by)
+        b_mag = b.magnitude()
+
+        a = Vector2(ax, ay)
+
+        if b_mag < 20:
+            m = map_range(b_mag, 0, 100, 0, self.speed)
+            a = a.move_towards(b, m * dt)
         else:
-            step_x = float(bx - ax) / steps_number
-            step_y = float(by - ay) / steps_number
+            a = a.move_towards(b, self.speed * dt)
 
-            self.rect = Rect(ax + step_x, ay + step_y, self.size, self.size)
-            self.rotate(ax, ay, ax + step_x, ay + step_y)
+        self.rect.x = a.x
+        self.rect.y = a.y
+
+    def do_move(self, ax, ay, bx, by, dt):
+        self.move(ax, ay, bx, by, dt)
 
         # is we at the distinction?
         if ax == bx and ay == by or distance_between((ax, ay), (bx, by)) < 1:
@@ -133,9 +153,9 @@ class Drone(Drawable, BaseMediator):
             elif move_type == Move_Type.DROP_OFF:
                 self.drop()
 
-               # TODO reimpliment drop zone check
-               #  if not self.is_in_drop_zone():
-               #     print(self.name + " did a drop of that was not in a drop zone 🤬.")
+            # TODO reimpliment drop zone check
+            #  if not self.is_in_drop_zone():
+            #     print(self.name + " did a drop of that was not in a drop zone 🤬.")
 
             self.curr_move = None
 
@@ -143,20 +163,20 @@ class Drone(Drawable, BaseMediator):
         if len(self.moves) > 0 and self.curr_move is None:
             self.curr_move = self.moves.pop(0)
             self.status = DroneMode.BUSY
-            self.logger.log(f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
+            self.logger.log(
+                f"{self.name}, move to: ({'{0:.2f}'.format(self.curr_move[0][0])}, {'{0:.2f}'.format(self.curr_move[0][1])}) from: ({'{0:.2f}'.format(self.rect.x)}, {'{0:.2f}'.format(self.rect.y)})")
 
     def on_tick(self, delta):
-        self.take_task()
-        self.process_task()
-        self.move_package_with_drone()
+        if self.status != DroneMode.DOCK:
+            self.take_task()
+            self.process_task(delta)
+            self.move_package_with_drone()
+        else:
+            x, y = self.env_ref.home
+            self.rect.x = x
+            self.rect.y = y
 
     # not done (trying to turn the drone in the direction of flying)
-    def rotate(self, ax, ay, bx, by):
-        v1 = pygame.math.Vector2(ax, ay)
-        v2 = pygame.math.Vector2(bx, by)
-        angle_v1_v2_degree = v1.angle_to(v2)
-
-        # self.image = pygame.transform.rotate(self.image, angle_v1_v2_degree)
 
     def is_in_drop_zone(self):
         return True
