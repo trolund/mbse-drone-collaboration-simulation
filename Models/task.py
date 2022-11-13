@@ -14,9 +14,8 @@ class Task(Drawable):
     address: list
     width: int
     height: int
-    def __init__(self, address, packages=None, number_of_attachment_points=1):
 
-
+    def __init__(self, address, packages=None, number_of_attachment_points=1, load_img=True):
         super().__init__()
         self.packages = packages
         self.address = address
@@ -28,13 +27,13 @@ class Task(Drawable):
 
         self.images = []
 
-        img = pygame.image.load(os.path.join('Assets', 'task.png')).convert_alpha()
-        img = pygame.transform.scale(img, (self.size * 100, self.size * 100))
+        if load_img:
+            img = pygame.image.load(os.path.join('Assets', 'task.png')).convert_alpha()
+            img = pygame.transform.scale(img, (self.size * 100, self.size * 100))
 
-        self.images.append(img)
-        self.image = self.images[0]
-        self.rect = self.image.get_rect()
-        self.id = self.rect
+            self.images.append(img)
+            self.image = self.images[0]
+            self.rect = self.image.get_rect()
 
     def get_lift_requirement(self):
         return sum(p.weight for p in self.packages)

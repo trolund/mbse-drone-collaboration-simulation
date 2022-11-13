@@ -3,12 +3,11 @@ import pygame
 from dependency_injector.wiring import Provide
 
 from GUI.UI import UI
-from Logging.eventlogger import EventLogger, LogFile
+from Logging.eventlogger import EventLogger
 from Models.settings import Settings
 from Models.colors import WHITE, GREY, BLACK
 from Models.drone import Drone
 from Models.env import Env
-from Models.setup import FPS
 from Models.truck import Truck
 from Services.Task_creater import create_random_tasks
 from Services.drone_controller import DroneController
@@ -88,7 +87,7 @@ class Simulation(object):
             env.task_ref.append(t)
             env.sprites.add(t)
 
-        self.task_manager = TaskManager()
+        self.task_manager = TaskManager(self.step_size)
 
     def create_truck(self, layout, step_size, env: Env, pos):
         route = None

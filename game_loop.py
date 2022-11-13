@@ -76,4 +76,4 @@ class GameLoop(object):
             # program is running ahead
             else:
                 sleepTime = max(next_tick, next_frame) - time.time()
-                time.sleep(sleepTime)
+                # time.sleep(sleepTime)
