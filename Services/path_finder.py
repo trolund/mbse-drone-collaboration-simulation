@@ -3,7 +3,6 @@ import numpy as np
 
 from dependency_injector.wiring import Provide
 from sklearn.cluster import KMeans
-from scipy.spatial import distance
 
 
 from Models.basic_types import Pos
@@ -118,64 +117,7 @@ class PatchFinder:
 
         return stop_points
 
-    def cluster_delivery(self, delivery_address, stop_points):
-
-        nr_of_clusters = len(stop_points)
-
-        delivery_address = [list(el) for el in delivery_address]
-
-        kmeans = KMeans(n_clusters=nr_of_clusters, init=stop_points)
-        kmeans.fit(delivery_address)
-
-        cluster_centers = kmeans.cluster_centers_
-
-        print("cluster_centers: ", cluster_centers)
-        print("stop_points: ", stop_points)
-
-        clusters = [[] for i in range(nr_of_clusters)]
-        index = 0
-
-        for i in kmeans.labels_:
-            clusters[i].append(delivery_address[index])
-            index = index + 1
-
-        return clusters, cluster_centers
-
-    def cluster_packages_kmeans(self, delivery_address, route):
-
-        nr_of_clusters = self.compute_stop_points(route)
-
-        delivery_address = [list(el) for el in delivery_address]
-
-        kmeans = KMeans(n_clusters=nr_of_clusters)
-        kmeans.fit(delivery_address)
-
-        cluster_centers = kmeans.cluster_centers_
-
-        clusters = [[] for i in range(nr_of_clusters)]
-        index = 0
-
-        for i in kmeans.labels_:
-            clusters[i].append(delivery_address[index])
-            index = index + 1
-
-        return clusters, cluster_centers
 
 
-    def cluster_delivery(self, cluster_centers, delivery_address):
-
-        pack_clusters = [[] for i in range(len(cluster_centers))]
-
-        for i in delivery_address:
-            min_dist = distance.euclidean(i,cluster_centers[0])
-            min_index =  0
-            for m in range(len(cluster_centers)):
-                dist = distance.euclidean(i,cluster_centers[m])
-                if dist < min_dist:
-                    min_dist = dist
-                    min_index = m
-            pack_clusters[min_index].append(i)
-
-        return pack_clusters
 
  

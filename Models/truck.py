@@ -19,11 +19,13 @@ class Truck(Drawable):
     speed = 0.00005  # 0.0 - 1.0
     stop = False
 
-    def __init__(self, grid_pos, size, packages=None, number_of_attachment_points=1, path=None, stop_points=None, config=Provide[Container.config], env: Env = Provide[Container.env]):
+    def __init__(self, grid_pos, size, task_manager, packages=None, number_of_attachment_points=1, path=None, stop_points=None, config=Provide[Container.config], env: Env = Provide[Container.env]):
         super().__init__()
 
+        print("packages: ", packages)
         self.env = env
         self.config = config
+        self.task_manager = task_manager
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
         self.grid_pos = grid_pos
@@ -76,6 +78,25 @@ class Truck(Drawable):
 
         # take new task
         self.take_task(delta)
+
+        # Stop the truck if at the stopping position 
+        # Stay until all clustered packages are delivered/picked up from the truck
+        all_delivered = True
+
+        if self.curr_task in self.stop_points:
+            self.stop = True
+
+            addr = self.task_manager.get_addr_of_tasks_left()
+            curr_clust = self.task_manager.get_curr_cluster()
+
+            for i in curr_clust:
+                if i in addr:
+                    all_delivered = False
+            
+            if all_delivered:
+                self.stop = False
+                self.task_manager.update_curr_cluster()
+                self.stop_points.pop(0)
 
         # process task
         if not self.stop:

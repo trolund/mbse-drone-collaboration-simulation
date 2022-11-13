@@ -42,7 +42,7 @@ class DroneController(ConcreteMediator):
             self.ready_list.append(d)
 
     def assign_tasks(self):
-
+        
         if len(self.ready_list) > 0 and self.task_manager.get_number_of_packages_left() > 0:
             curr_drone: Drone = self.ready_list.pop()
             next_task = self.task_manager.get_head_package()

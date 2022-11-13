@@ -62,6 +62,7 @@ class Simulation(object):
 
     def create_drones(self, env: Env, step_size, number_of_drones: int):
 
+
         self.drones_ref = []
 
         for d in range(0, number_of_drones):
@@ -95,11 +96,12 @@ class Simulation(object):
             planner = PatchFinder()
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
             stop_points = planner.compute_stop_points(route)
-            delivery_spot_clusters = planner.cluster_delivery(stop_points, delivery_spots)
+            # delivery_spot_clusters = planner.cluster_delivery(stop_points, delivery_spots)
             route = translate_moves(route, step_size)
+            self.task_manager.cluster_delivery(stop_points, delivery_spots)
             stop_points = translate_moves(stop_points, step_size)
 
-            print("stop_points: ",stop_points)
+            # print("stop_points: ",stop_points)
             # print("delivery_spots: ",delivery_spots)
             # print("package_clusters: ",package_clusters)
 
@@ -114,8 +116,9 @@ class Simulation(object):
             # print("stop_points_Y= ", list(list(zip(*stop_points))[1]))
 
 
+
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
-        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref, stop_points = stop_points)
+        truck = Truck(pos, path=route, size=step_size, task_manager = self.task_manager, packages=env.task_ref, stop_points = stop_points)
         env.home = truck.get_home()
         env.sprites.add(truck)
 

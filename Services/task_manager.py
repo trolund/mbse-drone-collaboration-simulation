@@ -1,6 +1,7 @@
 from typing import List
 
 from dependency_injector.wiring import Provide
+from scipy.spatial import distance
 
 from Logging.eventlogger import EventLogger
 from Models.env import Env
@@ -23,6 +24,8 @@ class TaskManager:
         # sort the packages
         self.env_ref.task_ref = self.sort_tasks(env.task_ref)
 
+        self.delivery_clusters = None
+
     def get_number_of_packages_left(self):
         return len(self.env_ref.task_ref)
 
@@ -39,6 +42,90 @@ class TaskManager:
     def print_tasks(self, tasks: List[Task], home):
         for t in tasks:
             print(distance_between(home, (t.rect.x, t.rect.y)))
+
+    def get_addr_of_tasks_left(self):
+        tasks = self.env_ref.task_ref
+        
+        addresses = []
+        for t in tasks:
+            addresses.append(t.get_address())
+
+        return addresses
+
+    def cluster_delivery(self, cluster_centers, delivery_address):
+
+        print("CLUSTER")
+        print(cluster_centers)
+        print(delivery_address)
+
+        pack_clusters = [[] for i in range(len(cluster_centers))]
+
+        for i in delivery_address:
+            min_dist = distance.euclidean(i,cluster_centers[0])
+            min_index =  0
+            for m in range(len(cluster_centers)):
+                dist = distance.euclidean(i,cluster_centers[m])
+                if dist < min_dist:
+                    min_dist = dist
+                    min_index = m
+            pack_clusters[min_index].append(i)
+
+        print(pack_clusters)
+
+        self.delivery_clusters = pack_clusters
+
+    def update_curr_cluster(self):
+        # if all delivered
+        self.delivery_clusters.pop(0)
+
+    def get_curr_cluster(self):
+        # print("pack_clusters: ", self.delivery_clusters)
+
+        return self.delivery_clusters[0]
+
+    # def cluster_delivery(self, delivery_address, stop_points):
+
+    #     nr_of_clusters = len(stop_points)
+
+    #     delivery_address = [list(el) for el in delivery_address]
+
+    #     kmeans = KMeans(n_clusters=nr_of_clusters, init=stop_points)
+    #     kmeans.fit(delivery_address)
+
+    #     cluster_centers = kmeans.cluster_centers_
+
+    #     print("cluster_centers: ", cluster_centers)
+    #     print("stop_points: ", stop_points)
+
+    #     clusters = [[] for i in range(nr_of_clusters)]
+    #     index = 0
+
+    #     for i in kmeans.labels_:
+    #         clusters[i].append(delivery_address[index])
+    #         index = index + 1
+
+    #     return clusters, cluster_centers
+
+    # def cluster_packages_kmeans(self, delivery_address, route):
+
+    #     nr_of_clusters = self.compute_stop_points(route)
+
+    #     delivery_address = [list(el) for el in delivery_address]
+
+    #     kmeans = KMeans(n_clusters=nr_of_clusters)
+    #     kmeans.fit(delivery_address)
+
+    #     cluster_centers = kmeans.cluster_centers_
+
+    #     clusters = [[] for i in range(nr_of_clusters)]
+    #     index = 0
+
+    #     for i in kmeans.labels_:
+    #         clusters[i].append(delivery_address[index])
+    #         index = index + 1
+
+    #     return clusters, cluster_centers
+
 
 # def queue_package(amount_of_packages, possible_addresses, max_weight):
 #     min_weight = 200

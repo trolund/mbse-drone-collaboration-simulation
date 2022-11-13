@@ -44,7 +44,9 @@ class Task(Drawable):
 
     def is_taken(self):
         return self.taken
-
+    
+    def get_address(self):
+        return self.address
 
     def __str__(self):
         return (f"Package with id xx and weight {self.get_lift_requirement()}, should be delivered to {self.address}")
