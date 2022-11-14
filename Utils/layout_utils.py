@@ -131,7 +131,6 @@ def find_optimal_truck_pos(layout: Layout, pack_pos):
 
     if len(pack_pos) % 2 != 0:
         x = xcords[int((n+1)/2)]
-        print(x)
         y = ycords[int((n+1)/2)]
     else:
         print(type(int(n/2)+1))

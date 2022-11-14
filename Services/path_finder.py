@@ -1,12 +1,20 @@
 import heapq
 import numpy as np
 
+from dependency_injector.wiring import Provide
+from sklearn.cluster import KMeans
+
+
 from Models.basic_types import Pos
+from containers import Container
 
 
 # inspiration - https://www.analytics-link.com/post/2018/09/14/applying-the-a-path-finding-algorithm-in-python-part-1
 # -2d-square-grid
 class PatchFinder:
+
+    def __init__(self, config=Provide[Container.config]):
+        self.config = config
 
     def heuristic(self, a: Pos, b: Pos):
         return np.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
@@ -92,23 +100,24 @@ class PatchFinder:
 
         return route
 
+    def compute_stop_points(self, route):
 
-# if __name__ == "__main__":
-#     (layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
-#         world_size=15,
-#         ground_size=5,
-#         road_size=1,
-#         customer_density=0.5)
-#
-#     planner = PatchFinder()
-#
-#     route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
-#
-#     print(route)
-#
-#     for i in range(len(layout)):
-#         for j in range(len(layout)):
-#             if (i, j) in route:
-#                 layout[i][j] = "M"
-#
-#     print_layout(layout)
+        nr_of_steps = len(route)
+        nr_of_stops = int(float(self.config["setup"]["truck_stop_density"]) * nr_of_steps)
+
+        stop_points = []
+        slice = int(len(route) / nr_of_stops)
+        index = 0
+        for i in range(nr_of_steps):
+            try:
+                stop_points.append(route[index])
+                index = index + slice
+            except:
+                break
+
+        return stop_points
+
+
+
+
+ 

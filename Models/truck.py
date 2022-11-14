@@ -6,6 +6,7 @@ from dependency_injector.wiring import Provide
 from pygame import Vector2
 from pygame.rect import Rect
 
+from Models.basic_types import Pos
 from Models.env import Env
 from Models.drawable import Drawable
 from Models.task import Task
@@ -20,6 +21,8 @@ class Truck(Drawable):
 
     def __init__(self, grid_pos,
                  size,
+                 task_manager,
+                 stop_points,
                  packages=None,
                  number_of_attachment_points=1, path=None,
                  env: Env = Provide[Container.env],
@@ -29,9 +32,12 @@ class Truck(Drawable):
         self.speed = int(config["setup"]["truck_speed"])
 
         self.env = env
+        self.config = config
+        self.task_manager = task_manager
         self.packages = packages
         self.number_of_attachment_points = number_of_attachment_points
         self.grid_pos = grid_pos
+        self.stop_points: list[(Pos, int)] = stop_points
 
         self.images = []
 
@@ -97,6 +103,27 @@ class Truck(Drawable):
         if len(self.moves) > 0 and self.curr_task is None:
             self.curr_task = self.moves.pop(0)
 
+        # Stop the truck if at the stopping position 
+        # Stay until all clustered packages are delivered/picked up from the truck
+        all_delivered = True
+
+        if self.stop_points != None and self.curr_task in self.stop_points:
+            self.speed = 0
+
+
+            addr = self.task_manager.get_addr_of_tasks_left()
+            curr_clust = self.task_manager.get_curr_cluster()
+
+            for i in curr_clust:
+                if i in addr:
+                    all_delivered = False
+            
+            if all_delivered:
+                self.speed = int(self.config["setup"]["truck_speed"])
+
+                self.task_manager.update_curr_cluster()
+                self.stop_points.pop(0)
+
         # process task
         if self.curr_task is not None:
             ay = self.rect.y
@@ -113,5 +140,24 @@ class Truck(Drawable):
         self.move_package_with_truck()
         return self.rect.x, self.rect.y
 
+    def take_task(self, delta):
+        if len(self.moves) > 0 and self.curr_task is None:
+            self.curr_task = self.moves.pop(0)
+
+    def process_task(self):
+        if self.curr_task is not None:
+            ay = self.rect.y
+            ax = self.rect.x
+            bx = self.curr_task[0]
+            by = self.curr_task[1]
+
+            self.move(ax, ay, bx, by, delta)
+
+            if ax == bx and ay == by:
+                self.curr_task = None
+
     def get_pos(self):
         return self.grid_pos
+
+    def get_stop_points(self):
+        return self.stop_points

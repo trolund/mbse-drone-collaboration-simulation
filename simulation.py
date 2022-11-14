@@ -38,7 +38,6 @@ class Simulation(object):
 
         logger.log("Starting Simulation - " + name, show_in_ui=False)
 
-
         self.settings = Settings(config)
         logger.log("World Size:" + str(self.settings.world_size), show_in_ui=False)
         
@@ -68,6 +67,7 @@ class Simulation(object):
 
     def create_drones(self, env: Env, step_size, number_of_drones: int, ):
 
+
         self.drones_ref = []
 
         for d in range(0, number_of_drones):
@@ -94,16 +94,19 @@ class Simulation(object):
 
         self.task_manager = TaskManager(self.step_size)
 
-    def create_truck(self, layout, step_size, env: Env, pos):
+    def create_truck(self, layout, step_size, env: Env, pos, delivery_spots):
         route = None
-
+        stop_points = None
         if self.settings.moving_truck:
             planner = PatchFinder()
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
+            stop_points = planner.compute_stop_points(route)
             route = translate_moves(route, step_size)
+            self.task_manager.cluster_delivery(stop_points, delivery_spots)
+            stop_points = translate_moves(stop_points, step_size)
 
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
-        truck = Truck(pos, path=route, size=step_size, packages=env.task_ref)
+        truck = Truck(pos, path=route, size=step_size, task_manager = self.task_manager, packages=env.task_ref, stop_points = stop_points)
         env.home = truck.get_home()
         env.sprites.add(truck)
 
@@ -240,7 +243,7 @@ class Simulation(object):
         self.rand = Random_util(self.settings.seed) 
         
         # setup layout
-        (self.layout, delivery_sports, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
+        (self.layout, delivery_spots, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
             self.settings.ground_size,
             self.rand,
@@ -250,11 +253,11 @@ class Simulation(object):
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
-        self.create_tasks(self.env, delivery_sports, self.settings.number_of_tasks)
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
+        self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size), delivery_spots)
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
-
-        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_sports, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
+        
+        self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_spots, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
 
         # Simulation/game loop
         self.timer = Timer()

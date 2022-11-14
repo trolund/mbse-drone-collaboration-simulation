@@ -2,7 +2,7 @@ import json
 
 
 def dumpJson(data):
-    print(data)
+    # print(data)
     # Serializing json
     json_object = json.dumps(data.__dict__)
 
