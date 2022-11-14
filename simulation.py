@@ -94,7 +94,7 @@ class Simulation(object):
 
         self.task_manager = TaskManager(self.step_size)
 
-    def create_truck(self, layout, step_size, env: Env, pos, delivery_spots):
+    def create_truck(self, layout, step_size, env: Env, pos):
         route = None
         stop_points = None
         if self.settings.moving_truck:
@@ -102,7 +102,7 @@ class Simulation(object):
             route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
             stop_points = planner.compute_stop_points(route)
             route = translate_moves(route, step_size)
-            self.task_manager.cluster_delivery(stop_points, delivery_spots)
+            self.task_manager.cluster_delivery(stop_points, self.env.task_ref)
             stop_points = translate_moves(stop_points, step_size)
 
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
@@ -254,7 +254,7 @@ class Simulation(object):
 
         # create all objects in the environment
         self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size), delivery_spots)
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
         
         self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_spots, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")

@@ -23,7 +23,7 @@ class TaskManager:
         self.step_size = step_size
 
         # sort the packages
-        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
+        # self.env_ref.task_ref = self.sort_tasks(env.task_ref)
 
         self.delivery_clusters = None
 
@@ -38,6 +38,7 @@ class TaskManager:
         return len(self.env_ref.task_ref) == 0
 
     def sort_tasks(self, tasks: List[Task]):
+
         sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
         self.print_tasks(sorted_tasks, self.env_ref.home)
         return sorted_tasks
@@ -55,35 +56,54 @@ class TaskManager:
 
         return addresses
 
-    def cluster_delivery(self, cluster_centers, delivery_address):
+    def cluster_delivery(self, cluster_centers, tasks):
 
-        print("CLUSTER")
-        print(cluster_centers)
-        print(delivery_address)
+        print("delivery_address: ", len(tasks))
+        print(tasks)
 
         pack_clusters = [[] for i in range(len(cluster_centers))]
 
-        for i in delivery_address:
-            min_dist = distance.euclidean(i,cluster_centers[0])
+        for i in tasks:
+            addr = i.get_address()
+            min_dist = distance.euclidean(addr,cluster_centers[0])
             min_index =  0
             for m in range(len(cluster_centers)):
-                dist = distance.euclidean(i,cluster_centers[m])
+                dist = distance.euclidean(addr,cluster_centers[m])
                 if dist < min_dist:
                     min_dist = dist
                     min_index = m
-            pack_clusters[min_index].append(i)
-
-        print(pack_clusters)
+            pack_clusters[min_index].append(addr)
 
         self.delivery_clusters = pack_clusters
 
+        # Sort packages based on clusters
+        self.sort_tasks_on_clusters()
+
+    # NOTE: doesn't work
+    def sort_tasks_on_clusters(self):
+        
+        tasks = self.env_ref.task_ref
+        queue = []
+
+        for i in self.delivery_clusters:
+            # print("i: ", i)
+            for j in tasks:
+                # print("j: ", j.get_address())
+                if j.get_address() in i:
+                    queue.append(j)
+                    # print("ADDED: ", j.get_address())
+
+
+        print("self.delivery_clusters: ", self.delivery_clusters)
+        # self.print_tasks(tasks, self.env_ref.home)
+        # print("QUEUE")
+        self.print_tasks(queue, self.env_ref.home)
+        self.env_ref.task_ref = queue
+
     def update_curr_cluster(self):
-        # if all delivered
         self.delivery_clusters.pop(0)
 
     def get_curr_cluster(self):
-        # print("pack_clusters: ", self.delivery_clusters)
-
         return self.delivery_clusters[0]
 
     # def cluster_delivery(self, delivery_address, stop_points):

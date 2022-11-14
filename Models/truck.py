@@ -110,9 +110,11 @@ class Truck(Drawable):
         if self.stop_points != None and self.curr_task in self.stop_points:
             self.speed = 0
 
-
             addr = self.task_manager.get_addr_of_tasks_left()
             curr_clust = self.task_manager.get_curr_cluster()
+
+            print("left pack to deliver: ", addr)
+            print("current cluster: ", curr_clust)
 
             for i in curr_clust:
                 if i in addr:
