@@ -40,8 +40,7 @@ class TaskManager:
     def sort_tasks(self, tasks: List[Task]):
 
         sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
-        print("Initial task sort. Truck assumed to be stationary: ")
-        self.print_tasks(sorted_tasks, self.env_ref.home)
+        # self.print_tasks(sorted_tasks, self.env_ref.home)
         return sorted_tasks
 
     def print_tasks(self, tasks: List[Task], home):
@@ -58,9 +57,6 @@ class TaskManager:
         return addresses
 
     def cluster_delivery(self, cluster_centers, tasks):
-
-        print("delivery_address: ", len(tasks))
-        # print(tasks)
 
         pack_clusters = [[] for i in range(len(cluster_centers))]
 
@@ -86,18 +82,10 @@ class TaskManager:
         queue = []
 
         for i in self.delivery_clusters:
-            # print("i: ", i)
             for j in tasks:
-                # print("j: ", j.get_address())
                 if j.get_address() in i:
                     queue.append(j)
-                    # print("ADDED: ", j.get_address())
 
-
-        print("self.delivery_clusters: ", self.delivery_clusters)
-        print("Sorted tasks because the truck is moving: ")
-        self.print_tasks(queue, self.env_ref.home)
-        # print("QUEUE")
         # self.print_tasks(queue, self.env_ref.home)
         self.env_ref.task_ref = queue
 

@@ -242,7 +242,6 @@ class Simulation(object):
         # setup PRNG
         self.rand = Random_util(self.settings.seed) 
         
-        print("self.settings.optimal_truck_pos: ", self.settings.optimal_truck_pos)
         # setup layout
         (self.layout, delivery_spots, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
@@ -250,12 +249,12 @@ class Simulation(object):
             self.rand,
             road_size=self.settings.road_size,
             customer_density=self.settings.customer_density,
-            optimal_truck_pos=self.settings.optimal_truck_pos)
+            moving_truck=self.settings.moving_truck)
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
         self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(0, 0, self.step_size))
+        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
         
         self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_spots, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
