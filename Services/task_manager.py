@@ -1,3 +1,4 @@
+from collections import deque
 from typing import List
 
 from dependency_injector.wiring import Provide
@@ -23,7 +24,11 @@ class TaskManager:
         self.step_size = step_size
 
         # sort the packages
-        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
+        s = self.sort_tasks(env.task_ref)
+        self.print_tasks(s)
+        self.env_ref.task_ref = s
+        print("---dsjfdskj----")
+        self.print_tasks(s)
 
         self.delivery_clusters = None
 
@@ -32,17 +37,18 @@ class TaskManager:
 
     def get_head_package(self):
         self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
+        print(len(self.env_ref.task_ref))
         return self.env_ref.task_ref.pop()
 
     def is_done(self):
         return len(self.env_ref.task_ref) == 0
 
     def sort_tasks(self, tasks: List[Task]):
-        sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
-        self.print_tasks(sorted_tasks, self.env_ref.home)
+        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(self.env_ref.home, x.address), reverse=True))
+        self.print_tasks(sorted_tasks)
         return sorted_tasks
 
-    def print_tasks(self, tasks: List[Task], home):
+    def print_tasks(self, tasks):
         for t in tasks:
             print(t.address, distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)))
 

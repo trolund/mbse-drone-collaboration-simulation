@@ -1,3 +1,5 @@
+from collections import deque
+
 import pygame
 
 from Models.setup import WIDTH, HEIGHT
@@ -10,7 +12,7 @@ class Env:
     # all sprirtes displayed on screen
     sprites = pygame.sprite.Group()
 
-    task_ref: list[Task] = []
+    task_ref = deque()
     truck_ref = None
     # drone_ref: list[Drone] = []
 
