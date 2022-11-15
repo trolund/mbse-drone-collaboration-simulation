@@ -22,8 +22,8 @@ class TaskManager:
         self.env_ref = env
         self.step_size = step_size
 
-        # sort the packages
-        # self.env_ref.task_ref = self.sort_tasks(env.task_ref)
+        # sort the packages for a stationary truck
+        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
 
         self.delivery_clusters = None
 
@@ -40,6 +40,7 @@ class TaskManager:
     def sort_tasks(self, tasks: List[Task]):
 
         sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
+        print("Initial task sort. Truck assumed to be stationary: ")
         self.print_tasks(sorted_tasks, self.env_ref.home)
         return sorted_tasks
 
@@ -59,7 +60,7 @@ class TaskManager:
     def cluster_delivery(self, cluster_centers, tasks):
 
         print("delivery_address: ", len(tasks))
-        print(tasks)
+        # print(tasks)
 
         pack_clusters = [[] for i in range(len(cluster_centers))]
 
@@ -95,9 +96,10 @@ class TaskManager:
 
 
         print("self.delivery_clusters: ", self.delivery_clusters)
-        # self.print_tasks(tasks, self.env_ref.home)
-        # print("QUEUE")
+        print("Sorted tasks because the truck is moving: ")
         self.print_tasks(queue, self.env_ref.home)
+        # print("QUEUE")
+        # self.print_tasks(queue, self.env_ref.home)
         self.env_ref.task_ref = queue
 
     def update_curr_cluster(self):
