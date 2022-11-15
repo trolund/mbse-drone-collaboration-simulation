@@ -107,27 +107,36 @@ class Truck(Drawable):
         # Stay until all clustered packages are delivered/picked up from the truck
         all_delivered = True
 
-        if self.stop_points != None and self.curr_task in self.stop_points:
-            self.speed = 0
+        if self.stop_points != None:
+            # print("self.stop_points: ", self.stop_points)
+            # print("self.curr_task: ", self.curr_task)
+            # print(self.speed)
+            # print("left pack to deliver: ", self.task_manager.get_addr_of_tasks_left())
+            # print("current cluster: ", self.task_manager.get_curr_cluster())
 
-            addr = self.task_manager.get_addr_of_tasks_left()
-            curr_clust = self.task_manager.get_curr_cluster()
+            if self.curr_task in self.stop_points:
+                # print("INNNN")
+                self.speed = 0
 
-            # print("left pack to deliver: ", addr)
-            # print("current cluster: ", curr_clust)
+                addr = self.task_manager.get_addr_of_tasks_left()
+                curr_clust = self.task_manager.get_curr_cluster()
 
-            for i in curr_clust:
-                if i in addr:
-                    all_delivered = False
-            
-            if all_delivered:
-                self.speed = int(self.config["setup"]["truck_speed"])
+                # print("addr: ", addr)
+                # print("curr_clust: ", curr_clust)
 
-                self.task_manager.update_curr_cluster()
-                self.stop_points.pop(0)
+                for i in curr_clust:
+                    if i in addr:
+                        all_delivered = False
+                
+                if all_delivered:
+                    # print("ALL delivered")
+                    self.speed = int(self.config["setup"]["truck_speed"])
 
-        # process task
-        if self.curr_task is not None:
+                    self.task_manager.update_curr_cluster()
+                    self.stop_points.pop(0)
+
+        # process task when the truck is allowed to move
+        if self.curr_task is not None and all_delivered:
             ay = self.rect.y
             ax = self.rect.x
             bx = self.curr_task[0]

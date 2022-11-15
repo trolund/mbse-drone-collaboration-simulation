@@ -95,7 +95,7 @@ def create_layout_env(world_size: int,
                       rand: Random_util,
                       road_size: int = 2,
                       customer_density: float = 0.5,
-                      optimal_truck_pos: bool = True,
+                      optimal_truck_pos: bool = False,
                       ):
 
     m = world_size + road_size

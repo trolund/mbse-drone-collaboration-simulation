@@ -32,7 +32,7 @@ class TaskManager:
 
     def get_head_package(self):
         self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
-        return self.env_ref.task_ref.pop()
+        return self.env_ref.task_ref.pop(0)
 
     def is_done(self):
         return len(self.env_ref.task_ref) == 0
@@ -80,7 +80,6 @@ class TaskManager:
         # Sort packages based on clusters
         self.sort_tasks_on_clusters()
 
-    # NOTE: doesn't work
     def sort_tasks_on_clusters(self):
         
         tasks = self.env_ref.task_ref

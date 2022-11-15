@@ -242,6 +242,7 @@ class Simulation(object):
         # setup PRNG
         self.rand = Random_util(self.settings.seed) 
         
+        print("self.settings.optimal_truck_pos: ", self.settings.optimal_truck_pos)
         # setup layout
         (self.layout, delivery_spots, number_of_grounds, number_of_customers), truck_pos = create_layout_env(
             self.settings.world_size,
