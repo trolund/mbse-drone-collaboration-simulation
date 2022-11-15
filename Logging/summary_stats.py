@@ -48,7 +48,7 @@ def distances(coordinate_list,no_drones):
 
             if i['drone'] == 'drone_'+str(drone)+',':
                 dist = dist + math.hypot(float(i['FromX'])-float(i['ToX']), float(i['FromY'])-float(i['ToY']))
-                dist_format = format_number(dist,2)
+                dist_format = float(format_number(dist,2))
         distances.append(dist_format)
         dist = 0
     return distances
@@ -156,16 +156,17 @@ def make_summary_file(file):
     msg5 = time_per_drone(dist,speed)
     msg6 = time_per_package(file,time)
     msg7 = avg_package_per_drone(no_packages,number_of_drones)
-
-    messages = [file,msg,msg1,msg2,msg3,msg4,msg5,msg6,msg7]
+    msg8 = format_number(Average(dist),2)
+    messages = [file,msg,msg1,msg2,msg3,msg4,msg5,msg6,msg7,msg8]
     return messages
     #write_to_csv(headers,messages,file.split(".")[0])
-
+def Average(lst):
+    return sum(lst) / len(lst)
 
 
 def main():
     files = get_files("20211110","20231111")
-    headers = ["File","No_drones","No_packages","Total_time","Avg_speed","Dist_drone","Working_time_drones","Avg_time_package","Avg_packages_drone"]
+    headers = ["File","No_drones","No_packages","Total_time","Avg_speed","Dist_drone","Working_time_drones","Avg_time_package","Avg_packages_drone","Avg_dist_traveled"]
 
     date = datetime.datetime.now().strftime("%Y_%m_%d")
     Filename = "Summary_"+date
