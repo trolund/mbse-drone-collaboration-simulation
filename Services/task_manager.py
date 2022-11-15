@@ -44,7 +44,7 @@ class TaskManager:
         return len(self.env_ref.task_ref) == 0
 
     def sort_tasks(self, tasks: List[Task]):
-        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(self.env_ref.home, x.address), reverse=True))
+        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(self.env_ref.home, x.address), reverse=False))
         self.print_tasks(sorted_tasks)
         return sorted_tasks
 
