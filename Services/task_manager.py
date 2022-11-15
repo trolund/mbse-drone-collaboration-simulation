@@ -50,7 +50,7 @@ class TaskManager:
 
     def print_tasks(self, tasks):
         for t in tasks:
-            print(t.address, distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)))
+            print(t.address, distance_between(self.env_ref.home, t.address))
 
     def get_addr_of_tasks_left(self):
         tasks = self.env_ref.task_ref
