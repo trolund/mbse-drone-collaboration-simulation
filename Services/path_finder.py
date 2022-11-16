@@ -2,7 +2,7 @@ import heapq
 import numpy as np
 
 from dependency_injector.wiring import Provide
-from sklearn.cluster import KMeans
+#from sklearn.cluster import KMeans
 
 
 from Models.basic_types import Pos
