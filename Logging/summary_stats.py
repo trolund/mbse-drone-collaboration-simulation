@@ -2,6 +2,8 @@ import csv
 import datetime
 import math
 import os
+from statistics import mean 
+import numpy as np
 
 def format_number(msg,decimals):
     string_decimals = '{0:.'+str(decimals)+'f}'
@@ -153,11 +155,12 @@ def make_summary_file(file):
     msg2 = format_number(time,2)
     msg3 = format_number(speed,2)
     msg4 = dist
+    msg41 = sum(dist)
     msg5 = time_per_drone(dist,speed)
     msg6 = time_per_package(file,time)
     msg7 = avg_package_per_drone(no_packages,number_of_drones)
     msg8 = format_number(Average(dist),2)
-    messages = [file,msg,msg1,msg2,msg3,msg4,msg5,msg6,msg7,msg8]
+    messages = [file,msg,msg1,msg2,msg3,msg4,msg41,msg5,msg6,msg7,msg8]
     return messages
     #write_to_csv(headers,messages,file.split(".")[0])
 def Average(lst):
@@ -166,15 +169,48 @@ def Average(lst):
 
 def main():
     files = get_files("20211110","20231111")
-    headers = ["File","No_drones","No_packages","Total_time","Avg_speed","Dist_drone","Working_time_drones","Avg_time_package","Avg_packages_drone","Avg_dist_traveled"]
+    headers = ["No_drones","No_packages","Total_time","Avg_speed","Dist_tot","Avg_time_package","Avg_packages_drone","Avg_dist_traveled"]
+    # removed the arrays dist_drone and working_time_drones
 
     date = datetime.datetime.now().strftime("%Y_%m_%d")
     Filename = "Summary_"+date
     write_to_csv(headers, Filename)
 
+    total_time = []
+    avg_speed = []
+    dist_drone = []
+    dist_tot = []
+    working_time = []
+    avg_time_pack = []
+    avg_pack_drone = []
+    avg_dist_travelled = []
+
     for file in files:
         summary = make_summary_file(file)
-        write_to_csv(summary,Filename)
+        no_drones = summary[1]
+        no_packages = summary[2]
+        total_time.append(summary[3])
+        avg_speed.append(summary[4])
+        #dist_drone.append(summary[5])
+        dist_tot.append(summary[6])
+        #working_time.append(summary[7])
+        avg_time_pack.append(summary[8])
+        avg_pack_drone.append(summary[9])
+        avg_dist_travelled.append(summary[10])
+
+    total_time = list(map(float, total_time))
+    avg_speed = list(map(float, avg_speed))
+    #dist_drone = list(map(float, dist_drone))
+    dist_tot = list(map(float, dist_tot))
+    #working_time = list(map(float, working_time))
+    avg_time_pack = list(map(float, avg_time_pack))
+    avg_pack_drone = list(map(float, avg_pack_drone))
+    avg_dist_travelled = list(map(float, avg_dist_travelled))
+
+    averages = [no_drones,no_packages,round(mean(total_time),2),round(mean(avg_speed),2),round(mean(dist_tot),2),round(mean(avg_time_pack),2),round(mean(avg_pack_drone),2),round(mean(avg_dist_travelled),2)]   
+
+    print(averages)
+    write_to_csv(averages,Filename)
 
 
 
