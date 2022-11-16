@@ -46,7 +46,6 @@ class TaskManager:
 
         return x.distance_to(y)
 
-
     def sort_tasks(self, tasks: List[Task]):
         grid_home = pos_to_grid_tuple(self.env_ref.home, self.step_size)
         sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(grid_home, x.address), reverse=True))
@@ -55,7 +54,6 @@ class TaskManager:
 
     def print_tasks(self, tasks):
         grid_home = pos_to_grid_tuple(self.env_ref.home, self.step_size)
-        print(grid_home)
         for t in tasks:
             print(t.address, distance_between(grid_home, t.address))
 
@@ -71,6 +69,7 @@ class TaskManager:
     def cluster_delivery(self, cluster_centers, tasks):
 
         pack_clusters = [[] for i in range(len(cluster_centers))]
+        task_clusters = [[] for i in range(len(cluster_centers))]
 
         for i in tasks:
             addr = i.get_address()
@@ -82,28 +81,46 @@ class TaskManager:
                     min_dist = dist
                     min_index = m
             pack_clusters[min_index].append(addr)
+            task_clusters[min_index].append(i)
 
         self.delivery_clusters = pack_clusters
-        print("Before")
-        print(self.delivery_clusters)
-        self.print_tasks(self.env_ref.task_ref)
-        # Sort packages based on clusters
-        self.sort_tasks_on_clusters()
-        print("After")
+
+        print("Clusters: ", self.delivery_clusters)
+        print("Tasks before sort")
         self.print_tasks(self.env_ref.task_ref)
 
-    def sort_tasks_on_clusters(self):
+        self.sort_tasks_on_clusters(task_clusters, cluster_centers)
+
+        print("Tasks after sort")
+        self.print_tasks(self.env_ref.task_ref)
+
+    def sort_tasks_on_clusters(self, task_clusters, cluster_centers):
+
+        tasks = []
+
+        index = 0
+        for i in task_clusters:
+            # Sort the inner cluster based on the cluster center coordinates
+            sorted_cluster = deque(sorted(i, key=lambda x: distance_between(cluster_centers[index], x.address), reverse=False))
+            for j in sorted_cluster:
+                tasks.append(j)
+            index += 1
+
+        # tasks.reverse() 
+        self.env_ref.task_ref = tasks
+
+    # def sort_tasks_on_clusters(self):
         
-        tasks = self.env_ref.task_ref
-        queue = []
+    #     tasks = self.env_ref.task_ref
+    #     queue = []
 
-        for i in self.delivery_clusters:
-            for j in tasks:
-                if j.get_address() in i:
-                    queue.append(j)
+    #     for i in self.delivery_clusters:
+    #         for j in tasks:
+    #             if j.get_address() in i:
+    #                 queue.append(j)
 
-        # self.print_tasks(queue, self.env_ref.home)
-        self.env_ref.task_ref = queue
+    #     # self.print_tasks(queue, self.env_ref.home)
+    #     self.env_ref.task_ref = queue
 
     def update_curr_cluster(self):
         self.delivery_clusters.pop(0)
