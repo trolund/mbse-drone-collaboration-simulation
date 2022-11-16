@@ -65,6 +65,10 @@ class Truck(Drawable):
             self.moves = path
         self.curr_move = None
 
+    def add_route(self, path, stop_points):
+        self.moves = path
+        self.stop_points = stop_points
+
     def move_package_with_truck(self):
         for t in self.packages:
             if not t.is_taken():

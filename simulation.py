@@ -86,29 +86,25 @@ class Simulation(object):
 
         for idx, t in enumerate(tasks):
             # start at truck
-            # t.rect.x = env.home[0]  # + (5 * idx)
-            # t.rect.y = env.home[1]
+            t.rect.x = env.home[0]
+            t.rect.y = env.home[1]
 
             env.task_ref.append(t)
             env.sprites.add(t)
 
-        self.task_manager = TaskManager(self.step_size)
-
     def create_truck(self, layout, step_size, env: Env, pos):
         route = None
         stop_points = None
-        if self.settings.moving_truck:
-            planner = PatchFinder()
-            route = planner.find_path(layout, (0, 0), (len(layout) - 1, len(layout) - 1))
-            stop_points = planner.compute_stop_points(route)
-            route = translate_moves(route, step_size)
-            self.task_manager.cluster_delivery(stop_points, self.env.task_ref)
-            stop_points = translate_moves(stop_points, step_size)
+        self.task_manager = TaskManager(self.step_size)
 
         self.logger.log("Starting Position of truck - " + str(pos), show_in_ui=False)
+
         truck = Truck(pos, path=route, size=step_size, task_manager = self.task_manager, packages=env.task_ref, stop_points = stop_points)
         env.home = truck.get_home()
+        env.truck_ref = truck
         env.sprites.add(truck)
+
+
 
     def draw_layers(self, layout, x_len: int, y_len: int, step_size: int, env):
         # draw the basic layout
@@ -234,6 +230,14 @@ class Simulation(object):
     def set_simulation_speed(self, scale):
         self.gl.scale_simulation(scale)
 
+    def cluster_sort(self):
+            planner = PatchFinder()
+            route = planner.find_path(self.layout, (0, 0), (len(self.layout) - 1, len(self.layout) - 1))
+            stop_points = planner.compute_stop_points(route)
+            route = translate_moves(route, self.step_size)
+            self.task_manager.cluster_delivery(stop_points, self.env.task_ref)
+            stop_points = translate_moves(stop_points, self.step_size)
+            self.env.truck_ref.add_route(route, stop_points)
 
     def Main(self):
         # instance of UI
@@ -253,10 +257,16 @@ class Simulation(object):
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment
+        self.create_truck(self.layout, self.step_size, self.env,
+                          grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
-        self.create_truck(self.layout, self.step_size, self.env, grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
-        
+
+        if not self.settings.moving_truck:
+            self.task_manager.sort()
+        else:
+            self.cluster_sort()
+
         self.logger.log(f"ENV Complexity: {calc_complexity(number_of_customers, self.settings.world_size, delivery_spots, truck_pos, self.settings.number_of_drones, self.settings.number_of_tasks)}")
 
         # Simulation/game loop

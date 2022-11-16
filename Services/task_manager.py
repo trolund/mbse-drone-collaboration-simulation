@@ -1,12 +1,14 @@
+from collections import deque
 from typing import List
 
 from dependency_injector.wiring import Provide
+from pygame import Vector2
 from scipy.spatial import distance
 
 from Logging.eventlogger import EventLogger
 from Models.env import Env
 from Models.task import Task
-from Utils.layout_utils import distance_between, grid_to_pos_tuple
+from Utils.layout_utils import distance_between, grid_to_pos_tuple, pos_to_grid_tuple
 from containers import Container
 
 
@@ -21,31 +23,41 @@ class TaskManager:
         self.logger = logger
         self.env_ref = env
         self.step_size = step_size
-
-        # sort the packages for a stationary truck
-        self.env_ref.task_ref = self.sort_tasks(env.task_ref)
-
         self.delivery_clusters = None
+
+    def sort(self):
+        # sort the packages for a stationary truck
+        self.env_ref.task_ref = self.sort_tasks(self.env_ref.task_ref)
 
     def get_number_of_packages_left(self):
         return len(self.env_ref.task_ref)
 
     def get_head_package(self):
         self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
-        return self.env_ref.task_ref.pop(0)
+        pop = self.env_ref.task_ref.pop()
+        return pop
 
     def is_done(self):
         return len(self.env_ref.task_ref) == 0
 
-    def sort_tasks(self, tasks: List[Task]):
+    def vector_dist(self, a, b):
+        x = Vector2(a)
+        y = Vector2(b)
 
-        sorted_tasks = sorted(tasks, key=lambda x: distance_between(self.env_ref.home, grid_to_pos_tuple(x.address, self.step_size)), reverse=True)
-        # self.print_tasks(sorted_tasks, self.env_ref.home)
+        return x.distance_to(y)
+
+
+    def sort_tasks(self, tasks: List[Task]):
+        grid_home = pos_to_grid_tuple(self.env_ref.home, self.step_size)
+        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(grid_home, x.address), reverse=True))
+        self.print_tasks(sorted_tasks)
         return sorted_tasks
 
-    def print_tasks(self, tasks: List[Task], home):
+    def print_tasks(self, tasks):
+        grid_home = pos_to_grid_tuple(self.env_ref.home, self.step_size)
+        print(grid_home)
         for t in tasks:
-            print(t.address, distance_between(self.env_ref.home, grid_to_pos_tuple(t.address, self.step_size)))
+            print(t.address, distance_between(grid_home, t.address))
 
     def get_addr_of_tasks_left(self):
         tasks = self.env_ref.task_ref
@@ -62,19 +74,23 @@ class TaskManager:
 
         for i in tasks:
             addr = i.get_address()
-            min_dist = distance.euclidean(addr,cluster_centers[0])
-            min_index =  0
+            min_dist = distance.euclidean(addr, cluster_centers[0])
+            min_index = 0
             for m in range(len(cluster_centers)):
-                dist = distance.euclidean(addr,cluster_centers[m])
+                dist = distance.euclidean(addr, cluster_centers[m])
                 if dist < min_dist:
                     min_dist = dist
                     min_index = m
             pack_clusters[min_index].append(addr)
 
         self.delivery_clusters = pack_clusters
-
+        print("Before")
+        print(self.delivery_clusters)
+        self.print_tasks(self.env_ref.task_ref)
         # Sort packages based on clusters
         self.sort_tasks_on_clusters()
+        print("After")
+        self.print_tasks(self.env_ref.task_ref)
 
     def sort_tasks_on_clusters(self):
         
