@@ -77,9 +77,9 @@ class Drone(Drawable, BaseMediator):
     def attach(self, task: Task):
         self.logger.log(self.name + " attach!")
 
-        if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
-            raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
-                            (self.rect.x, self.rect.y))
+        # if task.rect.x != self.rect.x or task.rect.y != self.rect.y:
+        #     raise Exception('can not attach - drone is not centered over a package! 😤📦', self.name,
+        #                     (self.rect.x, self.rect.y))
 
         self.attachment = task
         self.attachment.set_taken()

@@ -34,8 +34,10 @@ class TaskManager:
 
     def get_head_package(self):
         self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
-        pop = self.env_ref.task_ref.pop()
-        return pop
+        if self.config["setup"]["moving_truck"] == "0":
+            return self.env_ref.task_ref.pop()
+        else:
+            return self.env_ref.task_ref.pop(0)
 
     def is_done(self):
         return len(self.env_ref.task_ref) == 0
