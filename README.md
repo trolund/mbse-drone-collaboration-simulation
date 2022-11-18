@@ -14,6 +14,11 @@ The main config file **config.ini** contains all the global parameters. the file
 
 * scale - the scale the simulation starts at.
 
+Options for a truck: 
+* moving_truck = 1 -> the truck moves
+* moving_truck = 0 and random_position = 0 -> stationary truck with the optimal position
+* moving_truck = 0 and random_position = 1 -> stationary truck with the random position
+
 # Definitions (Conventions of the project)
 
 

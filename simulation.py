@@ -253,7 +253,8 @@ class Simulation(object):
             self.rand,
             road_size=self.settings.road_size,
             customer_density=self.settings.customer_density,
-            moving_truck=self.settings.moving_truck)
+            moving_truck=self.settings.moving_truck,
+            random_position=self.settings.random_position)
         (self.step_size, self.x_len, self.y_len, self.settings.scale) = get_world_size(self.screen, self.layout)
 
         # create all objects in the environment

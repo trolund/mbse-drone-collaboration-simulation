@@ -96,6 +96,7 @@ def create_layout_env(world_size: int,
                       road_size: int = 2,
                       customer_density: float = 0.5,
                       moving_truck: bool = True,
+                      random_position: bool = False
                       ):
 
     m = world_size + road_size
@@ -113,9 +114,19 @@ def create_layout_env(world_size: int,
                 else:
                     layout[i][j] = "."
 
-    if moving_truck == False:
+    # Options: 
+    # moving_truck = 1 -> the truck moves
+    # moving_truck = 0 and random_position = 0 -> stationary truck with the optimal position
+    # moving_truck = 0 and random_position = 1 -> stationary truck with the random position
+
+    if moving_truck == False and random_position == False:
         layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, rand, m, ground_size, road_size, customer_density)
         new_layout, truck_pos = find_optimal_truck_pos(layout, delivery_spots)
+        return [new_layout, delivery_spots, number_of_grounds, number_of_customers], truck_pos
+    
+    elif moving_truck == False and random_position == True:
+        layout, delivery_spots, number_of_grounds, number_of_customers = provide_dp(layout, rand, m, ground_size, road_size, customer_density)
+        new_layout, truck_pos = find_random_truck_pos(layout, rand)
         return [new_layout, delivery_spots, number_of_grounds, number_of_customers], truck_pos
     else:
         return provide_dp(layout, rand, m, ground_size, road_size, customer_density), (0, 0)
@@ -156,12 +167,13 @@ def find_all_road_pos(layout):
 
     return pos
 
-def create_random_truck_pos(layout: Layout):
-    pos = find_random_road_pos(layout)
-    layout[pos[0]][pos[1]] = "T"
+def find_random_truck_pos(layout: Layout, rand: Random_util):
+    pos = find_random_road_pos(layout, rand)
+    # layout[pos[0]][pos[1]] = "T"
     return layout, pos
 
 def find_random_road_pos(layout: Layout, rand: Random_util):
+    
     curr = None
     pos = (0, 0)
     while curr != "R":
