@@ -16,9 +16,8 @@ class Battery:
                  Af: float = 0.5, # Cross-section [m^2], horizontal
                  At: float = 0.1, # Cross-section [m^2], vertical
                  Cd: float = 1, # Drag coefficient
-                 Ct: float = 0.03, # Thrust coefficient
-                 Ap: float = 0.5, # Propeller disc area [m^2]
-                 r: float = 0.1 # Propeller radius [m]
+                 Ct: float = 0.02, # Thrust coefficient
+                 r: float = 0.6 # Propeller radius [m]
                  ):
         self.md = md
         self.mp = mp
@@ -26,7 +25,7 @@ class Battery:
         self.At = At 
         self.Cd = Cd
         self.Ct = Ct
-        self.Ap = Ap
+        self.Ap = (3.14 * (2*r)**2) / 4 # Propeller disc area [m^2] 
         self.r = r
 
     # Attach package to drone
