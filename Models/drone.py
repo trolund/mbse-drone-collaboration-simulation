@@ -16,7 +16,7 @@ from Utils.Utils import map_range
 from Utils.layout_utils import distance_between
 from containers import Container
 from Models.drawable import Drawable
-
+from Models.Battery import Battery
 
 def get_cor(move: Move):
     return move[0][0], move[0][1]
@@ -32,8 +32,10 @@ def get_move_obj(move: Move):
 
 class Drone(Drawable, BaseMediator):
     lift: float = 22.5
-    status: DroneMode
     speed: float = 200
+
+    status: DroneMode
+    battery: Battery
 
     def __init__(self, grid_pos, name="",
                  logger: EventLogger = Provide[Container.event_logger],
@@ -46,6 +48,7 @@ class Drone(Drawable, BaseMediator):
 
         self.logger = logger
         self.env_ref = env
+        self.battery = Battery()
 
         self.id = uuid.uuid4()
         self.status = DroneMode.IDLE
@@ -83,6 +86,7 @@ class Drone(Drawable, BaseMediator):
 
         self.attachment = task
         self.attachment.set_taken()
+        self.battery.set_package(0.5, 0.25, 0.25)
 
     ######
     def drop(self):
@@ -93,6 +97,7 @@ class Drone(Drawable, BaseMediator):
         # delivered bool
         self.logger.log(f"{self.name} - DROP, {self.attachment}")
         self.attachment = None
+        self.battery.remove_package()
 
     def add_move_point(self, pos: Pos, name: Move_Type = Move_Type.NORMAL, obj: any = None):
         self.moves.append((pos, name, obj))
@@ -141,6 +146,7 @@ class Drone(Drawable, BaseMediator):
 
         self.rect.x = a.x
         self.rect.y = a.y
+        self.battery.update(dt, self.speed)
 
     def do_move(self, ax, ay, bx, by, dt):
         self.move(ax, ay, bx, by, dt)

@@ -1,9 +1,14 @@
 class Battery:
     g: float = 9.80665 # Gravitational acceleration [ms/s^2]
     rho: float = 1.204 # Air density [kg/m^3], at surface
+    
+    #Af: float = 0
+    #At: float = 0
 
-    Apf: float = 0
-    Atf: float = 0
+    Apf: float = 0 # Payload cross-section, hoz 
+    Apt: float = 0 # Payload cross-section, vert
+
+    battery_energy = 0 # Energy spent
     
     def __init__(self,
                  md: float = 0.5, # Mass [kg], drone
@@ -18,55 +23,65 @@ class Battery:
         self.md = md
         self.mp = mp
         self.Af = Af
-        self.At = At
+        self.At = At 
         self.Cd = Cd
         self.Ct = Ct
         self.Ap = Ap
         self.r = r
         
-    def set_package(mass, Apf, Atf):
+    def set_package(self, mass, Apf, Apt):
         self.mp = mass
         self.Apf = Apf
-        self.Atf = Atf
+        self.Apf = Apt
+        print("Got package")
 
-    def remove_package():
+    def remove_package(self):
         self.mp = 0
         self.Apf = 0
         self.Atf = 0
-        
-    def rot_horizontal(vh: float):
-        nom = ( 4*(md+mp)^2 * g^2 + \
-                rho^2 * Af^2 * Cd^2 * vh^4 )^(1/4)
-        dnum = ( r^2 * rho * Ap *  Ct)^(1/2)
+        print("Dropped off package")
 
-        return nom/denum
+    def update(self, dt, vv = 0, vh = 0):
+        ep = self.get_move_EP(dt, vv, vh)
+        self.battery_energy += ep[0]
 
-    def rot_vertical(vv: float):
-        nom = ( 2 * (md+mp) * g + \
-                rho * At * Cd * vv^2 )^(1/2)
-
-        dnum = ( r^2 * rho * Ap * Ct )^(1/2)
-
-        return nom/denum
-
-    def conv_Ah(power, dt):
-        return 0
-
-    def get_power(ang_freq: float):
-        return 2.258 * 10^(-7) * ang_freq^3 + \
-            3.866 * 10^(-5) * ang_freq^2 + \
-            5.137 * 10^(-3) * ang_freq + \
+    def get_power(self, ang_freq: float):
+        return 2.258 * 10**(-7) * ang_freq**3 + \
+            3.866 * 10**(-5) * ang_freq**2 + \
+            5.137 * 10**(-3) * ang_freq + \
             2.616
 
-    def get_move_EP(dt, vv = 0, vh = 0):
-        ang_freq_h = rot_horizontal(vh)
-        ang_freq_v = rot_vertical(vv)
+    def get_move_EP(self, dt, vv = 0, vh = 0):
+        ang_freq_h = self.rot_horizontal(vh)
+        ang_freq_v = self.rot_vertical(vv)
 
-        Ph = get_power(ang_freq_h)
-        Pv = get_power(ang_freq_v)
+        Ph = self.get_power(ang_freq_h)
+        Pv = self.get_power(ang_freq_v)
         P = Ph + Pv
         E = P / dt
 
         return (E, P)
+        
+    def rot_horizontal(self, vh: float):
+        nom = ( 4*(self.md+self.mp)**2 * self.g**2 + \
+                self.rho**2 * (self.Af+self.Apf)**2 * self.Cd**2 * vh**4 )**(1/4)
+        dnum = ( self.r**2 * self.rho * self.Ap *  self.Ct)**(1/2)
+
+        return nom/dnum
+
+    def rot_vertical(self, vv: float):
+        nom = ( 2 * (self.md+self.mp) * self.g + \
+                self.rho * (self.At+self.Apt) * self.Cd * vv**2 )**(1/2)
+
+        dnum = ( self.r**2 * self.rho * self.Ap * self.Ct )**(1/2)
+
+        return nom/dnum
+
+    def conv_Ah(power, dt):
+        return 0
+
+    
+
+    
 
     
