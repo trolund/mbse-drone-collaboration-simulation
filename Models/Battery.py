@@ -13,7 +13,7 @@ class Battery:
                  Cd: float = 1, # Drag coefficient
                  Ct: float = 0.03, # Thrust coefficient
                  Ap: float = 0.5, # Propeller disc area [m^3]
-                 p: float = 0.05 # Propeller radius [m]
+                 r: float = 0.05 # Propeller radius [m]
                  ):
         self.md = md
         self.mp = mp
@@ -22,7 +22,7 @@ class Battery:
         self.Cd = Cd
         self.Ct = Ct
         self.Ap = Ap
-        self.p = p
+        self.r = r
         
     def set_package(mass, Apf, Atf):
         self.mp = mass
@@ -49,10 +49,24 @@ class Battery:
 
         return nom/denum
 
-    def power(ang_freq: float):
+    def conv_Ah(power, dt):
+        return 0
+
+    def get_power(ang_freq: float):
         return 2.258 * 10^(-7) * ang_freq^3 + \
             3.866 * 10^(-5) * ang_freq^2 + \
             5.137 * 10^(-3) * ang_freq + \
             2.616
+
+    def get_move_EP(dt, vv = 0, vh = 0):
+        ang_freq_h = rot_horizontal(vh)
+        ang_freq_v = rot_vertical(vv)
+
+        Ph = get_power(ang_freq_h)
+        Pv = get_power(ang_freq_v)
+        P = Ph + Pv
+        E = P / dt
+
+        return (E, P)
 
     
