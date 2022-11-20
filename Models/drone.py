@@ -146,7 +146,8 @@ class Drone(Drawable, BaseMediator):
 
         self.rect.x = a.x
         self.rect.y = a.y
-        self.battery.update(dt, self.speed)
+        ep = self.battery.update(dt, self.speed)
+        self.logger.log(self.name + " has inst power: {:.2f}".format(ep[1]))
 
     def do_move(self, ax, ay, bx, by, dt):
         self.move(ax, ay, bx, by, dt)

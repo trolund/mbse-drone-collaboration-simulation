@@ -45,6 +45,8 @@ class Battery:
         ep = self.get_move_EP(dt, vv, vh)
         self.battery_energy += ep[0]
 
+        return ep
+
     def get_power(self, ang_freq: float):
         return 2.258 * 10**(-7) * ang_freq**3 + \
             3.866 * 10**(-5) * ang_freq**2 + \
