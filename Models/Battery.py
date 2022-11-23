@@ -9,6 +9,9 @@ class Battery:
     Apt: float = 0 # Payload cross-section, vert
 
     battery_energy = 0 # Energy spent
+    n_obs = 0 # How many observations have we seen?
+    CA_n = 0 # Commulative average power for observation n
+    
     
     def __init__(self,
                  md: float = 0.5, # Mass [kg], drone
@@ -34,7 +37,6 @@ class Battery:
         self.mp = mass
         self.Apf = Apf
         self.Apf = Apt
-        print("Got package")
 
     # Detach package from drone
     # Set package parameters to 0
@@ -42,12 +44,12 @@ class Battery:
         self.mp = 0
         self.Apf = 0
         self.Atf = 0
-        print("Dropped off package")
 
     def update(self, dt, vv = 0, vh = 0):
         ep = self.get_move_EP(dt, vv, vh)
         self.battery_energy += ep[0]
-
+        self.update_com_avg(ep[1])
+        
         return ep
 
     # Get power as function of rotor angular velocity
@@ -92,6 +94,10 @@ class Battery:
 
     def get_energy_consumed(self):
         return self.battery_energy
+
+    def update_com_avg(self, inst_power: float):
+        self.CA_n = (inst_power + self.n_obs * self.CA_n) /\
+            (self.n_obs + 1)
 
     
 
