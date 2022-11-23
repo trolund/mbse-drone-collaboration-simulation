@@ -191,6 +191,8 @@ class Simulation(object):
             self.ui.handle_events(event)
 
         if self.done:
+            for d in self.drones_ref:
+                d.log_power()
             msg = f"Simulation finished at time:{self.timer.get_time_log()}"
             if msg != "":
                 self.logger.log(msg,False)

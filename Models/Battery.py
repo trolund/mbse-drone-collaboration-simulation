@@ -95,10 +95,16 @@ class Battery:
     def get_energy_consumed(self):
         return self.battery_energy
 
+    # Update cumulative average of the instantatious
+    # power of the drone
     def update_com_avg(self, inst_power: float):
+        #print("Inst power: {:.2f}".format(inst_power))
         self.CA_n = (inst_power + self.n_obs * self.CA_n) /\
             (self.n_obs + 1)
+        self.n_obs = self.n_obs + 1
 
+    def get_battery_stats(self):
+        return (self.CA_n, self.battery_energy)
     
 
     
