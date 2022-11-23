@@ -86,7 +86,8 @@ class Drone(Drawable, BaseMediator):
 
         self.attachment = task
         self.attachment.set_taken()
-        self.battery.set_package(0.5, 0.25, 0.25)
+        self.battery.set_package(self.attachment.get_lift_requirement(),
+                                 0.25, 0.25)
 
     ######
     def drop(self):
@@ -146,8 +147,9 @@ class Drone(Drawable, BaseMediator):
 
         self.rect.x = a.x
         self.rect.y = a.y
-        ep = self.battery.update(dt, self.speed)
-        self.logger.log(self.name + " has inst power: {:.2f}".format(ep[1]))
+        
+        ep = self.battery.update(dt, self.speed/100)
+        #self.logger.log(self.name + " has inst power: {:.2f}".format(ep[1]))
 
     def do_move(self, ax, ay, bx, by, dt):
         self.move(ax, ay, bx, by, dt)
