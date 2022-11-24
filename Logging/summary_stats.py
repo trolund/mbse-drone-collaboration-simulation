@@ -181,15 +181,15 @@ def make_summary_file(file):
     msg1 = no_packages
     msg2 = format_number(time,2)
     msg3 = format_number(speed,2)
-    msg4 = dist
+    #msg4 = dist
     msg41 = sum(dist)
-    msg5 = time_per_drone(dist,speed)
+    #msg5 = time_per_drone(dist,speed)
     msg6 = time_per_package(file,time)
     msg7 = avg_package_per_drone(no_packages,number_of_drones)
     msg8 = format_number(Average(dist),2)
     msg9 = energy
     msg10 = power
-    messages = [file,msg,msg1,msg2,msg3,msg4,msg41,msg5,msg6,msg7,msg8, msg9, msg10]
+    messages = [msg,msg1,msg2,msg3,msg41,msg6,msg7,msg8, msg9, msg10]
     return messages
     #write_to_csv(headers,messages,file.split(".")[0])
 
