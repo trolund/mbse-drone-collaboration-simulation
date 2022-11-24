@@ -163,6 +163,7 @@ def make_summary_file(file):
     messages = [file,msg,msg1,msg2,msg3,msg4,msg41,msg5,msg6,msg7,msg8]
     return messages
     #write_to_csv(headers,messages,file.split(".")[0])
+
 def Average(lst):
     return sum(lst) / len(lst)
 
@@ -187,30 +188,32 @@ def main():
 
     for file in files:
         summary = make_summary_file(file)
-        no_drones = summary[1]
-        no_packages = summary[2]
-        total_time.append(summary[3])
-        avg_speed.append(summary[4])
+        write_to_csv(summary,Filename)   
+ 
+        #no_drones = summary[1]
+        #no_packages = summary[2]
+        #total_time.append(summary[3])
+        #avg_speed.append(summary[4])
         #dist_drone.append(summary[5])
-        dist_tot.append(summary[6])
+        #dist_tot.append(summary[6])
         #working_time.append(summary[7])
-        avg_time_pack.append(summary[8])
-        avg_pack_drone.append(summary[9])
-        avg_dist_travelled.append(summary[10])
+        #avg_time_pack.append(summary[8])
+        #avg_pack_drone.append(summary[9])
+        #avg_dist_travelled.append(summary[10])
 
-    total_time = list(map(float, total_time))
-    avg_speed = list(map(float, avg_speed))
-    #dist_drone = list(map(float, dist_drone))
-    dist_tot = list(map(float, dist_tot))
-    #working_time = list(map(float, working_time))
-    avg_time_pack = list(map(float, avg_time_pack))
-    avg_pack_drone = list(map(float, avg_pack_drone))
-    avg_dist_travelled = list(map(float, avg_dist_travelled))
+    #total_time = list(map(float, total_time))
+    #avg_speed = list(map(float, avg_speed))
+    ##dist_drone = list(map(float, dist_drone))
+    #dist_tot = list(map(float, dist_tot))
+    ##working_time = list(map(float, working_time))
+    #avg_time_pack = list(map(float, avg_time_pack))
+    #avg_pack_drone = list(map(float, avg_pack_drone))
+    #avg_dist_travelled = list(map(float, avg_dist_travelled))
 
-    averages = [no_drones,no_packages,round(mean(total_time),2),round(mean(avg_speed),2),round(mean(dist_tot),2),round(mean(avg_time_pack),2),round(mean(avg_pack_drone),2),round(mean(avg_dist_travelled),2)]   
+    #averages = [no_drones,no_packages,round(mean(total_time),2),round(mean(avg_speed),2),round(mean(dist_tot),2),round(mean(avg_time_pack),2),round(mean(avg_pack_drone),2),round(mean(avg_dist_travelled),2)]   
 
-    print(averages)
-    write_to_csv(averages,Filename)
+    #print(averages)
+    #write_to_csv(averages,Filename)
 
 
 
