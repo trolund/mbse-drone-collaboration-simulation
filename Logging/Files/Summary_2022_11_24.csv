@@ -1,2 +1,32 @@
 No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
 5,20,69.83,195.22,60888.41,3.49,4.0,12177.68
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+logfile_2022_11_24-09_55_34.log,5,20,69.83,195.22,"[13632.84, 12272.72, 12589.61, 12029.75, 10363.49]",60888.409999999996,"['69.83', '62.87', '64.49', '61.62', '53.09']",3.49,4.00,12177.68,"5226213.39
+,4578628.54
+,4875791.23
+,4269149.09
+,3846749.20
+,","83.55
+,81.70
+,84.34
+,78.32
+,80.95
+,"
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+logfile_2022_11_24-09_55_34.log,5,20,69.83,195.22,"[13632.84, 12272.72, 12589.61, 12029.75, 10363.49]",60888.409999999996,"['69.83', '62.87', '64.49', '61.62', '53.09']",3.49,4.00,12177.68,"5226213.39
+,4578628.54
+,4875791.23
+,4269149.09
+,3846749.20
+,","83.55
+,81.70
+,84.34
+,78.32
+,80.95
+,"
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+logfile_2022_11_24-09_55_34.log,5,20,69.83,195.22,"[13632.84, 12272.72, 12589.61, 12029.75, 10363.49]",60888.409999999996,"['69.83', '62.87', '64.49', '61.62', '53.09']",3.49,4.00,12177.68,"5226213.39,4578628.54,4875791.23,4269149.09,3846749.20,","83.55,81.70,84.34,78.32,80.95,"
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+No_drones,No_packages,Total_time,Avg_speed,Dist_tot,Avg_time_package,Avg_packages_drone,Avg_dist_traveled,Energy_consumption,Avg_power
+logfile_2022_11_24-09_55_34.log,5,20,69.83,195.22,"[13632.84, 12272.72, 12589.61, 12029.75, 10363.49]",60888.409999999996,"['69.83', '62.87', '64.49', '61.62', '53.09']",3.49,4.00,12177.68,"83.55,81.70,84.34,78.32,80.95","5226213.39,4578628.54,4875791.23,4269149.09,3846749.20"

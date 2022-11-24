@@ -160,7 +160,9 @@ def get_battery_info(filename):
                 energy += str(info[3])+","
         except IndexError:
             continue
-    return battery_info, energy
+        new_b = battery_info.replace("\n","")
+        new_e = energy.replace("\n","")
+    return new_e[:-1:], new_b[:-1:]
 
 
     
@@ -216,7 +218,7 @@ def main():
     for file in files:
         summary = make_summary_file(file)
         write_to_csv(summary,Filename)   
- 
+        print(summary)
         #no_drones = summary[1]
         #no_packages = summary[2]
         #total_time.append(summary[3])
