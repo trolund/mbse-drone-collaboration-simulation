@@ -141,6 +141,31 @@ def write_to_csv(data, filename):
         writer = csv.writer(f)
         writer.writerow(data)
 
+def get_battery_info(filename):
+    filepos = "./Logging/Files/"+filename
+    battery_info = ""
+    energy = ""
+    with open(filepos) as f:
+        f = f.readlines()
+    for line in f:
+
+        parts = line.split(";")
+        #print(parts[1])
+        info = parts[1].split(" ")
+        #print(info)
+        try:
+            if info[2] == "power[W]:":
+                battery_info += str(info[3])+","
+            if info[2] == "consumption[J]:":
+                energy += str(info[3])+","
+        except IndexError:
+            continue
+    return battery_info, energy
+
+
+    
+
+
 def make_summary_file(file):
     list = readLog(file)
     dist = distances(list,get_drones(file))
@@ -148,7 +173,7 @@ def make_summary_file(file):
     number_of_drones = get_drones(file)
     time = get_time(file)
     speed = get_speed(time, float(max(dist)))
-    
+    power, energy = get_battery_info(file)
     #date = datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
     msg = number_of_drones
     msg1 = no_packages
@@ -160,7 +185,9 @@ def make_summary_file(file):
     msg6 = time_per_package(file,time)
     msg7 = avg_package_per_drone(no_packages,number_of_drones)
     msg8 = format_number(Average(dist),2)
-    messages = [file,msg,msg1,msg2,msg3,msg4,msg41,msg5,msg6,msg7,msg8]
+    msg9 = energy
+    msg10 = power
+    messages = [file,msg,msg1,msg2,msg3,msg4,msg41,msg5,msg6,msg7,msg8, msg9, msg10]
     return messages
     #write_to_csv(headers,messages,file.split(".")[0])
 def Average(lst):
@@ -169,7 +196,7 @@ def Average(lst):
 
 def main():
     files = get_files("20211110","20231111")
-    headers = ["No_drones","No_packages","Total_time","Avg_speed","Dist_tot","Avg_time_package","Avg_packages_drone","Avg_dist_traveled"]
+    headers = ["No_drones","No_packages","Total_time","Avg_speed","Dist_tot","Avg_time_package","Avg_packages_drone","Avg_dist_traveled", "Energy_consumption","Avg_power"]
     # removed the arrays dist_drone and working_time_drones
 
     date = datetime.datetime.now().strftime("%Y_%m_%d")
@@ -218,4 +245,4 @@ def main():
 if __name__ == "__main__":
    # setup dependency injection
    main()
-   
+   #get_battery_info("logfile_2022_11_24-09_44_01.log")

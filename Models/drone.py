@@ -219,5 +219,5 @@ class Drone(Drawable, BaseMediator):
 
     def log_power(self):
         stat = self.battery.get_battery_stats()
-        self.logger.log(self.name + "average power[W]:{:.2f} W".format(stat[0]))
-        self.logger.log(self.name + "energy consumption[J]:{:.2f}".format(stat[1]))
+        self.logger.log(self.name + " average power[W]: {:.2f}".format(stat[0]))
+        self.logger.log(self.name + " energy consumption[J]: {:.2f}".format(stat[1]))
