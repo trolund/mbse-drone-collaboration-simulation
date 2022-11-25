@@ -41,7 +41,7 @@ class Simulation(object):
         self.settings = Settings(config)
         logger.log("World Size:" + str(self.settings.world_size), show_in_ui=False)
         
-        logger.log("Customer density:" + str(self.settings.customer_density), show_in_ui=False)
+        logger.log("Customer density: " + str(self.settings.customer_density), show_in_ui=False)
         
         logger.log("Config loaded ", show_in_ui=False)
         self.logger = logger
@@ -264,7 +264,6 @@ class Simulation(object):
                           grid_to_pos(truck_pos[0], truck_pos[1], self.step_size))
         self.create_tasks(self.env, delivery_spots, self.settings.number_of_tasks)
         self.create_drones(self.env, self.step_size, self.settings.number_of_drones)
-
         if not self.settings.moving_truck:
             self.task_manager.sort()
         else:

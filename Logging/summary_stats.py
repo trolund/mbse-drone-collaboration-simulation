@@ -166,6 +166,24 @@ def get_battery_info(filename):
 
 
     
+def customer_density(filename):
+    filepos = "./Logging/Files/"+filename
+    with open(filepos) as f:
+        f = f.readlines()
+    for line in f:
+        #print(line)
+        parts = line.split(";")
+        #print(parts[1])
+        info = parts[1].split(" ")
+        #print(info)
+        #print(info)
+        try:
+            if info[0] == "Customer":
+                density = parts[1].split(":")
+                return density[1].replace("\n","")
+
+        except IndexError:
+            continue
 
 
 def make_summary_file(file):
@@ -249,5 +267,6 @@ def main():
 
 if __name__ == "__main__":
    # setup dependency injection
-   main()
-   #get_battery_info("logfile_2022_11_24-09_44_01.log")
+   #main()
+   test = customer_density("logfile_2022_11_24-10_48_08.log")
+   print(test)
