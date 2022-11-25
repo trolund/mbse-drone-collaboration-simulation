@@ -2,17 +2,49 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
+*Before running the project please install the Dependencies and look at the config section*
+
 ## Dependencies 
 
 To run the project please install the following packages by using pip or pip3:
 
-    pip3 install pygame pygame_gui dependency_injector
+    pip3 install pygame==2.1.3.dev8 pygame_gui dependency_injector configparser scikit-learn sklearn numpy pandas matplotlib pandas
 
 ## Config 
 
-The main config file **config.ini** contains all the global parameters. the file is group by sections '[section]'
+The main config file **config.ini** contains all the global parameters. the file is grouped by sections '[section]'.
+
+### graphics [section]
 
 * scale - the scale the simulation starts at.
+* fullscreen (1 = fullscreen, 0 = window)
+* window_h (height in px of window)
+* window_w (width in px of window)
+
+### setup [section]
+
+#### Simulation environment parameters
+* world_size
+* ground_size
+* road_size=1
+* customer_density
+
+    Be aware that unsupported configs does exist. If the simulator can not make a meaningful environment it will simply close right after it starts.
+
+Please look at the section [Neighborhood (env) structure](#neighborhood-env-structure) to understand the parameters.
+
+#### Simulation parameters 
+
+* number_of_tasks=50 (value from 0-1000, number of packages that is in the truck)
+* number_of_drones=10 (value from 0-1000, The number of drones there should be simulated)
+* simulation_speed=200 (1-500) (1 = realtime speed, 500 = as fast as the computer can go.)
+* auto_close_window=1 (1 or 0, if 1 the window will close when the simulation is done.)
+* drone_speed = 200 (value from 50-500)
+* truck_speed = 150 (value from 50-500)
+* customer_density=0.5 (the possibility of a house owner in the neighborhood to be a customer awaiting a package)
+* truck_stop_density=0.05 (the percentage of the travel distance that the truck should consider as a stop pos)
+* min_package_weight=200 (the minimum weight of the generated packages)
+* max_package_weight=2000 (the maximum weight of the generated packages)
 
 Options for a truck: 
 * moving_truck = 1 -> the truck moves
@@ -33,7 +65,6 @@ Creates the 2D representation of a neighborhood
 * Delivery spot: "S"
 * Truck: "T"
 
-  
 For instance will the input (world_size=15, ground_size=5, road_size=1, customer_density=0.5) result in the neighborhood
 below. This representation is called a layout in the code. **Please change the parameters in the main config file**.
 
@@ -64,7 +95,6 @@ Applying the path-finder to the layout above gives following route.
 
 * Start point = (0,0)
 * End point = (len(layout) - 1, len(layout) - 1))
-
 
     planner = PatchFinder()
 
