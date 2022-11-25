@@ -41,7 +41,7 @@ class Simulation(object):
         self.settings = Settings(config)
         logger.log("World Size:" + str(self.settings.world_size), show_in_ui=False)
         
-        logger.log("Customer density: " + str(self.settings.customer_density), show_in_ui=False)
+        logger.log("Costumer density:" + str(self.settings.customer_density), show_in_ui=False)
         
         logger.log("Config loaded ", show_in_ui=False)
         self.logger = logger
