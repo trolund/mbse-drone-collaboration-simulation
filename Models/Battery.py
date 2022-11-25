@@ -16,11 +16,11 @@ class Battery:
     def __init__(self,
                  md: float = 0.5, # Mass [kg], drone
                  mp: float = 0, # Mass [kg], payload
-                 Af: float = 0.5, # Cross-section [m^2], horizontal
-                 At: float = 0.1, # Cross-section [m^2], vertical
+                 Af: float = 0.4, # Cross-section [m^2], horizontal
+                 At: float = 0.2, # Cross-section [m^2], vertical
                  Cd: float = 1, # Drag coefficient
                  Ct: float = 0.02, # Thrust coefficient
-                 r: float = 0.6 # Propeller radius [m]
+                 r: float = 0.25 # Propeller radius [m]
                  ):
         self.md = md
         self.mp = mp
@@ -34,7 +34,7 @@ class Battery:
     # Attach package to drone
     # Update package parameters
     def set_package(self, mass, Apf, Apt):
-        self.mp = mass
+        self.mp = mass / 1000 # Convert to kg
         self.Apf = Apf
         self.Apf = Apt
 
@@ -68,8 +68,12 @@ class Battery:
         Ph = self.get_power(ang_freq_h)
         Pv = self.get_power(ang_freq_v)
         P = Ph + Pv
-        E = P / dt
-
+        E = P * dt
+        
+        #print("P: {:.2f}".format(P))
+        #print("E: {:.2f}".format(E))
+        #print("dt: {:.2f}".format(dt))
+        
         return (E, P)
 
     # Calculate angular velocity for horizontal travel at vh m/s
@@ -101,10 +105,11 @@ class Battery:
         #print("Inst power: {:.2f}".format(inst_power))
         self.CA_n = (inst_power + self.n_obs * self.CA_n) /\
             (self.n_obs + 1)
+        
         self.n_obs = self.n_obs + 1
 
     def get_battery_stats(self):
-        return (self.CA_n, self.battery_energy)
+        return (self.CA_n, self.battery_energy, self.n_obs)
     
 
     
