@@ -197,7 +197,10 @@ class Simulation(object):
             if msg != "":
                 self.logger.log(msg,False)
             if self.settings.auto_close_window:
-                pygame.quit() #THIS DETERMINES IF THE SIMULATION WINDOW WILL CLOSE AUTOMATICALLY WHEN THE SIMULATION IS OVER
+                self.gl.is_running = False
+                pygame.display.quit()
+                pygame.quit()  # THIS DETERMINES IF THE SIMULATION WINDOW WILL CLOSE AUTOMATICALLY WHEN THE SIMULATION IS OVER
+                exit(0)
             msg = ""
     
         
