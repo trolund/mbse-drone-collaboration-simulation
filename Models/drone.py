@@ -148,7 +148,7 @@ class Drone(Drawable, BaseMediator):
         self.rect.x = a.x
         self.rect.y = a.y
         
-        ep = self.battery.update(dt, self.speed/100)
+        ep = self.battery.update(dt, self.speed/14)
         #self.logger.log(self.name + " has inst power: {:.2f}".format(ep[1]))
 
     def do_move(self, ax, ay, bx, by, dt):
@@ -223,3 +223,6 @@ class Drone(Drawable, BaseMediator):
                         " average power: {:.2f} W".format(stat[0]))
         self.logger.log(self.name + \
                         " energy consumption: {:.2f} J".format(stat[1]))
+        self.logger.log(self.name + \
+                        " has done {:d} move ops in total.".format(stat[2]))
+        
