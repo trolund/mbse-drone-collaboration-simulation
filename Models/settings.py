@@ -16,7 +16,7 @@ class Settings:
         self.truck_pos = None
         self.simulation_speed = int(config["setup"]["simulation_speed"])
         self.auto_close_window = False if config["setup"]["auto_close_window"] == "0" else True
-        self.seed = None
+        self.seed = 1
 
         # screen
         self.scale = float(config["graphics"]["scale"])

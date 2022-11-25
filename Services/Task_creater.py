@@ -10,7 +10,7 @@ def get_random_address(possible_addresses):
 
 
 def create_packages(amount_of_packages, max_weight):
-    min_weight = 100
+    min_weight = 200
     packages = []
 
     for i in range(amount_of_packages):
@@ -30,7 +30,7 @@ def create_random_tasks(possible_addresses, number_of_tasks, load_img=True):
 
     for i in range(number_of_tasks):
         point = get_random_address(possible_addresses)
-        packages = create_packages(1, 2200)
+        packages = create_packages(1, 200)
         t = Task(point, packages, load_img=load_img)
         tasks.append(t)
 
