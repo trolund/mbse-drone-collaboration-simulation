@@ -8,6 +8,7 @@ import glob
 from Logging.summary_stats import get_summary_stats
 import numpy as np
 import contextlib
+import pandas as pd
 
 from pathlib import Path
 import json
@@ -40,7 +41,10 @@ def run_simulation():
     while True:
         return_code = process.poll()
         if return_code is not None:
-            return
+            if return_code == 0:
+                return
+            else:
+                raise RuntimeError()
 
 
 def get_run_log_folder(name):
@@ -57,6 +61,11 @@ def create_run(name, parameters, skip_completed=True):
         outfile.write(json_object)
 
     step_idxes = [0] * len(parameters)
+    param_values = []
+    param_names = []
+    for param_idx in range(len(parameters)):
+        param_names.append(parameters[param_idx][0])
+
     combinations = reduce(
         lambda x, y: x*y, list(map(lambda param: len(param[1]), parameters)))
 
@@ -66,17 +75,23 @@ def create_run(name, parameters, skip_completed=True):
 
     for i in range(combinations):
         log_destination = Path(run_log_folder, str(i) + '.log')
+        param_values.append([])
 
-        if not log_destination.is_file():
-            print(f'Running simulation {i + 1}/{combinations}')
-            for param_idx in range(len(parameters)):
-                param_name, param_range = parameters[param_idx][0], parameters[param_idx][1]
-                param_val = param_range[step_idxes[param_idx]]
+        should_run_this_run = not log_destination.is_file() or not skip_completed
 
+        for param_idx in range(len(parameters)):
+            param_name, param_range = parameters[param_idx][0], parameters[param_idx][1]
+            param_val = param_range[step_idxes[param_idx]]
+            param_values[i].append(param_val)
+
+            if should_run_this_run:
                 config.set('setup', param_name, param_val)
-                with open(config_path, 'w') as configfile:
-                    config.write(configfile)
 
+        if should_run_this_run:
+            with open(config_path, 'w') as configfile:
+                config.write(configfile)
+
+            print(f'Running simulation {i + 1}/{combinations}')
             run_simulation()
 
             list_of_logs = glob.glob(str(logging_folder) + '/*.log')
@@ -92,20 +107,44 @@ def create_run(name, parameters, skip_completed=True):
                 step_idx(idx + 1)
         step_idx(0)
 
+    return {
+        'names': param_names,
+        'values': param_values
+    }
+
 
 if __name__ == "__main__":
     name = 'droneDistance_nrDrones_customerDensity'
-    create_run(name, [
+    parameter_combinations = create_run(name, [
         ('number_of_drones', list(range(1, 51, 1))),
         ('customer_density',  list(np.linspace(0.1, 1, 9, endpoint=False))),
         ('moving_truck',  [0, 1])
     ])
     shutil.move(config_backup_path, config_path)
 
+    parameter_df = pd.DataFrame(columns=parameter_combinations['names'],
+                                data=parameter_combinations['values'])
+
+    # create the summary stats
     files = glob.glob(str(Path(get_run_log_folder(name), '*')))
+    files.sort(key=lambda i: int(os.path.splitext(os.path.basename(i))[0]))
     summery_stats_path = Path(simulation_batcher_data_path, name + '.csv')
     with contextlib.suppress(FileNotFoundError):
         os.remove(summery_stats_path)
     get_summary_stats(files, summery_stats_path)
+    # add parameters to file
+    summary_stats_df = pd.read_csv(summery_stats_path)
+    summary_stats_complete_df = pd.concat(
+        [parameter_df, summary_stats_df], axis=1)
+    summary_stats_complete_df.to_csv(summery_stats_path, index=False)
 
     # os.system('shutdown /s /t 1')
+
+
+################  Generate droneDistance_nrDrones_customerDensity ###########
+# name = 'droneDistance_nrDrones_customerDensity'
+# create_run(name, [
+#     ('number_of_drones', list(range(1, 51, 1))),
+#     ('customer_density',  list(np.linspace(0.1, 1, 9, endpoint=False))),
+#     ('moving_truck',  [0, 1])
+# ])
