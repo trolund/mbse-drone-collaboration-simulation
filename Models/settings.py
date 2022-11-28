@@ -26,7 +26,4 @@ class Settings:
         self.is_fullscreen = False if config["graphics"]["fullscreen"] == "0" else True
         self.width = float(config["graphics"]["window_w"])
         self.height = float(config["graphics"]["window_h"])
-
-
-
-
+        self.headless = bool(int(config["graphics"]["headless"]))
