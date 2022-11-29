@@ -147,26 +147,22 @@ def write_to_csv(data, file_path):
 
 
 def get_battery_info(file_path):
-    battery_info = ""
-    energy = ""
+    total_power_consumption_watts = 0.0
+    total_energy_consumption_joules = 0.0
     with open(file_path) as f:
         f = f.readlines()
     for line in f:
 
         parts = line.split(";")
-        # print(parts[1])
         info = parts[1].split(" ")
-        # print(info)
         try:
-            if info[2] == "power[W]:":
-                battery_info += str(info[3])+","
-            if info[2] == "consumption[J]:":
-                energy += str(info[3])+","
+            if info[2] == "power:":
+                total_power_consumption_watts += float(info[3])
+            if info[2] == "consumption:":
+                total_energy_consumption_joules += float(info[3])
         except IndexError:
             continue
-        new_b = battery_info.replace("\n", "")
-        new_e = energy.replace("\n", "")
-    return new_e[:-1:], new_b[:-1:]
+    return total_power_consumption_watts, total_energy_consumption_joules
 
 
 def customer_density(file_path):
@@ -179,6 +175,7 @@ def customer_density(file_path):
         info = parts[1].split(" ")
         # print(info)
         # print(info)
+
         try:
             if info[0] == "Costumer":
                 density = parts[1].split(":")
@@ -195,7 +192,8 @@ def make_summary_file(file_path):
     number_of_drones = get_drones(file_path)
     time = get_time(file_path)
     speed = get_speed(time, float(max(dist)))
-    power, energy = get_battery_info(file_path)
+    total_power_consumption_watts, total_power_consumption_watts = get_battery_info(
+        file_path)
     #date = datetime.datetime.now().strftime("%Y.%m.%d-%H:%M:%S")
     no_drones = number_of_drones
     no_package = no_packages
@@ -207,8 +205,8 @@ def make_summary_file(file_path):
     avg_time_package = time_per_package(file_path, time)
     avg_package_drones = avg_package_per_drone(no_packages, number_of_drones)
     avg_dist = format_number(Average(dist), 2)
-    energy_cons = energy
-    power_cons = power
+    energy_cons = total_power_consumption_watts / number_of_drones
+    power_cons = total_power_consumption_watts / number_of_drones
     costumer_density = customer_density(file_path)
     messages = [no_drones, no_package, time_tot, avg_speed, dist_tot, avg_time_package,
                 avg_package_drones, avg_dist, energy_cons, power_cons, costumer_density]
@@ -222,7 +220,7 @@ def Average(lst):
 
 def get_summary_stats(file_paths, file_path):
     headers = ["No_drones", "No_packages", "Total_time", "Avg_speed", "Dist_tot", "Avg_time_package",
-               "Avg_packages_drone", "Avg_dist_traveled", "Energy_consumption", "Avg_power", "Costmer_density"]
+               "Avg_packages_drone", "Avg_dist_traveled", "Avg_Energy_consumption", "Avg_power", "Costmer_density"]
     # removed the arrays dist_drone and working_time_drones
 
     write_to_csv(headers, file_path)

@@ -35,16 +35,24 @@ if not config_backup_path.is_file():
 
 
 def run_simulation():
-    process = subprocess.Popen(['python', 'simulation.py'],
-                               stdout=subprocess.PIPE,
-                               universal_newlines=True)
-    while True:
-        return_code = process.poll()
-        if return_code is not None:
-            if return_code == 0:
-                return
-            else:
-                raise RuntimeError()
+    with subprocess.Popen(['python', 'simulation.py'], stdout=subprocess.PIPE, bufsize=1, universal_newlines=True) as process:
+        for line in process.stdout:
+            print(line, end='')  # process line here
+
+    if process.returncode != 0:
+        raise subprocess.CalledProcessError(process.returncode, process.args)
+
+    # process = subprocess.Popen(['python', 'simulation.py'],
+    #                            stdout=subprocess.PIPE,
+    #                            universal_newlines=True)
+    # while True:
+    #     return_code = process.poll()
+    #     process.
+    #     if return_code is not None:
+    #         if return_code == 0:
+    #             return
+    #         else:
+    #             raise RuntimeError()
 
 
 def get_run_log_folder(name):
@@ -114,11 +122,10 @@ def create_run(name, parameters, skip_completed=True):
 
 
 if __name__ == "__main__":
-    name = 'droneDistance_nrDrones_customerDensity'
+    name = 'avgEnergyPrDrone_packageWeight_nrDrones'
     parameter_combinations = create_run(name, [
-        ('number_of_drones', list(range(1, 51, 1))),
-        ('customer_density',  list(np.linspace(0.1, 1, 9, endpoint=False))),
-        ('moving_truck',  [0, 1])
+        ('number_of_drones', list(range(1, 21, 1))),
+        ('fixed_package_weight',  list(range(100, 25100, 300)))
     ])
     shutil.move(config_backup_path, config_path)
 
@@ -138,7 +145,7 @@ if __name__ == "__main__":
         [parameter_df, summary_stats_df], axis=1)
     summary_stats_complete_df.to_csv(summery_stats_path, index=False)
 
-    # os.system('shutdown /s /t 1')
+    os.system('shutdown /s /t 1')
 
 
 ################  Generate droneDistance_nrDrones_customerDensity ###########

@@ -84,8 +84,8 @@ class Simulation(object):
 
     def create_tasks(self, env: Env, possible_addresses, number_of_tasks):
 
-        tasks = create_random_tasks(possible_addresses, number_of_tasks, int(
-            self.config["setup"]["min_package_weight"]), int(self.config["setup"]["max_package_weight"]))
+        tasks = create_random_tasks(possible_addresses, number_of_tasks,
+                                    self.settings.min_package_weight, self.settings.max_package_weight)
 
         for idx, t in enumerate(tasks):
             # start at truck

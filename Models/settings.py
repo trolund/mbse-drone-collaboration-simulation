@@ -18,8 +18,16 @@ class Settings:
         self.auto_close_window = False if config["setup"]["auto_close_window"] == "0" else True
         self.seed = 1
 
-        self.max_package_weight = int(config["setup"]["max_package_weight"])
-        self.min_package_weight = int(config["setup"]["min_package_weight"])
+        fixed_package_weight = int(config["setup"]["fixed_package_weight"])
+        if fixed_package_weight:
+            print('yes fixed package weight')
+            self.max_package_weight = fixed_package_weight
+            self.min_package_weight = fixed_package_weight
+        else:
+            self.max_package_weight = int(
+                config["setup"]["max_package_weight"])
+            self.min_package_weight = int(
+                config["setup"]["min_package_weight"])
 
         # screen
         self.scale = float(config["graphics"]["scale"])
