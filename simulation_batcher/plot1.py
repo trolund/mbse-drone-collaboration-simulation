@@ -24,8 +24,13 @@ moving_truck_df = df.loc[df['moving_truck'] == 1].reset_index(drop=True)
 
 truck_based_df = stationary_truck_df.join(
     moving_truck_df['Avg_dist_traveled'], rsuffix='moving').drop('moving_truck', axis=1)
-truck_based_df['percentage_increase'] = ((moving_truck_df['Avg_dist_traveled'] /
-                                         stationary_truck_df['Avg_dist_traveled']) - 1)*100
+# truck_based_df['percentage_increase'] = ((moving_truck_df['Avg_dist_traveled'] /
+#                                          stationary_truck_df['Avg_dist_traveled']) - 1)*100
+truck_based_df['percentage_increase'] = (1-(moving_truck_df['Avg_dist_traveled'] /
+                                         stationary_truck_df['Avg_dist_traveled']))*100
+# truck_based_df['percentage_increase'] = ((moving_truck_df['Avg_dist_traveled'] /
+#                                          stationary_truck_df['Avg_dist_traveled']))*100
+
 
 id_list = truck_based_df['customer_density'].unique()
 

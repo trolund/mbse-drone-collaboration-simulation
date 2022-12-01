@@ -7,6 +7,17 @@ from Models.package import Package
 from Models.drawable import Drawable
 
 
+SCALED_IMAGE = None
+
+
+def get_scaled_image(size):
+    global SCALED_IMAGE
+    if SCALED_IMAGE is None:
+        SCALED_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join(
+            'Assets', 'task.png')).convert_alpha(), (size * 100, size * 100))
+    return SCALED_IMAGE
+
+
 class Task(Drawable):
     packages: List[Package] = []
     number_of_attachment_points: int
@@ -28,10 +39,7 @@ class Task(Drawable):
         self.images = []
 
         if load_img:
-            img = pygame.image.load(os.path.join('Assets', 'task.png')).convert_alpha()
-            img = pygame.transform.scale(img, (self.size * 100, self.size * 100))
-
-            self.images.append(img)
+            self.images.append(get_scaled_image(self.size))
             self.image = self.images[0]
             self.rect = self.image.get_rect()
 
@@ -43,7 +51,7 @@ class Task(Drawable):
 
     def is_taken(self):
         return self.taken
-    
+
     def get_address(self):
         return self.address
 

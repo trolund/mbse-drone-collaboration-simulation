@@ -18,6 +18,7 @@ from containers import Container
 from Models.drawable import Drawable
 from Models.Battery import Battery
 
+
 def get_cor(move: Move):
     return move[0][0], move[0][1]
 
@@ -28,6 +29,17 @@ def get_move_type(move: Move):
 
 def get_move_obj(move: Move):
     return move[2]
+
+
+SCALED_IMAGE = None
+
+
+def get_scaled_image(size):
+    global SCALED_IMAGE
+    if SCALED_IMAGE is None:
+        SCALED_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join(
+            'Assets', 'drone.png')).convert_alpha(), (size * 100, size * 100))
+    return SCALED_IMAGE
 
 
 class Drone(Drawable, BaseMediator):
@@ -68,9 +80,7 @@ class Drone(Drawable, BaseMediator):
         self.images = []
         msg = name + " initialized"
         self.logger.log(msg, False)
-        self.img = pygame.image.load(os.path.join('Assets', 'drone.png')).convert_alpha()
-        img = pygame.transform.scale(self.img, (self.size * 100, self.size * 100))
-        self.images.append(img)
+        self.images.append(get_scaled_image(self.size))
         self.image = self.images[0]
 
         self.rect = self.image.get_rect()
@@ -93,7 +103,8 @@ class Drone(Drawable, BaseMediator):
     def drop(self):
 
         if self.attachment is None:
-            raise Exception('you can not drop a package you dont have!!!! 😤📦', self.name, (self.rect.x, self.rect.y))
+            raise Exception('you can not drop a package you dont have!!!! 😤📦',
+                            self.name, (self.rect.x, self.rect.y))
 
         # delivered bool
         self.logger.log(f"{self.name} - DROP, {self.attachment}")
@@ -147,7 +158,7 @@ class Drone(Drawable, BaseMediator):
 
         self.rect.x = a.x
         self.rect.y = a.y
-        
+
         ep = self.battery.update(dt, self.speed/14)
         #self.logger.log(self.name + " has inst power: {:.2f}".format(ep[1]))
 
@@ -219,11 +230,9 @@ class Drone(Drawable, BaseMediator):
 
     def log_power(self):
         stat = self.battery.get_battery_stats()
-        self.logger.log(self.name + \
+        self.logger.log(self.name +
                         " average power: {:.2f} W".format(stat[0]))
-        self.logger.log(self.name + \
+        self.logger.log(self.name +
                         " energy consumption: {:.2f} J".format(stat[1]))
-        self.logger.log(self.name + \
+        self.logger.log(self.name +
                         " has done {:d} move ops in total.".format(stat[2]))
-        
-

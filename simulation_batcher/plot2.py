@@ -6,10 +6,6 @@ from matplotlib.pyplot import semilogx, loglog, subplots, scatter, figure, plot,
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-# plt.rcParams.update(plt.rcParamsDefault)
-# use LaTeX fonts in the plot
-# plt.rc('text', usetex=True)
-# plt.rc('font', family='serif')
 
 date = datetime.datetime.now().strftime("%Y_%m_%d")
 filename = Path('C:/Users/Jensm/OneDrive - Danmarks Tekniske Universitet/9. semester/02223 - Model-Based Systems Engineering/git/simulation_batcher/avgEnergyPrDrone_packageWeight_nrDrones.csv')
@@ -23,9 +19,14 @@ id_list = df['number_of_drones'].unique()
 fig, ax = plt.subplots()
 ax.legend(title='Number of drones')
 
-for i in id_list:
+plt.rcParams.update(plt.rcParamsDefault)
+# use LaTeX fonts in the plot
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
+for i in [1, 2, 3, 5, 7, 9, 12, 15, 18, 20]:
     ax = df.loc[(df['number_of_drones'] == i)].plot(
-        y='Avg_Energy_consumption', x='fixed_package_weight', ax=ax, label=i)
+        y='Avg_Energy_consumption', x='fixed_package_weight', ax=ax, label=i, xlim=[0, 25000], ylim=[0, 175000])
     plt.title(i, fontsize=18)  # Labeling titel
     plt.xlabel('Package weights [g]', fontsize=12)  # Labeling x-axis
     plt.ylabel('Average Energy consumption pr drone[J]',

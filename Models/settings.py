@@ -18,11 +18,13 @@ class Settings:
         self.auto_close_window = False if config["setup"]["auto_close_window"] == "0" else True
         self.seed = 1
 
-        if hasattr(config["setup"], 'fixed_package_weight'):
+        if 'fixed_package_weight' in config["setup"]:
             fixed_package_weight = int(config["setup"]["fixed_package_weight"])
+            print('setting the package weight to', fixed_package_weight)
             self.max_package_weight = fixed_package_weight
             self.min_package_weight = fixed_package_weight
         else:
+            print('no fixed package weight')
             self.max_package_weight = int(
                 config["setup"]["max_package_weight"])
             self.min_package_weight = int(

@@ -33,7 +33,8 @@ class TaskManager:
         return len(self.env_ref.task_ref)
 
     def get_head_package(self):
-        self.logger.log(f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
+        self.logger.log(
+            f"Packages left in queue: {len(self.env_ref.task_ref)}", show_in_ui=False)
 
         if self.config["setup"]["moving_truck"] == "0":
             return self.env_ref.task_ref.pop()
@@ -51,8 +52,9 @@ class TaskManager:
 
     def sort_tasks(self, tasks: List[Task]):
         grid_home = pos_to_grid_tuple(self.env_ref.home, self.step_size)
-        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(grid_home, x.address), reverse=True))
-        self.print_tasks(sorted_tasks)
+        sorted_tasks = deque(sorted(tasks, key=lambda x: distance_between(
+            grid_home, x.address), reverse=True))
+        # self.print_tasks(sorted_tasks)
         return sorted_tasks
 
     def print_tasks(self, tasks):
@@ -62,7 +64,7 @@ class TaskManager:
 
     def get_addr_of_tasks_left(self):
         tasks = self.env_ref.task_ref
-        
+
         addresses = []
         for t in tasks:
             addresses.append(t.get_address())
@@ -88,14 +90,11 @@ class TaskManager:
 
         self.delivery_clusters = pack_clusters
 
-        print("Clusters: ", self.delivery_clusters)
-        print("Tasks before sort")
-        self.print_tasks(self.env_ref.task_ref)
+        # self.print_tasks(self.env_ref.task_ref)
 
         self.sort_tasks_on_clusters(task_clusters, cluster_centers)
 
-        print("Tasks after sort")
-        self.print_tasks(self.env_ref.task_ref)
+        # self.print_tasks(self.env_ref.task_ref)
 
     def sort_tasks_on_clusters(self, task_clusters, cluster_centers):
 
@@ -104,16 +103,17 @@ class TaskManager:
         index = 0
         for i in task_clusters:
             # Sort the inner cluster based on the cluster center coordinates
-            sorted_cluster = deque(sorted(i, key=lambda x: distance_between(cluster_centers[index], x.address), reverse=False))
+            sorted_cluster = deque(sorted(i, key=lambda x: distance_between(
+                cluster_centers[index], x.address), reverse=False))
             for j in sorted_cluster:
                 tasks.append(j)
             index += 1
 
-        # tasks.reverse() 
+        # tasks.reverse()
         self.env_ref.task_ref = tasks
 
     # def sort_tasks_on_clusters(self):
-        
+
     #     tasks = self.env_ref.task_ref
     #     queue = []
 
@@ -192,7 +192,6 @@ class TaskManager:
 #     return queue
 
 
-
 # if __name__ == "__main__":
 #     possible_addresses = [[1,1],[2,2],[3,3],[4,4]]
 #     amount_of_packages = 3
@@ -200,7 +199,6 @@ class TaskManager:
 #     queue = queue_package(amount_of_packages,possible_addresses,max_weight)
 #     for i in queue:
 #         print(i)
-
 
 """Return the package with the smallest distance from home (truck) to the destination"""
 
