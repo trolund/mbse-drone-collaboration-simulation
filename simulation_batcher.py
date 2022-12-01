@@ -122,11 +122,13 @@ def create_run(name, parameters, skip_completed=True):
 
 
 if __name__ == "__main__":
-    name = 'avgEnergyPrDrone_packageWeight_nrDrones'
+    name = 'reproduce poster'
     parameter_combinations = create_run(name, [
-        ('number_of_drones', list(range(1, 21, 1))),
-        ('fixed_package_weight',  list(range(100, 25100, 300)))
+        ('number_of_drones', list(range(1, 11, 1))),
+        # ('customer_density',  list(np.linspace(0.1, 1, 9, endpoint=False))),
+        ('moving_truck',  [0, 1])
     ])
+
     shutil.move(config_backup_path, config_path)
 
     parameter_df = pd.DataFrame(columns=parameter_combinations['names'],
@@ -145,7 +147,7 @@ if __name__ == "__main__":
         [parameter_df, summary_stats_df], axis=1)
     summary_stats_complete_df.to_csv(summery_stats_path, index=False)
 
-    os.system('shutdown /s /t 1')
+    # os.system('shutdown /s /t 1')
 
 
 ################  Generate droneDistance_nrDrones_customerDensity ###########
