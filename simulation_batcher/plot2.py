@@ -22,10 +22,6 @@ fig, ax = plt.subplots()
 #ax.legend(title='Number of Drones')
 #plt.legend(loc='lower right')
 
-plt.rcParams.update(plt.rcParamsDefault)
-# use LaTeX fonts in the plot
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
 
 for i in [1, 2, 3, 5, 7, 9, 12, 15]:
     ax = df.loc[(df['number_of_drones'] == i)].plot(
