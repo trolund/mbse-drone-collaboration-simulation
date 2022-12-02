@@ -2,7 +2,13 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
+
+
+## running the simulator 
+
 *Before running the project please install the Dependencies and look at the config section*
+
+    python3 simulation.py 
 
 ## Dependencies 
 
@@ -52,7 +58,6 @@ Options for a truck:
 * moving_truck = 0 and random_position = 1 -> stationary truck with the random position
 
 # Definitions (Conventions of the project)
-
 
 ## ENV service (env_service.py) 
 
@@ -123,10 +128,6 @@ The route is marked with the character "M".
      R  .  .  .  .  R  .  .  .  .  R  .  .  .  .  M 
      R  R  R  R  R  R  R  R  R  R  R  R  R  R  R  M 
 
-# TODO list
-
-  * Make sure the Drones fly with a realistic speed that is based on size of the world.
-=======
 # Definitions 
 
 ## Neighborhood (env) structure
