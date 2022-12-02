@@ -37,6 +37,7 @@ if not config_backup_path.is_file():
 def run_simulation():
     with subprocess.Popen(['python', 'simulation.py'], stdout=subprocess.PIPE, bufsize=1, universal_newlines=True) as process:
         for line in process.stdout:
+            process.stdout.flush()
             print(line, end='')  # process line here
 
     if process.returncode != 0:
@@ -59,7 +60,7 @@ def get_run_log_folder(name):
     return Path(simulation_batcher_data_path, name + '_logs')
 
 
-def create_run(name, parameters, skip_completed=True):
+def create_run(name, parameters, skip_completed=True, skip_all_simulations=False):
     json_object = json.dumps(parameters, indent=4)
     parameter_file = os.path.join(
         simulation_batcher_data_path, Path('./' + name + parameter_file_ext))
@@ -85,7 +86,8 @@ def create_run(name, parameters, skip_completed=True):
         log_destination = Path(run_log_folder, str(i) + '.log')
         param_values.append([])
 
-        should_run_this_run = not log_destination.is_file() or not skip_completed
+        should_run_this_run = (not log_destination.is_file(
+        ) or not skip_completed) and not skip_all_simulations
 
         for param_idx in range(len(parameters)):
             param_name, param_range = parameters[param_idx][0], parameters[param_idx][1]
@@ -122,12 +124,19 @@ def create_run(name, parameters, skip_completed=True):
 
 
 if __name__ == "__main__":
-    name = 'reproduce poster'
+    # name = 'all_the_params'
+    # parameter_combinations = create_run(name, [
+    #     ('number_of_tasks', list(range(1, 401, 50))),
+    #     ('number_of_drones',  list(range(1, 51, 10))),
+    #     ('drone_speed',  list(range(50, 601, 50))),
+    #     ('truck_speed',  list(range(50, 601, 50)))
+    # ], skip_all_simulations=False)
+
+    name = 'simulationDuration_numberOfDrones_nrOfTasks'
     parameter_combinations = create_run(name, [
-        ('number_of_drones', list(range(1, 11, 1))),
-        # ('customer_density',  list(np.linspace(0.1, 1, 9, endpoint=False))),
-        ('moving_truck',  [0, 1])
-    ])
+        ('number_of_tasks', [1, 50, 100, 150, 200, 250, 300]),
+        ('number_of_drones',  list(range(1, 25, 1)))
+    ], skip_all_simulations=False)
 
     shutil.move(config_backup_path, config_path)
 
