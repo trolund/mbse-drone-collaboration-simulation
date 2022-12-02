@@ -6,10 +6,13 @@ from matplotlib.pyplot import semilogx, loglog, subplots, scatter, figure, plot,
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+# use LaTeX fonts in the plot
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 
 date = datetime.datetime.now().strftime("%Y_%m_%d")
-filename = Path('C:/Users/Jensm/OneDrive - Danmarks Tekniske Universitet/9. semester/02223 - Model-Based Systems Engineering/git/simulation_batcher/all_the_params.csv')
-# filename = Path('C:/Users/Jensm/OneDrive - Danmarks Tekniske Universitet/9. semester/02223 - Model-Based Systems Engineering/git/simulation_batcher/simulationDuration_numberOfDrones_nrOfTasks.csv')
+filename = Path('C:/Users/odaby/Desktop/MBSE_Project/MBSE-Drone-Collaboration/simulation_batcher/all_the_params.csv')
+
 
 df = pd.read_csv(filename)
 df = df[['number_of_tasks', 'number_of_drones', 'drone_speed',
@@ -37,5 +40,9 @@ for i in id_list:
     # plt.xlabel('Package weights [g]', fontsize=12)  # Labeling x-axis
     # plt.ylabel('Average Energy consumption pr drone[J]',
     #            fontsize=12)  # Labeling y-axis
-# plt.title('Energy Consumption of drones')
+plt.title('Energy Consumption of drones')
+plt.xlabel('Drone Speed (relative)', fontsize=12)  # x-axis
+plt.ylabel('Delivery Time (relative)', fontsize=12)#yaxis
+plt.title('Delivery Time with Respect to Truck and Drone Speed')
+plt.grid(visible=None, which='major', axis='both', linestyle='--')
 plt.show()
