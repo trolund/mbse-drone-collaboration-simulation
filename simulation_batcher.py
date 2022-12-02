@@ -124,10 +124,18 @@ def create_run(name, parameters, skip_completed=True, skip_all_simulations=False
 
 
 if __name__ == "__main__":
-    name = 'avgEnergyPrDrone_packageWeight_nrDrones'
+    # name = 'all_the_params'
+    # parameter_combinations = create_run(name, [
+    #     ('number_of_tasks', list(range(1, 401, 50))),
+    #     ('number_of_drones',  list(range(1, 51, 10))),
+    #     ('drone_speed',  list(range(50, 601, 50))),
+    #     ('truck_speed',  list(range(50, 601, 50)))
+    # ], skip_all_simulations=False)
+
+    name = 'simulationDuration_numberOfDrones_nrOfTasks'
     parameter_combinations = create_run(name, [
-        ('number_of_drones', list(range(1, 21, 1))),
-        ('fixed_package_weight',  list(range(100, 25100, 300)))
+        ('number_of_tasks', [1, 50, 100, 150, 200, 250, 300]),
+        ('number_of_drones',  list(range(1, 25, 1)))
     ], skip_all_simulations=False)
 
     shutil.move(config_backup_path, config_path)

@@ -19,10 +19,6 @@ id_list = df['number_of_drones'].unique()
 fig, ax = plt.subplots()
 ax.legend(title='Number of drones')
 
-plt.rcParams.update(plt.rcParamsDefault)
-# use LaTeX fonts in the plot
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
 
 for i in [1, 2, 3, 5, 7, 9, 12, 15, 18, 20]:
     ax = df.loc[(df['number_of_drones'] == i)].plot(
