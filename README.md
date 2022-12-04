@@ -147,11 +147,11 @@ The route is marked with the character "M".
 
 All data produced is in the folder 'simulation_batcher'.
 
-In this folder each scenario has its own folder with the raw log files. Futhermore, a summery of the runs is compiled in to a CSV file with the same name.
+In this folder each scenario has its own folder with the raw log files. Futhermore, a summary of the runs has been compiled in to a CSV file with the same name.
 
 ## Plots
 
-Plots can be regenerated from the data by running the following files (the path to the csv files should be updated):
+Plots can be regenerated from the data by running the following files (with the path to the csv files updated):
 
 * plot1.py
 * plot2.py
