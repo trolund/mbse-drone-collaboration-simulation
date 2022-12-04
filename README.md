@@ -145,10 +145,9 @@ The route is marked with the character "M".
 
 # Data (Experiments)
 
-All data produced in the folder 'simulation_batcher'
+All data produced is in the folder 'simulation_batcher'.
 
-Each scenario have a folder with the raw log files. 
-A summery of the runs is compiled in to a CSV file.  
+In this folder scenario have et own folder with the raw log files. Futhermore a summery of the runs is compiled in to a CSV file with the same name.
 
 ## plots
 
