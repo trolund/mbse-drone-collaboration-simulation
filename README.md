@@ -2,7 +2,7 @@
 
 This project have been done as a part of the course 02223 - Model-Based Systems Engineering at DTU in the Fall of 2022
 
-
+A video of the running simulator can be found [here.](https://youtu.be/Zj8hlKBSeCk) 
 
 ## Running the simulator 
 
