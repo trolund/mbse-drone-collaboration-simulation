@@ -141,4 +141,4 @@ The route is marked with the character "M".
 * Road : "R"
 * Ground: "dot"
 * Delivery spot: "S"
-* House : "H" (could be nice)
+* Truck path : "M" 
