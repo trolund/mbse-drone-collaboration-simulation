@@ -149,7 +149,7 @@ All data produced is in the folder 'simulation_batcher'.
 
 In this folder scenario have et own folder with the raw log files. Futhermore a summery of the runs is compiled in to a CSV file with the same name.
 
-## plots
+## Plots
 
 Plots can be regenerated from data by running the following files:
 
