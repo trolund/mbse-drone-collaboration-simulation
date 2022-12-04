@@ -139,6 +139,6 @@ The route is marked with the character "M".
 ## Neighborhood (env) structure
 
 * Road : "R"
-* Ground: "G"
+* Ground: "dot"
 * Delivery spot: "S"
 * House : "H" (could be nice)
