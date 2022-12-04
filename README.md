@@ -20,10 +20,10 @@ To run the project please install the following packages by using pip or pip3:
 
 ## Using the UI
 
-By pressing "U" will zoom in
-by pressing "D" will zoom out
+- By pressing "U" will zoom in
+- by pressing "D" will zoom out
 
-The arrow keys can be used to explore the environment.
+- The arrow keys can be used to explore the environment.
 
 ## Config 
 
@@ -142,3 +142,19 @@ The route is marked with the character "M".
 * Ground: "dot"
 * Delivery spot: "S"
 * Truck path : "M" 
+
+# Data (Experiments)
+
+All data produced in the folder 'simulation_batcher'
+
+Each scenario have a folder with the raw log files. 
+A summery of the runs is compiled in to a CSV file.  
+
+## plots
+
+Plots can be regenerated from data by running the following files:
+
+* plot1.py
+* plot2.py
+* plot3_analysis.py
+* plot4_analysis.py
