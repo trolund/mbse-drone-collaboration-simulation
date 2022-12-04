@@ -21,6 +21,8 @@ To run the project please install the following packages by using pip or pip3:
 By pressing "U" will zoom in
 by pressing "D" will zoom out
 
+The arrow keys can be used to explore the environment.
+
 ## Config 
 
 The main config file **config.ini** contains all the global parameters. the file is grouped by sections '[section]'.
