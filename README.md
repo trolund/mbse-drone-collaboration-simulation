@@ -16,6 +16,11 @@ To run the project please install the following packages by using pip or pip3:
 
     pip3 install pygame==2.1.3.dev8 pygame_gui dependency_injector configparser scikit-learn sklearn numpy pandas matplotlib pandas
 
+## Using the UI
+
+By pressing "U" will zoom in
+by pressing "D" will zoom out
+
 ## Config 
 
 The main config file **config.ini** contains all the global parameters. the file is grouped by sections '[section]'.
